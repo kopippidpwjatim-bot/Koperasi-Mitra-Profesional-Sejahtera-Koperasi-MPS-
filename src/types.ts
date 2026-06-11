@@ -1,0 +1,160 @@
+export type UserRole = 'admin' | 'anggota' | 'sekretaris' | 'ketua' | 'bendahara';
+
+export type MemberStatus = 'pending' | 'approved' | 'rejected';
+
+export interface Member {
+  id: string;
+  nama: string; // lengkap dengan gelar
+  tempatLahir: string;
+  tanggalLahir: string;
+  institusiPensiun: string;
+  jenisKelamin: 'Laki-Laki' | 'Perempuan';
+  agama: 'Islam' | 'Kristen' | 'Budha' | 'Hindu' | 'Konghucu' | 'Kepercayaan';
+  pekerjaanKeahlian: string;
+  noHp: string;
+  email: string;
+  alamatLengkap: string;
+  photo?: string; // base64 DataURL or fallback SVG URL
+  noAnggota?: string; // 10 digit, e.g. 999000011
+  noRekening?: string; // 10 digit
+  password?: string;
+  status: MemberStatus;
+  role: UserRole;
+  registeredAt: string;
+  
+  // Balances
+  saldoPokok: number;
+  saldoWajib: number;
+  saldoSukarela: number;
+  saldoPenyertaan: number;
+}
+
+export type TransactionCategory = 'Uang Masuk' | 'Uang Keluar';
+export type TransactionSourceType = 'Iuran Anggota' | 'Nota Dana Masuk' | 'Dana DPP' | 'SPJ' | 'Operasional' | 'Lainnya';
+
+export interface Transaction {
+  id: string;
+  tanggal: string;
+  kategori: TransactionCategory;
+  sumberTujuan: TransactionSourceType;
+  deskripsi: string;
+  noRekening: string; // Nomor Rekening Tujuan/Sumber
+  namaBankPemilik: string; // Nama Bank dan Pemilik Rekening
+  jumlahMasuk: number;
+  jumlahKeluar: number;
+  saldoAkhir: number;
+  approvedByKetua: boolean; // For exit transactions 'Uang Keluar'
+  createdBy: string; // Who entered the transaction
+  memberId?: string; // Links member context automatically if applicable (e.g. paying iuran)
+}
+
+export interface CooperativeSettings {
+  logo: string; // Base64
+  namaSekretariat: string;
+  alamatSekretariat: string;
+  noIjinPendirian: string;
+  noTelpWA: string;
+  email: string;
+}
+
+export interface StoreProduct {
+  id: string;
+  nama: string;
+  harga: number;
+  image: string;
+  kategori: string;
+  stok: number;
+  deskripsi: string;
+  externalUrl?: string;
+  showOnBeranda?: boolean;
+  order?: number;
+}
+
+export interface CartItem {
+  product: StoreProduct;
+  quantity: number;
+}
+
+export interface LoanApplication {
+  id: string;
+  memberId: string;
+  memberName: string;
+  jumlah: number;
+  tenor: number; // in months
+  bungaBulanan: number; // percentage
+  angsuranBulanan: number;
+  tujuan: string;
+  status: 'pending' | 'approved' | 'rejected';
+  tanggalPengajuan: string;
+}
+
+export interface WithdrawalRequest {
+  id: string;
+  memberId: string;
+  memberName: string;
+  jumlah: number;
+  jenisSimpanan: 'Sukarela' | 'Penyertaan';
+  status: 'pending' | 'approved' | 'rejected';
+  tanggalPengajuan: string;
+}
+
+export interface Article {
+  id: string;
+  title: string;
+  summary: string;
+  content: string;
+  date: string;
+  category: string;
+  image?: string;
+  externalUrl?: string;
+  showOnBeranda?: boolean;
+  order?: number;
+}
+
+export interface TentangItem {
+  id: string;
+  title: string;
+  content: string;
+  image: string;
+  externalUrl?: string;
+  showOnBeranda: boolean;
+  order: number;
+}
+
+export interface LayananItem {
+  id: string;
+  title: string;
+  content: string;
+  image: string;
+  externalUrl?: string;
+  showOnBeranda: boolean;
+  order: number;
+  badge?: string;
+}
+
+export interface GalleryItem {
+  id: string;
+  title: string;
+  description: string;
+  image: string;
+  externalUrl?: string;
+  showOnBeranda: boolean;
+  order: number;
+}
+
+export interface Announcement {
+  id: string;
+  title: string;
+  content: string;
+  date: string;
+  important: boolean;
+}
+
+export interface VisitorLog {
+  id: string;
+  nama: string;
+  email: string;
+  role: UserRole;
+  timestamp: string;
+  activity: string;
+}
