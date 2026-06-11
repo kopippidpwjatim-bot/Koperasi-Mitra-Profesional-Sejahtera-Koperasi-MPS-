@@ -240,7 +240,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <div className="lg:col-span-8 space-y-6">
                   <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#dca415]/15 border border-yellow-500/25 rounded-full text-[#dca415]">
                     <Building2 className="w-4 h-4" />
-                    <span className="text-[10.5px] font-bold tracking-widest uppercase">KOP IPPI DPW JATIM</span>
+                    <span className="text-[10.5px] font-bold tracking-widest uppercase">Koperasi IPPI DPW Jawa Timur</span>
                   </div>
                   <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight leading-tight uppercase font-sans">
                     Mewujudkan Purnatugas Mandiri, <span className="text-yellow-400">Sejahtera</span> & Bermartabat
