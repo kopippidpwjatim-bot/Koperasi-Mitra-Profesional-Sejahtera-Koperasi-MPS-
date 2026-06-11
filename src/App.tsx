@@ -50,88 +50,47 @@ import {
   GalleryItem
 } from './types';
 
+import {
+  getCooperativeSettings,
+  saveCooperativeSettings,
+  getMembers,
+  saveMembers,
+  getProducts,
+  saveProducts,
+  getTransactions,
+  saveTransactions,
+  getArticles,
+  saveArticles,
+  getAnnouncements,
+  saveAnnouncements,
+  getTentangItems,
+  saveTentangItems,
+  getLayananItems,
+  saveLayananItems,
+  getGalleryItems,
+  saveGalleryItems,
+  getLoans,
+  saveLoans,
+  getWithdrawals,
+  saveWithdrawals,
+  getVisitorLogs,
+  saveVisitorLogs
+} from './database';
+
 export default function App() {
-  // Global States persisted in LocalStorage
-  const [settings, setSettings] = useState<CooperativeSettings>(() => {
-    try {
-      const saved = localStorage.getItem('kop_settings');
-      return saved ? JSON.parse(saved) : DEFAULT_SETTINGS;
-    } catch {
-      return DEFAULT_SETTINGS;
-    }
-  });
+  // Database status loading flag
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  const [members, setMembers] = useState<Member[]>(() => {
-    try {
-      const saved = localStorage.getItem('kop_members');
-      return saved ? JSON.parse(saved) : DEFAULT_MEMBERS;
-    } catch {
-      return DEFAULT_MEMBERS;
-    }
-  });
-
-  const [products, setProducts] = useState<StoreProduct[]>(() => {
-    try {
-      const saved = localStorage.getItem('kop_products');
-      return saved ? JSON.parse(saved) : DEFAULT_PRODUCTS;
-    } catch {
-      return DEFAULT_PRODUCTS;
-    }
-  });
-
-  const [transactions, setTransactions] = useState<Transaction[]>(() => {
-    try {
-      const saved = localStorage.getItem('kop_transactions');
-      return saved ? JSON.parse(saved) : DEFAULT_TRANSACTIONS;
-    } catch {
-      return DEFAULT_TRANSACTIONS;
-    }
-  });
-
-  const [articles, setArticles] = useState<Article[]>(() => {
-    try {
-      const saved = localStorage.getItem('kop_articles');
-      return saved ? JSON.parse(saved) : DEFAULT_ARTICLES;
-    } catch {
-      return DEFAULT_ARTICLES;
-    }
-  });
-
-  const [announcements, setAnnouncements] = useState<Announcement[]>(() => {
-    try {
-      const saved = localStorage.getItem('kop_announcements');
-      return saved ? JSON.parse(saved) : DEFAULT_ANNOUNCEMENTS;
-    } catch {
-      return DEFAULT_ANNOUNCEMENTS;
-    }
-  });
-
-  const [tentangItems, setTentangItems] = useState<TentangItem[]>(() => {
-    try {
-      const saved = localStorage.getItem('kop_tentang_items');
-      return saved ? JSON.parse(saved) : DEFAULT_TENTANG_ITEMS;
-    } catch {
-      return DEFAULT_TENTANG_ITEMS;
-    }
-  });
-
-  const [layananItems, setLayananItems] = useState<LayananItem[]>(() => {
-    try {
-      const saved = localStorage.getItem('kop_layanan_items');
-      return saved ? JSON.parse(saved) : DEFAULT_LAYANAN_ITEMS;
-    } catch {
-      return DEFAULT_LAYANAN_ITEMS;
-    }
-  });
-
-  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>(() => {
-    try {
-      const saved = localStorage.getItem('kop_gallery_items');
-      return saved ? JSON.parse(saved) : DEFAULT_GALLERY_ITEMS;
-    } catch {
-      return DEFAULT_GALLERY_ITEMS;
-    }
-  });
+  // Global States (initially empty, populated asynchronously on mount)
+  const [settings, setSettings] = useState<CooperativeSettings>(DEFAULT_SETTINGS);
+  const [members, setMembers] = useState<Member[]>(DEFAULT_MEMBERS);
+  const [products, setProducts] = useState<StoreProduct[]>(DEFAULT_PRODUCTS);
+  const [transactions, setTransactions] = useState<Transaction[]>(DEFAULT_TRANSACTIONS);
+  const [articles, setArticles] = useState<Article[]>(DEFAULT_ARTICLES);
+  const [announcements, setAnnouncements] = useState<Announcement[]>(DEFAULT_ANNOUNCEMENTS);
+  const [tentangItems, setTentangItems] = useState<TentangItem[]>(DEFAULT_TENTANG_ITEMS);
+  const [layananItems, setLayananItems] = useState<LayananItem[]>(DEFAULT_LAYANAN_ITEMS);
+  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>(DEFAULT_GALLERY_ITEMS);
   
   const [activeMember, setActiveMember] = useState<Member | null>(null);
   const [impersonatedRole, setImpersonatedRole] = useState<UserRole | null>(null);
@@ -140,148 +99,137 @@ export default function App() {
   const [guestCart, setGuestCart] = useState<CartItem[]>([]);
 
   // Telemetry logs state
-  const [visitorLogs, setVisitorLogs] = useState<VisitorLog[]>(() => {
-    try {
-      const saved = localStorage.getItem('kop_visitor_logs');
-      return saved ? JSON.parse(saved) : [
-        { 
-          id: 'log-1', 
-          nama: 'H. Sugeng Riyanto, M.M.', 
-          email: 'admin@koperasi-ippi.com', 
-          role: 'admin', 
-          timestamp: new Date().toLocaleTimeString('id-ID') + ' WIB', 
-          activity: 'Login administratif berhasil' 
-        },
-        { 
-          id: 'log-2', 
-          nama: 'Mohammad Muslih, S.H.', 
-          email: 'Ikatanppi@gmail.com', 
-          role: 'anggota', 
-          timestamp: new Date(Date.now() - 1700000).toLocaleTimeString('id-ID') + ' WIB', 
-          activity: 'Mengunduh digital KTA elektrik' 
-        }
-      ];
-    } catch {
-      return [];
-    }
-  });
+  const [visitorLogs, setVisitorLogs] = useState<VisitorLog[]>([]);
 
   // Loans and Withdrawals States
-  const [loans, setLoans] = useState<LoanApplication[]>(() => {
-    try {
-      const saved = localStorage.getItem('kop_loans');
-      return saved ? JSON.parse(saved) : [
-        {
-          id: 'loan-sample-1',
-          memberId: 'anggota-1',
-          memberName: 'Mohammad Muslih, S.H., M.M.',
-          jumlah: 5000000,
-          tenor: 12,
-          bungaBulanan: 1.0,
-          angsuranBulanan: 466667,
-          tujuan: 'Tambahan modal kios sembako purnatugas',
-          status: 'pending',
-          tanggalPengajuan: '2026-06-10'
-        }
-      ];
-    } catch {
-      return [];
+  const [loans, setLoans] = useState<LoanApplication[]>([]);
+  const [withdrawals, setWithdrawals] = useState<WithdrawalRequest[]>([]);
+
+  // 1. ASYNC FETCHING ON PORTAL INITIALIZATION (EFFECT MANDATE FIRST TURN)
+  React.useEffect(() => {
+    async function loadCofigurationFromDatabase() {
+      try {
+        const [
+          dbSettings,
+          dbMembers,
+          dbProducts,
+          dbTransactions,
+          dbArticles,
+          dbAnnouncements,
+          dbTentang,
+          dbLayanan,
+          dbGallery,
+          dbLoans,
+          dbWithdrawals,
+          dbLogs
+        ] = await Promise.all([
+          getCooperativeSettings(),
+          getMembers(),
+          getProducts(),
+          getTransactions(),
+          getArticles(),
+          getAnnouncements(),
+          getTentangItems(),
+          getLayananItems(),
+          getGalleryItems(),
+          getLoans(),
+          getWithdrawals(),
+          getVisitorLogs()
+        ]);
+
+        setSettings(dbSettings);
+        setMembers(dbMembers);
+        setProducts(dbProducts);
+        setTransactions(dbTransactions);
+        setArticles(dbArticles);
+        setAnnouncements(dbAnnouncements);
+        setTentangItems(dbTentang);
+        setLayananItems(dbLayanan);
+        setGalleryItems(dbGallery);
+        setLoans(dbLoans);
+        setWithdrawals(dbWithdrawals);
+        setVisitorLogs(dbLogs);
+      } catch (e) {
+        console.error("Database connection fallback default:", e);
+      } finally {
+        setIsLoading(false);
+      }
     }
-  });
+    loadCofigurationFromDatabase();
+  }, []);
 
-  const [withdrawals, setWithdrawals] = useState<WithdrawalRequest[]>(() => {
-    try {
-      const saved = localStorage.getItem('kop_withdrawals');
-      return saved ? JSON.parse(saved) : [
-        {
-          id: 'withdraw-sample-1',
-          memberId: 'anggota-1',
-          memberName: 'Mohammad Muslih, S.H., M.M.',
-          jumlah: 150000,
-          jenisSimpanan: 'Sukarela',
-          status: 'pending',
-          tanggalPengajuan: '2026-06-11'
-        }
-      ];
-    } catch {
-      return [];
+  // 2. REACTIVE WRITERS BACKWARD SYNCING
+  React.useEffect(() => {
+    if (!isLoading) {
+      saveCooperativeSettings(settings);
     }
-  });
+  }, [settings, isLoading]);
 
-  // LocalStorage synchronizers
   React.useEffect(() => {
-    try {
-      localStorage.setItem('kop_settings', JSON.stringify(settings));
-    } catch (e) {
-      console.warn("Could not save settings to localStorage, might exceed typical format:", e);
+    if (!isLoading) {
+      saveMembers(members);
     }
-  }, [settings]);
+  }, [members, isLoading]);
 
   React.useEffect(() => {
-    try {
-      localStorage.setItem('kop_members', JSON.stringify(members));
-    } catch {}
-  }, [members]);
+    if (!isLoading) {
+      saveProducts(products);
+    }
+  }, [products, isLoading]);
 
   React.useEffect(() => {
-    try {
-      localStorage.setItem('kop_products', JSON.stringify(products));
-    } catch {}
-  }, [products]);
+    if (!isLoading) {
+      saveTransactions(transactions);
+    }
+  }, [transactions, isLoading]);
 
   React.useEffect(() => {
-    try {
-      localStorage.setItem('kop_transactions', JSON.stringify(transactions));
-    } catch {}
-  }, [transactions]);
+    if (!isLoading) {
+      saveArticles(articles);
+    }
+  }, [articles, isLoading]);
 
   React.useEffect(() => {
-    try {
-      localStorage.setItem('kop_articles', JSON.stringify(articles));
-    } catch {}
-  }, [articles]);
+    if (!isLoading) {
+      saveAnnouncements(announcements);
+    }
+  }, [announcements, isLoading]);
 
   React.useEffect(() => {
-    try {
-      localStorage.setItem('kop_announcements', JSON.stringify(announcements));
-    } catch {}
-  }, [announcements]);
+    if (!isLoading) {
+      saveTentangItems(tentangItems);
+    }
+  }, [tentangItems, isLoading]);
 
   React.useEffect(() => {
-    try {
-      localStorage.setItem('kop_tentang_items', JSON.stringify(tentangItems));
-    } catch {}
-  }, [tentangItems]);
+    if (!isLoading) {
+      saveLayananItems(layananItems);
+    }
+  }, [layananItems, isLoading]);
 
   React.useEffect(() => {
-    try {
-      localStorage.setItem('kop_layanan_items', JSON.stringify(layananItems));
-    } catch {}
-  }, [layananItems]);
+    if (!isLoading) {
+      saveGalleryItems(galleryItems);
+    }
+  }, [galleryItems, isLoading]);
 
   React.useEffect(() => {
-    try {
-      localStorage.setItem('kop_gallery_items', JSON.stringify(galleryItems));
-    } catch {}
-  }, [galleryItems]);
+    if (!isLoading) {
+      saveLoans(loans);
+    }
+  }, [loans, isLoading]);
 
   React.useEffect(() => {
-    try {
-      localStorage.setItem('kop_loans', JSON.stringify(loans));
-    } catch {}
-  }, [loans]);
+    if (!isLoading) {
+      saveWithdrawals(withdrawals);
+    }
+  }, [withdrawals, isLoading]);
 
   React.useEffect(() => {
-    try {
-      localStorage.setItem('kop_withdrawals', JSON.stringify(withdrawals));
-    } catch {}
-  }, [withdrawals]);
-
-  React.useEffect(() => {
-    try {
-      localStorage.setItem('kop_visitor_logs', JSON.stringify(visitorLogs));
-    } catch {}
-  }, [visitorLogs]);
+    if (!isLoading) {
+      saveVisitorLogs(visitorLogs);
+    }
+  }, [visitorLogs, isLoading]);
 
   // Auth triggers
   const handleOpenAuth = (tab: 'login' | 'register') => {
@@ -849,6 +797,17 @@ export default function App() {
 
   // Determine active view based on log status (and emulation role)
   const resolvedRole: UserRole | null = impersonatedRole || (activeMember ? activeMember.role : null);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[#070d19] flex flex-col justify-center items-center text-[#ffffff] font-sans antialiased">
+        <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+        <h2 className="mt-8 text-xl font-bold tracking-tight">Koperasi IPPI DPW Jawa Timur</h2>
+        <p className="mt-2 text-xs text-indigo-300 font-mono tracking-widest uppercase">Ikatan Profesional & Pensiunan Indonesia</p>
+        <p className="mt-4 text-xs text-slate-500">Menghubungkan ke database aman...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-100 flex flex-col">

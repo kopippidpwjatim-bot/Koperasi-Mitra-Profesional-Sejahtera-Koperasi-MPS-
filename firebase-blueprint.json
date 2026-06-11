@@ -1,0 +1,253 @@
+{
+  "entities": {
+    "CooperativeSettings": {
+      "title": "Cooperative Settings",
+      "description": "General configuration parameters of the cooperative",
+      "type": "object",
+      "properties": {
+        "logo": { "type": "string", "description": "Base64 encoded logo SVG or DataURL" },
+        "namaSekretariat": { "type": "string" },
+        "alamatSekretariat": { "type": "string" },
+        "noIjinPendirian": { "type": "string" },
+        "noTelpWA": { "type": "string" },
+        "email": { "type": "string" }
+      },
+      "required": ["logo", "namaSekretariat", "alamatSekretariat", "noIjinPendirian", "noTelpWA", "email"]
+    },
+    "Member": {
+      "title": "Member Profile",
+      "description": "Registered cooperative members and staff profiles",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "nama": { "type": "string" },
+        "tempatLahir": { "type": "string" },
+        "tanggalLahir": { "type": "string" },
+        "institusiPensiun": { "type": "string" },
+        "jenisKelamin": { "type": "string", "enum": ["Laki-Laki", "Perempuan"] },
+        "agama": { "type": "string", "enum": ["Islam", "Kristen", "Budha", "Hindu", "Konghucu", "Kepercayaan"] },
+        "pekerjaanKeahlian": { "type": "string" },
+        "noHp": { "type": "string" },
+        "email": { "type": "string" },
+        "alamatLengkap": { "type": "string" },
+        "photo": { "type": "string" },
+        "noAnggota": { "type": "string" },
+        "noRekening": { "type": "string" },
+        "password": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected"] },
+        "role": { "type": "string", "enum": ["admin", "anggota", "sekretaris", "ketua", "bendahara"] },
+        "registeredAt": { "type": "string" },
+        "saldoPokok": { "type": "number" },
+        "saldoWajib": { "type": "number" },
+        "saldoSukarela": { "type": "number" },
+        "saldoPenyertaan": { "type": "number" }
+      },
+      "required": ["id", "nama", "status", "role", "email", "registeredAt"]
+    },
+    "StoreProduct": {
+      "title": "Store Product",
+      "description": "Products available in the Cooperative Store",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "nama": { "type": "string" },
+        "harga": { "type": "number" },
+        "image": { "type": "string" },
+        "kategori": { "type": "string" },
+        "stok": { "type": "number" },
+        "deskripsi": { "type": "string" }
+      },
+      "required": ["id", "nama", "harga", "stok"]
+    },
+    "Transaction": {
+      "title": "Ledger Transaction",
+      "description": "Ledger entry of incomes or outcomes recorded by treasurer",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "tanggal": { "type": "string" },
+        "kategori": { "type": "string", "enum": ["Uang Masuk", "Uang Keluar"] },
+        "sumberTujuan": { "type": "string" },
+        "deskripsi": { "type": "string" },
+        "noRekening": { "type": "string" },
+        "namaBankPemilik": { "type": "string" },
+        "jumlahMasuk": { "type": "number" },
+        "jumlahKeluar": { "type": "number" },
+        "saldoAkhir": { "type": "number" },
+        "approvedByKetua": { "type": "boolean" },
+        "createdBy": { "type": "string" },
+        "memberId": { "type": "string" }
+      },
+      "required": ["id", "tanggal", "kategori", "sumberTujuan", "jumlahMasuk", "jumlahKeluar", "saldoAkhir"]
+    },
+    "Article": {
+      "title": "Dynamic Article",
+      "description": "Blog posts and education material displayed on landing page",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "summary": { "type": "string" },
+        "content": { "type": "string" },
+        "date": { "type": "string" },
+        "category": { "type": "string" },
+        "image": { "type": "string" },
+        "showOnBeranda": { "type": "boolean" }
+      },
+      "required": ["id", "title", "summary", "content", "date"]
+    },
+    "Announcement": {
+      "title": "Important Announcement",
+      "description": "Pinned board announcements",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "content": { "type": "string" },
+        "date": { "type": "string" },
+        "important": { "type": "boolean" }
+      },
+      "required": ["id", "title", "content", "date"]
+    },
+    "TentangItem": {
+      "title": "About Item",
+      "description": "Visi, Misi and history details on landing page",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "content": { "type": "string" },
+        "image": { "type": "string" },
+        "showOnBeranda": { "type": "boolean" },
+        "order": { "type": "number" }
+      },
+      "required": ["id", "title", "content", "image"]
+    },
+    "LayananItem": {
+      "title": "Services Item",
+      "description": "Cooperative business units list",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "badge": { "type": "string" },
+        "content": { "type": "string" },
+        "image": { "type": "string" },
+        "showOnBeranda": { "type": "boolean" },
+        "order": { "type": "number" }
+      },
+      "required": ["id", "title", "content", "image"]
+    },
+    "GalleryItem": {
+      "title": "Gallery Photo Item",
+      "description": "Activities portfolio gallery",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "image": { "type": "string" },
+        "showOnBeranda": { "type": "boolean" },
+        "order": { "type": "number" }
+      },
+      "required": ["id", "title", "image"]
+    },
+    "LoanApplication": {
+      "title": "Loan Request",
+      "description": "Credit and business loans applications",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "memberId": { "type": "string" },
+        "memberName": { "type": "string" },
+        "jumlah": { "type": "number" },
+        "tenor": { "type": "number" },
+        "bungaBulanan": { "type": "number" },
+        "angsuranBulanan": { "type": "number" },
+        "tujuan": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected"] },
+        "tanggalPengajuan": { "type": "string" }
+      },
+      "required": ["id", "memberId", "jumlah", "tenor", "status"]
+    },
+    "WithdrawalRequest": {
+      "title": "Withdrawal Request",
+      "description": "Savings withdrawal requests for voluntary/pledged deposits",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "memberId": { "type": "string" },
+        "memberName": { "type": "string" },
+        "jumlah": { "type": "number" },
+        "jenisSimpanan": { "type": "string", "enum": ["Sukarela", "Penyertaan"] },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected"] },
+        "tanggalPengajuan": { "type": "string" }
+      },
+      "required": ["id", "memberId", "jumlah", "jenisSimpanan", "status"]
+    },
+    "VisitorLog": {
+      "title": "Visitor Log",
+      "description": "Audit trails activity log",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "nama": { "type": "string" },
+        "email": { "type": "string" },
+        "role": { "type": "string" },
+        "timestamp": { "type": "string" },
+        "activity": { "type": "string" }
+      },
+      "required": ["id", "nama", "email", "role", "timestamp", "activity"]
+    }
+  },
+  "firestore": {
+    "settings": {
+      "schema": "CooperativeSettings",
+      "description": "Global config metrics doc"
+    },
+    "members": {
+      "schema": "Member",
+      "description": "Registry of cooperative members"
+    },
+    "products": {
+      "schema": "StoreProduct",
+      "description": "Cooperative store merchandise"
+    },
+    "transactions": {
+      "schema": "Transaction",
+      "description": "Cooperative financial ledger entries"
+    },
+    "articles": {
+      "schema": "Article",
+      "description": "News and blog posts"
+    },
+    "announcements": {
+      "schema": "Announcement",
+      "description": "Pinned system announcements"
+    },
+    "tentang_items": {
+      "schema": "TentangItem",
+      "description": "Landing page about items"
+    },
+    "layanan_items": {
+      "schema": "LayananItem",
+      "description": "Landing page service segments"
+    },
+    "gallery_items": {
+      "schema": "GalleryItem",
+      "description": "Landing page gallery photos"
+    },
+    "loans": {
+      "schema": "LoanApplication",
+      "description": "Savings & Loans segment"
+    },
+    "withdrawals": {
+      "schema": "WithdrawalRequest",
+      "description": "Cash withdrawal request logs"
+    },
+    "visitor_logs": {
+      "schema": "VisitorLog",
+      "description": "Administrative telemetry trails"
+    }
+  }
+}
