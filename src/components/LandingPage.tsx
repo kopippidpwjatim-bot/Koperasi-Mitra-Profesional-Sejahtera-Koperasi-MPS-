@@ -1097,7 +1097,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <div className="space-y-3">
             <h4 className="font-bold text-white uppercase tracking-wider text-xs">Aksesibilitas</h4>
             <p className="text-[11px] leading-relaxed text-slate-400">No Ijin Pendirian Kementerian Koperasi RI: {settings.noIjinPendirian}</p>
-            <p className="text-[10px] text-yellow-400 font-mono">Bekerjasama dengan PT Pos Jatim & Bank Jatim</p>
+            <p className="text-[10px] text-yellow-400 font-mono">Bekerjasama dengan PT Pos Indonesia (Persero) & Bank BRI</p>
           </div>
         </div>
 
