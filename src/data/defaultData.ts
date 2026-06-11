@@ -422,7 +422,7 @@ export const DEFAULT_GALLERY_ITEMS: GalleryItem[] = [
   {
     id: "gal-6",
     title: "Penyuluhan Usaha Komoditas Madu",
-    description: "Pelatihan logistik madu hutan Madura bagi pensiunan pos di Sidoarjo.",
+    description: "Pelatihan logistik madu hutan Madura bagi anggota profesional dan pensiunan di Sidoarjo.",
     image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=400",
     showOnBeranda: true,
     order: 6

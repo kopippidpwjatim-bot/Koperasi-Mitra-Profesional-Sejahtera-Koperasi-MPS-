@@ -52,7 +52,7 @@ export const DashboardKetua: React.FC<DashboardKetuaProps> = ({
             </td>
             <td class="w-5/6 pl-4 text-center">
               <h2 class="text-xs font-black uppercase tracking-widest text-[#dca415] block leading-none">KOPERASI JASA SERBA USAHA</h2>
-              <h1 class="text-xl font-black text-blue-900 leading-tight">IKATAN PENSIUNAN POS INDONESIA (IPPI)</h1>
+              <h1 class="text-xl font-black text-blue-900 leading-tight">IKATAN PROFESIONAL & PENSIUNAN INDONESIA (IPPI)</h1>
               <p class="text-[15px] font-bold text-slate-800">DPW PROVINSI JAWA TIMUR</p>
               <p class="text-[10px] text-slate-500 font-medium leading-relaxed">${settings.alamatSekretariat}</p>
               <p class="text-[8.5px] text-slate-400 font-mono mt-0.5">
@@ -365,7 +365,7 @@ export const DashboardKetua: React.FC<DashboardKetuaProps> = ({
                     </td>
                     <td className="w-5/6 text-center pl-4">
                       <p className="text-[10px] font-black text-amber-600 block uppercase tracking-wider leading-none">KOPERASI JASA SERBA USAHA</p>
-                      <h4 className="text-[18px] font-black text-blue-900 tracking-tight leading-tight uppercase font-sans">IKATAN PENSIUNAN POS INDONESIA</h4>
+                      <h4 className="text-[18px] font-black text-blue-900 tracking-tight leading-tight uppercase font-sans">IKATAN PROFESIONAL & PENSIUNAN INDONESIA</h4>
                       <p className="text-xs font-black uppercase text-slate-800 leading-snug">DPW PROVINSI JAWA TIMUR</p>
                       <p className="text-[10px] text-slate-550 leading-relaxed max-w-[450px] mx-auto mt-0.5">{settings.alamatSekretariat}</p>
                       <p className="font-mono text-[8.5px] text-slate-400 mt-1">

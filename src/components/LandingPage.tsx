@@ -138,7 +138,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <div>
                 <span className="text-[10px] font-black uppercase text-yellow-400 tracking-wider block leading-none">KOPERASI IPPI</span>
                 <h1 className="text-sm sm:text-base font-extrabold text-white tracking-tight leading-tight">DPW Provinsi Jawa Timur</h1>
-                <p className="text-[9px] text-indigo-200 hidden sm:block">Ikatan Pensiunan Pos Indonesia | Akreditasi Legalitas & Kesejahteraan Mandiri</p>
+                <p className="text-[9px] text-indigo-200 hidden sm:block">Ikatan Profesional & Pensiunan Indonesia | Akreditasi Legalitas & Kesejahteraan Mandiri</p>
               </div>
             </div>
 
@@ -246,7 +246,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     Mewujudkan Purnatugas Mandiri, <span className="text-yellow-400">Sejahtera</span> & Bermartabat
                   </h1>
                   <p className="text-slate-300 text-sm sm:text-base max-w-xl font-medium leading-relaxed">
-                    Koperasi Serba Usaha Ikatan Pensiunan Pos Indonesia (IPPI) DPW Jawa Timur bertekad mendampingi kesejahteraan finansial, sosial, dan kesehatan purnabakti lewat layanan Koperasi terpercaya.
+                    Koperasi Serba Usaha Ikatan Profesional & Pensiunan Indonesia (IPPI) DPW Jawa Timur bertekad mendampingi kesejahteraan finansial, sosial, dan kesehatan purnabakti lewat layanan Koperasi terpercaya.
                   </p>
                   <div className="flex flex-wrap gap-3 pt-2">
                     <button 

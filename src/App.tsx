@@ -895,7 +895,7 @@ export default function App() {
                   </div>
                   <div>
                     <h1 className="font-bold text-sm sm:text-base leading-tight">Koperasi IPPI DPW Jawa Timur</h1>
-                    <p className="text-[10px] uppercase tracking-wider opacity-75 font-semibold">Sistem Portal {resolvedRole.toUpperCase()} - Ikatan Pensiunan Pos Indonesia</p>
+                    <p className="text-[10px] uppercase tracking-wider opacity-75 font-semibold">Sistem Portal {resolvedRole.toUpperCase()} - Ikatan Profesional & Pensiunan Indonesia</p>
                   </div>
                 </div>
 
@@ -1031,7 +1031,7 @@ export default function App() {
       {/* Footer copyright */}
       <footer className="bg-slate-900 border-t border-slate-800 text-slate-500 py-6 text-center text-[10px] tracking-wide select-none">
         <p>© 2026 Koperasi Serba Usaha IPPI DPW Jawa Timur. All Rights Reserved. Hak Cipta dilindungi Undang-Undang RI.</p>
-        <p className="mt-1 text-slate-650">Binaan Ikatan Pensiunan Pos Indonesia Wilayah Provinsi Jawa Timur | AHU Legal Terdaftar</p>
+        <p className="mt-1 text-slate-650">Binaan Ikatan Profesional & Pensiunan Indonesia Wilayah Provinsi Jawa Timur | AHU Legal Terdaftar</p>
       </footer>
 
     </div>
