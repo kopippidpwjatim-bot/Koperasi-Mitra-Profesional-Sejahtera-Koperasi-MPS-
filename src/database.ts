@@ -15,6 +15,8 @@ import {
   DEFAULT_GALLERY_ITEMS
 } from './data/defaultData';
 
+import { DEFAULT_LMS_COURSES } from './data/lmsData';
+
 import {
   CooperativeSettings,
   Member,
@@ -27,7 +29,9 @@ import {
   GalleryItem,
   LoanApplication,
   WithdrawalRequest,
-  VisitorLog
+  VisitorLog,
+  LMSCourse,
+  LMSUserProgress
 } from './types';
 
 // Check if Firebase was provisioned and active
@@ -296,6 +300,22 @@ export async function saveVisitorLogs(logs: VisitorLog[]): Promise<void> {
   await saveData<VisitorLog[]>('kop_visitor_logs', 'visitor_logs', logs);
 }
 
+export async function getLMSCourses(): Promise<LMSCourse[]> {
+  return loadData<LMSCourse[]>('kop_lms_courses', 'lms_courses', DEFAULT_LMS_COURSES);
+}
+
+export async function saveLMSCourses(courses: LMSCourse[]): Promise<void> {
+  await saveData<LMSCourse[]>('kop_lms_courses', 'lms_courses', courses);
+}
+
+export async function getLMSProgress(): Promise<LMSUserProgress[]> {
+  return loadData<LMSUserProgress[]>('kop_lms_progress', 'lms_progress', []);
+}
+
+export async function saveLMSProgress(progress: LMSUserProgress[]): Promise<void> {
+  await saveData<LMSUserProgress[]>('kop_lms_progress', 'lms_progress', progress);
+}
+
 // Multi-resource database initialization seed function
 export async function seedInitialData(): Promise<void> {
   await saveCooperativeSettings(DEFAULT_SETTINGS);
@@ -310,6 +330,8 @@ export async function seedInitialData(): Promise<void> {
   await saveLoans(DEFAULT_LOANS);
   await saveWithdrawals(DEFAULT_WITHDRAWALS);
   await saveVisitorLogs(DEFAULT_VISITOR_LOGS);
+  await saveLMSCourses(DEFAULT_LMS_COURSES);
+  await saveLMSProgress([]);
 }
 
 // Global persistence tester as required by Firestore Security verification

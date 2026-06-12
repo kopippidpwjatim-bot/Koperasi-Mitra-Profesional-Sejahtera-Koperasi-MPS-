@@ -20,6 +20,9 @@ import {
 import { 
   DashboardBendahara 
 } from './components/DashboardBendahara';
+import {
+  LMSPortal
+} from './components/LMSPortal';
 
 import { 
   DEFAULT_SETTINGS, 
@@ -32,6 +35,8 @@ import {
   DEFAULT_LAYANAN_ITEMS,
   DEFAULT_GALLERY_ITEMS
 } from './data/defaultData';
+
+import { DEFAULT_LMS_COURSES } from './data/lmsData';
 
 import { 
   Member, 
@@ -47,7 +52,9 @@ import {
   UserRole,
   TentangItem,
   LayananItem,
-  GalleryItem
+  GalleryItem,
+  LMSCourse,
+  LMSUserProgress
 } from './types';
 
 import {
@@ -75,6 +82,10 @@ import {
   saveWithdrawals,
   getVisitorLogs,
   saveVisitorLogs,
+  getLMSCourses,
+  saveLMSCourses,
+  getLMSProgress,
+  saveLMSProgress,
   seedInitialData,
   DEFAULT_LOANS,
   DEFAULT_WITHDRAWALS,
@@ -119,6 +130,10 @@ export default function App() {
   const [loans, setLoans] = useState<LoanApplication[]>(() => getLocalOrFallback('kop_loans', DEFAULT_LOANS));
   const [withdrawals, setWithdrawals] = useState<WithdrawalRequest[]>(() => getLocalOrFallback('kop_withdrawals', DEFAULT_WITHDRAWALS));
 
+  // LMS States
+  const [courses, setCourses] = useState<LMSCourse[]>(() => getLocalOrFallback('kop_lms_courses', DEFAULT_LMS_COURSES));
+  const [progressList, setProgressList] = useState<LMSUserProgress[]>(() => getLocalOrFallback('kop_lms_progress', []));
+
   // 1. ASYNC PROGRESSIVE FETCHING ON PORTAL INITIALIZATION (NO-BLOCKING, SEAMLESS DB RETRIEVAL)
   React.useEffect(() => {
     let active = true;
@@ -136,7 +151,9 @@ export default function App() {
           getGalleryItems().then(val => { if (active) setGalleryItems(val); }),
           getLoans().then(val => { if (active) setLoans(val); }),
           getWithdrawals().then(val => { if (active) setWithdrawals(val); }),
-          getVisitorLogs().then(val => { if (active) setVisitorLogs(val); })
+          getVisitorLogs().then(val => { if (active) setVisitorLogs(val); }),
+          getLMSCourses().then(val => { if (active) setCourses(val); }),
+          getLMSProgress().then(val => { if (active) setProgressList(val); })
         ]);
       } catch (e) {
         console.error("Database connection fallback default:", e);
@@ -225,6 +242,18 @@ export default function App() {
       saveVisitorLogs(visitorLogs);
     }
   }, [visitorLogs, hasLoadedFromDB]);
+
+  React.useEffect(() => {
+    if (hasLoadedFromDB) {
+      saveLMSCourses(courses);
+    }
+  }, [courses, hasLoadedFromDB]);
+
+  React.useEffect(() => {
+    if (hasLoadedFromDB) {
+      saveLMSProgress(progressList);
+    }
+  }, [progressList, hasLoadedFromDB]);
 
   // Auth triggers
   const handleOpenAuth = (tab: 'login' | 'register') => {
@@ -790,6 +819,35 @@ export default function App() {
     setWithdrawals(prev => prev.map(w => w.id === withdrawId ? { ...w, status: 'rejected' } : w));
   };
 
+  const handleSaveLMSProgress = async (updatedProgress: LMSUserProgress) => {
+    setProgressList(prev => {
+      const idx = prev.findIndex(p => p.memberId === updatedProgress.memberId);
+      if (idx > -1) {
+        const copy = [...prev];
+        copy[idx] = updatedProgress;
+        return copy;
+      } else {
+        return [...prev, updatedProgress];
+      }
+    });
+  };
+
+  const handleSaveLMSCourses = async (updatedCourses: LMSCourse[]) => {
+    setCourses(updatedCourses);
+  };
+
+  const handleLMSLogActivity = (activity: string) => {
+    const newLog: VisitorLog = {
+      id: `log-${Date.now()}`,
+      nama: activeMember ? activeMember.nama : 'Pengunjung Umum',
+      email: activeMember ? activeMember.email : 'guest@lms.com',
+      role: activeMember ? activeMember.role : 'anggota',
+      timestamp: new Date().toLocaleTimeString('id-ID') + ' WIB',
+      activity: `LMS: ${activity}`
+    };
+    setVisitorLogs(prev => [newLog, ...prev]);
+  };
+
   // Determine active view based on log status (and emulation role)
   const resolvedRole: UserRole | null = impersonatedRole || (activeMember ? activeMember.role : null);
 
@@ -836,6 +894,11 @@ export default function App() {
             setGuestCart={setGuestCart}
             activeMember={activeMember}
             onDeductBalanceForPurchase={handleDeductBalanceForPurchase}
+            courses={courses}
+            progressList={progressList}
+            onSaveProgress={handleSaveLMSProgress}
+            onSaveCourses={handleSaveLMSCourses}
+            onLogActivity={handleLMSLogActivity}
           />
         ) : (
           <div className="min-h-screen flex flex-col bg-slate-100">
@@ -892,6 +955,11 @@ export default function App() {
                   onApplyWithdrawal={handleApplyWithdrawal}
                   onBuyPPOB={handleBuyPPOB}
                   onLogout={handleLogout}
+                  courses={courses}
+                  progressList={progressList}
+                  onSaveProgress={handleSaveLMSProgress}
+                  onSaveCourses={handleSaveLMSCourses}
+                  onLogActivity={handleLMSLogActivity}
                 />
               )}
 

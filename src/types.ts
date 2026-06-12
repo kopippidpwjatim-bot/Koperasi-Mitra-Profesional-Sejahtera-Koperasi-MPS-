@@ -158,3 +158,46 @@ export interface VisitorLog {
   timestamp: string;
   activity: string;
 }
+
+// Learning Management System (LMS) Interfaces
+export interface LMSLesson {
+  id: string;
+  title: string;
+  content: string; // Detail materi (HTML/Text)
+  duration: string; // Durasi baca
+  order: number;
+}
+
+export interface LMSQuestion {
+  id: string;
+  questionText: string;
+  options: string[];
+  correctOptionIndex: number;
+}
+
+export interface LMSQuiz {
+  questions: LMSQuestion[];
+  passingScore: number; // e.g. 70
+}
+
+export interface LMSCourse {
+  id: string;
+  title: string;
+  category: 'UMKM Modern' | 'Pecinta Koperasi' | 'Manajemen Keuangan' | 'Digitalisasi Bisnis';
+  instructor: string;
+  description: string;
+  duration: string; // e.g. "3 Jam"
+  image: string; // URL / SVG base64
+  lessons: LMSLesson[];
+  quiz: LMSQuiz;
+}
+
+export interface LMSUserProgress {
+  id: string; // same as memberId
+  memberId: string;
+  memberName: string;
+  completedCourseIds: string[]; // List ID kursus yang lulus
+  quizScores: { [courseId: string]: number }; // Skor kuis tiap kursus
+  certifiedAt: { [courseId: string]: string }; // Tanggal kelulusan tiap kursus
+}
+

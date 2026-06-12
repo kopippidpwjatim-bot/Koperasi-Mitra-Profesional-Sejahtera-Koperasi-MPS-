@@ -4,7 +4,8 @@ import {
   MapPin, Clock, Calendar, ChevronRight, Eye, ShieldCheck, HelpCircle, 
   ShoppingCart, ArrowRight, ExternalLink, Bookmark, Search, Filter 
 } from 'lucide-react';
-import { CooperativeSettings, StoreProduct, Article, Announcement, CartItem, Member, TentangItem, LayananItem, GalleryItem } from '../types';
+import { CooperativeSettings, StoreProduct, Article, Announcement, CartItem, Member, TentangItem, LayananItem, GalleryItem, LMSCourse, LMSUserProgress } from '../types';
+import { LMSPortal } from './LMSPortal';
 
 interface LandingPageProps {
   settings: CooperativeSettings;
@@ -19,6 +20,13 @@ interface LandingPageProps {
   setGuestCart: React.Dispatch<React.SetStateAction<CartItem[]>>;
   activeMember: Member | null;
   onDeductBalanceForPurchase: (total: number, orderDetails: string) => boolean;
+  
+  // LMS
+  courses: LMSCourse[];
+  progressList: LMSUserProgress[];
+  onSaveProgress: (updatedProgress: LMSUserProgress) => Promise<void>;
+  onSaveCourses: (updatedCourses: LMSCourse[]) => Promise<void>;
+  onLogActivity: (activity: string) => void;
 }
 
 export const LandingPage: React.FC<LandingPageProps> = ({
@@ -33,9 +41,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   guestCart,
   setGuestCart,
   activeMember,
-  onDeductBalanceForPurchase
+  onDeductBalanceForPurchase,
+  courses,
+  progressList,
+  onSaveProgress,
+  onSaveCourses,
+  onLogActivity
 }) => {
-  const [activeTab, setActiveTab] = useState<'beranda' | 'tentang' | 'layanan' | 'berita' | 'galeri' | 'kontak'>('beranda');
+  const [activeTab, setActiveTab] = useState<'beranda' | 'tentang' | 'layanan' | 'berita' | 'galeri' | 'kontak' | 'lms'>('beranda');
   const [selectedCategory, setSelectedCategory] = useState<string>('Semua');
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [showCartModal, setShowCartModal] = useState<boolean>(false);
@@ -144,7 +157,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex space-x-1">
-              {(['beranda', 'tentang', 'layanan', 'berita', 'galeri', 'kontak'] as const).map((tab) => (
+              {(['beranda', 'tentang', 'layanan', 'berita', 'lms', 'galeri', 'kontak'] as const).map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
@@ -154,7 +167,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                       : 'text-indigo-100 hover:bg-indigo-850 hover:text-white'
                   }`}
                 >
-                  {tab === 'tentang' ? 'Tentang Kami' : tab === 'berita' ? 'Berita & Kegiatan' : tab === 'kontak' ? 'Hubungi Kami' : tab}
+                  {tab === 'tentang' ? 'Tentang Kami' : tab === 'berita' ? 'Berita & Kegiatan' : tab === 'lms' ? 'LMS (Learning)' : tab === 'kontak' ? 'Hubungi Kami' : tab}
                 </button>
               ))}
             </nav>
@@ -210,7 +223,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* MOBILE NAVIGATION BAR (SCROLLABLE ON SUB-HEADER) */}
       <div className="lg:hidden bg-slate-900 text-slate-300 border-b border-slate-800 overflow-x-auto whitespace-nowrap hide-scrollbar py-2 px-3 sticky top-16 z-30">
         <div className="flex space-x-1 max-w-full">
-          {(['beranda', 'tentang', 'layanan', 'berita', 'galeri', 'kontak'] as const).map((tab) => (
+          {(['beranda', 'tentang', 'layanan', 'berita', 'lms', 'galeri', 'kontak'] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -220,7 +233,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   : 'text-slate-300 hover:bg-slate-800'
               }`}
             >
-              {tab === 'tentang' ? 'Profil' : tab === 'berita' ? 'Berita' : tab}
+              {tab === 'tentang' ? 'Profil' : tab === 'berita' ? 'Berita' : tab === 'lms' ? 'LMS' : tab}
             </button>
           ))}
         </div>
@@ -935,6 +948,32 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     </div>
                   </div>
                 ))}
+            </div>
+          </div>
+        )}
+
+        {/* ================= LMS LEARNING MANAGEMENT SYSTEM TAB ================= */}
+        {activeTab === 'lms' && (
+          <div className="max-w-7xl mx-auto px-4 py-8 space-y-8 animate-fade-in">
+            <div className="bg-white rounded-2xl border border-slate-200 p-6 md:p-8 shadow-sm">
+              <div className="text-center space-y-2 mb-8">
+                <span className="text-xs uppercase tracking-widest text-[#dca415] font-black">PORTAL PEMBELAJARAN UMKM & ANGGOTA</span>
+                <h2 className="text-2xl sm:text-3xl font-black text-blue-950">LEARNING MANAGEMENT SYSTEM (LMS)</h2>
+                <div className="h-1 w-20 bg-yellow-500 mx-auto rounded-full mt-2"></div>
+                <p className="text-xs text-slate-500 max-w-xl mx-auto mt-2">
+                  Dapatkan akses modul terstruktur, kuis terakreditasi, dan sertifikat resmi Koperasi Jatim untuk menunjang daya saing bisnis dan keterampilan Anda.
+                </p>
+              </div>
+
+              <LMSPortal
+                currentUser={activeMember}
+                courses={courses}
+                progressList={progressList}
+                onSaveProgress={onSaveProgress}
+                onSaveCourses={onSaveCourses}
+                onLogActivity={onLogActivity}
+                onOpenAuth={() => onOpenAuth('login')}
+              />
             </div>
           </div>
         )}

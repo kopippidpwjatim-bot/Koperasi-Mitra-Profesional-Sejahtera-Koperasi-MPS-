@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { 
   User, Wallet, ArrowDownUp, TrendingUp, Cpu, PhoneCall, 
   HelpCircle, CreditCard, Sparkles, LogOut, Edit, Save, 
-  ArrowUpRight, ArrowDownLeft, ReceiptText, Sparkle, Percent, CheckCircle
+  ArrowUpRight, ArrowDownLeft, ReceiptText, Sparkle, Percent, CheckCircle,
+  GraduationCap
 } from 'lucide-react';
-import { Member, Transaction, CooperativeSettings, LoanApplication, WithdrawalRequest } from '../types';
+import { Member, Transaction, CooperativeSettings, LoanApplication, WithdrawalRequest, LMSCourse, LMSUserProgress } from '../types';
 import { KTA } from './KTA';
+import { LMSPortal } from './LMSPortal';
 
 interface DashboardAnggotaProps {
   member: Member;
@@ -18,6 +20,13 @@ interface DashboardAnggotaProps {
   onApplyWithdrawal: (withdrawalData: { jumlah: number, jenisSimpanan: 'Sukarela' | 'Penyertaan' }) => void;
   onBuyPPOB: (amount: number, ppobType: string, refDetail: string) => boolean;
   onLogout: () => void;
+  
+  // LMS
+  courses: LMSCourse[];
+  progressList: LMSUserProgress[];
+  onSaveProgress: (updatedProgress: LMSUserProgress) => Promise<void>;
+  onSaveCourses: (updatedCourses: LMSCourse[]) => Promise<void>;
+  onLogActivity: (activity: string) => void;
 }
 
 export const DashboardAnggota: React.FC<DashboardAnggotaProps> = ({
@@ -30,9 +39,14 @@ export const DashboardAnggota: React.FC<DashboardAnggotaProps> = ({
   onApplyLoan,
   onApplyWithdrawal,
   onBuyPPOB,
-  onLogout
+  onLogout,
+  courses,
+  progressList,
+  onSaveProgress,
+  onSaveCourses,
+  onLogActivity
 }) => {
-  const [activeTab, setActiveTab] = useState<'ringkasan' | 'layanan' | 'kta' | 'profil'>('ringkasan');
+  const [activeTab, setActiveTab] = useState<'ringkasan' | 'layanan' | 'kta' | 'profil' | 'lms'>('ringkasan');
   const [isEditingProfile, setIsEditingProfile] = useState<boolean>(false);
   
   // Profile edits
@@ -171,6 +185,7 @@ export const DashboardAnggota: React.FC<DashboardAnggotaProps> = ({
             { id: 'ringkasan', lbl: 'Ringkasan & Finansial', icon: <Wallet className="w-4 h-4" /> },
             { id: 'layanan', lbl: 'Layanan Pengajuan', icon: <ArrowDownUp className="w-4 h-4" /> },
             { id: 'kta', lbl: 'Cetak KTA', icon: <CreditCard className="w-4 h-4" /> },
+            { id: 'lms', lbl: 'LMS Pembelajaran', icon: <GraduationCap className="w-4 h-4" /> },
             { id: 'profil', lbl: 'Sunting Identitas', icon: <User className="w-4 h-4" /> }
           ].map((t) => (
             <button
@@ -708,6 +723,18 @@ export const DashboardAnggota: React.FC<DashboardAnggotaProps> = ({
                 </div>
               )}
             </div>
+          )}
+
+          {/* ================= TAB 5: LMS LEARNING PORTAL ================= */}
+          {activeTab === 'lms' && (
+            <LMSPortal
+              currentUser={member}
+              courses={courses}
+              progressList={progressList}
+              onSaveProgress={onSaveProgress}
+              onSaveCourses={onSaveCourses}
+              onLogActivity={onLogActivity}
+            />
           )}
 
         </div>
