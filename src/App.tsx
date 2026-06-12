@@ -75,23 +75,36 @@ import {
   saveWithdrawals,
   getVisitorLogs,
   saveVisitorLogs,
-  seedInitialData
+  seedInitialData,
+  DEFAULT_LOANS,
+  DEFAULT_WITHDRAWALS,
+  DEFAULT_VISITOR_LOGS
 } from './database';
 
-export default function App() {
-  // Database status loading flag
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+const getLocalOrFallback = <T,>(key: string, fallback: T): T => {
+  try {
+    const saved = localStorage.getItem(key);
+    return saved ? JSON.parse(saved) : fallback;
+  } catch (e) {
+    return fallback;
+  }
+};
 
-  // Global States (initially empty, populated asynchronously on mount)
-  const [settings, setSettings] = useState<CooperativeSettings>(DEFAULT_SETTINGS);
-  const [members, setMembers] = useState<Member[]>([]);
-  const [products, setProducts] = useState<StoreProduct[]>([]);
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [articles, setArticles] = useState<Article[]>([]);
-  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
-  const [tentangItems, setTentangItems] = useState<TentangItem[]>([]);
-  const [layananItems, setLayananItems] = useState<LayananItem[]>([]);
-  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
+export default function App() {
+  // Database status loading flag: initialized to false so the user can browse instantly using local/fallback states
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [hasLoadedFromDB, setHasLoadedFromDB] = useState<boolean>(false);
+
+  // Global States (synchronously loaded from localStorage or imports for a 0ms fully populated first paint)
+  const [settings, setSettings] = useState<CooperativeSettings>(() => getLocalOrFallback('kop_settings', DEFAULT_SETTINGS));
+  const [members, setMembers] = useState<Member[]>(() => getLocalOrFallback('kop_members', DEFAULT_MEMBERS));
+  const [products, setProducts] = useState<StoreProduct[]>(() => getLocalOrFallback('kop_products', DEFAULT_PRODUCTS));
+  const [transactions, setTransactions] = useState<Transaction[]>(() => getLocalOrFallback('kop_transactions', DEFAULT_TRANSACTIONS));
+  const [articles, setArticles] = useState<Article[]>(() => getLocalOrFallback('kop_articles', DEFAULT_ARTICLES));
+  const [announcements, setAnnouncements] = useState<Announcement[]>(() => getLocalOrFallback('kop_announcements', DEFAULT_ANNOUNCEMENTS));
+  const [tentangItems, setTentangItems] = useState<TentangItem[]>(() => getLocalOrFallback('kop_tentang_items', DEFAULT_TENTANG_ITEMS));
+  const [layananItems, setLayananItems] = useState<LayananItem[]>(() => getLocalOrFallback('kop_layanan_items', DEFAULT_LAYANAN_ITEMS));
+  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>(() => getLocalOrFallback('kop_gallery_items', DEFAULT_GALLERY_ITEMS));
   
   const [activeMember, setActiveMember] = useState<Member | null>(null);
   const [impersonatedRole, setImpersonatedRole] = useState<UserRole | null>(null);
@@ -100,11 +113,11 @@ export default function App() {
   const [guestCart, setGuestCart] = useState<CartItem[]>([]);
 
   // Telemetry logs state
-  const [visitorLogs, setVisitorLogs] = useState<VisitorLog[]>([]);
+  const [visitorLogs, setVisitorLogs] = useState<VisitorLog[]>(() => getLocalOrFallback('kop_visitor_logs', DEFAULT_VISITOR_LOGS));
 
   // Loans and Withdrawals States
-  const [loans, setLoans] = useState<LoanApplication[]>([]);
-  const [withdrawals, setWithdrawals] = useState<WithdrawalRequest[]>([]);
+  const [loans, setLoans] = useState<LoanApplication[]>(() => getLocalOrFallback('kop_loans', DEFAULT_LOANS));
+  const [withdrawals, setWithdrawals] = useState<WithdrawalRequest[]>(() => getLocalOrFallback('kop_withdrawals', DEFAULT_WITHDRAWALS));
 
   // 1. ASYNC FETCHING ON PORTAL INITIALIZATION (EFFECT MANDATE FIRST TURN)
   React.useEffect(() => {
@@ -153,6 +166,7 @@ export default function App() {
       } catch (e) {
         console.error("Database connection fallback default:", e);
       } finally {
+        setHasLoadedFromDB(true);
         setIsLoading(false);
       }
     }
@@ -161,76 +175,76 @@ export default function App() {
 
   // 2. REACTIVE WRITERS BACKWARD SYNCING
   React.useEffect(() => {
-    if (!isLoading) {
+    if (hasLoadedFromDB) {
       saveCooperativeSettings(settings);
     }
-  }, [settings, isLoading]);
+  }, [settings, hasLoadedFromDB]);
 
   React.useEffect(() => {
-    if (!isLoading) {
+    if (hasLoadedFromDB) {
       saveMembers(members);
     }
-  }, [members, isLoading]);
+  }, [members, hasLoadedFromDB]);
 
   React.useEffect(() => {
-    if (!isLoading) {
+    if (hasLoadedFromDB) {
       saveProducts(products);
     }
-  }, [products, isLoading]);
+  }, [products, hasLoadedFromDB]);
 
   React.useEffect(() => {
-    if (!isLoading) {
+    if (hasLoadedFromDB) {
       saveTransactions(transactions);
     }
-  }, [transactions, isLoading]);
+  }, [transactions, hasLoadedFromDB]);
 
   React.useEffect(() => {
-    if (!isLoading) {
+    if (hasLoadedFromDB) {
       saveArticles(articles);
     }
-  }, [articles, isLoading]);
+  }, [articles, hasLoadedFromDB]);
 
   React.useEffect(() => {
-    if (!isLoading) {
+    if (hasLoadedFromDB) {
       saveAnnouncements(announcements);
     }
-  }, [announcements, isLoading]);
+  }, [announcements, hasLoadedFromDB]);
 
   React.useEffect(() => {
-    if (!isLoading) {
+    if (hasLoadedFromDB) {
       saveTentangItems(tentangItems);
     }
-  }, [tentangItems, isLoading]);
+  }, [tentangItems, hasLoadedFromDB]);
 
   React.useEffect(() => {
-    if (!isLoading) {
+    if (hasLoadedFromDB) {
       saveLayananItems(layananItems);
     }
-  }, [layananItems, isLoading]);
+  }, [layananItems, hasLoadedFromDB]);
 
   React.useEffect(() => {
-    if (!isLoading) {
+    if (hasLoadedFromDB) {
       saveGalleryItems(galleryItems);
     }
-  }, [galleryItems, isLoading]);
+  }, [galleryItems, hasLoadedFromDB]);
 
   React.useEffect(() => {
-    if (!isLoading) {
+    if (hasLoadedFromDB) {
       saveLoans(loans);
     }
-  }, [loans, isLoading]);
+  }, [loans, hasLoadedFromDB]);
 
   React.useEffect(() => {
-    if (!isLoading) {
+    if (hasLoadedFromDB) {
       saveWithdrawals(withdrawals);
     }
-  }, [withdrawals, isLoading]);
+  }, [withdrawals, hasLoadedFromDB]);
 
   React.useEffect(() => {
-    if (!isLoading) {
+    if (hasLoadedFromDB) {
       saveVisitorLogs(visitorLogs);
     }
-  }, [visitorLogs, isLoading]);
+  }, [visitorLogs, hasLoadedFromDB]);
 
   // Auth triggers
   const handleOpenAuth = (tab: 'login' | 'register') => {
