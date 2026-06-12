@@ -152,6 +152,13 @@ export interface Announcement {
   important: boolean;
 }
 
+export interface Regulation {
+  id: string;
+  title: string;
+  content: string;
+  order: number;
+}
+
 export interface VisitorLog {
   id: string;
   nama: string;

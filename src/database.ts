@@ -12,7 +12,8 @@ import {
   DEFAULT_ANNOUNCEMENTS,
   DEFAULT_TENTANG_ITEMS,
   DEFAULT_LAYANAN_ITEMS,
-  DEFAULT_GALLERY_ITEMS
+  DEFAULT_GALLERY_ITEMS,
+  DEFAULT_REGULATIONS
 } from './data/defaultData';
 
 import { DEFAULT_LMS_COURSES } from './data/lmsData';
@@ -31,7 +32,8 @@ import {
   WithdrawalRequest,
   VisitorLog,
   LMSCourse,
-  LMSUserProgress
+  LMSUserProgress,
+  Regulation
 } from './types';
 
 // Check if Firebase was provisioned and active
@@ -237,6 +239,14 @@ export async function saveGalleryItems(items: GalleryItem[]): Promise<void> {
   await saveData<GalleryItem[]>('kop_gallery_items', 'gallery_items', items);
 }
 
+export async function getRegulations(): Promise<Regulation[]> {
+  return loadData<Regulation[]>('kop_regulations', 'regulations', DEFAULT_REGULATIONS);
+}
+
+export async function saveRegulations(items: Regulation[]): Promise<void> {
+  await saveData<Regulation[]>('kop_regulations', 'regulations', items);
+}
+
 // Sub-resource defaults
 export const DEFAULT_LOANS: LoanApplication[] = [
   {
@@ -317,6 +327,8 @@ export async function saveLMSProgress(progress: LMSUserProgress[]): Promise<void
 }
 
 // Multi-resource database initialization seed function
+export { DEFAULT_REGULATIONS } from './data/defaultData';
+
 export async function seedInitialData(): Promise<void> {
   await saveCooperativeSettings(DEFAULT_SETTINGS);
   await saveMembers(DEFAULT_MEMBERS);
@@ -327,6 +339,7 @@ export async function seedInitialData(): Promise<void> {
   await saveTentangItems(DEFAULT_TENTANG_ITEMS);
   await saveLayananItems(DEFAULT_LAYANAN_ITEMS);
   await saveGalleryItems(DEFAULT_GALLERY_ITEMS);
+  await saveRegulations(DEFAULT_REGULATIONS);
   await saveLoans(DEFAULT_LOANS);
   await saveWithdrawals(DEFAULT_WITHDRAWALS);
   await saveVisitorLogs(DEFAULT_VISITOR_LOGS);

@@ -1,4 +1,4 @@
-import { CooperativeSettings, Member, StoreProduct, Article, Announcement, Transaction, TentangItem, LayananItem, GalleryItem } from '../types';
+import { CooperativeSettings, Member, StoreProduct, Article, Announcement, Transaction, TentangItem, LayananItem, GalleryItem, Regulation } from '../types';
 
 export const DEFAULT_LOGO_SVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
   <circle cx="250" cy="250" r="230" fill="none" stroke="%230c4a80" stroke-width="20"/>
@@ -426,5 +426,26 @@ export const DEFAULT_GALLERY_ITEMS: GalleryItem[] = [
     image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=400",
     showOnBeranda: true,
     order: 6
+  }
+];
+
+export const DEFAULT_REGULATIONS: Regulation[] = [
+  {
+    id: "reg-1",
+    title: "FAQ - Pertanyaan Umum",
+    content: "1. Siapa yang boleh mendaftar?\nSeluruh pensiunan PT Pos / veteran logistik Jatim.\n2. Berapa iuran bulanan?\nIuran Pokok Rp 500.000 (sekali) & Wajib Rp 50.000/bulan.\nUntuk bantuan lain, silakan klik WhatsApp Floating button.",
+    order: 1
+  },
+  {
+    id: "reg-2",
+    title: "Syarat & Ketentuan",
+    content: "1. Anggota wajib mengisi formulir pendaftaran secara detail & mengupload pas-foto resmi.\n2. Login memerlukan persetujuan Sekretaris DPW Jatim.\n3. Saldo simpanan wajib ditarik sepenuhnya saat keluar keanggotaan.",
+    order: 2
+  },
+  {
+    id: "reg-3",
+    title: "Kebijakan Privasi",
+    content: "Koperasi menjamin 100% data pribadi, pas foto, nomor handphone, nomor rekening, dan riwayat transaksi finansial Anda disimpan terenkripsi di database internal dan tidak disebarluaskan.",
+    order: 3
   }
 ];

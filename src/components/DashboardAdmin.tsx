@@ -3,7 +3,7 @@ import {
   Settings, Users, ShieldAlert, History, RefreshCw, Printer, 
   Trash2, Edit, Plus, FileText, CheckCircle2, UserCheck, Search, Eye, Upload, Wallet, BookOpen
 } from 'lucide-react';
-import { Member, Transaction, CooperativeSettings, VisitorLog, StoreProduct, Article, Announcement, TentangItem, LayananItem, GalleryItem, LMSCourse, LMSUserProgress } from '../types';
+import { Member, Transaction, CooperativeSettings, VisitorLog, StoreProduct, Article, Announcement, TentangItem, LayananItem, GalleryItem, LMSCourse, LMSUserProgress, Regulation } from '../types';
 import { DEFAULT_LOGO_SVG } from '../data/defaultData';
 import { LMSPortal } from './LMSPortal';
 
@@ -34,6 +34,14 @@ interface DashboardAdminProps {
   onSaveProgress: (updatedProgress: LMSUserProgress) => Promise<void>;
   onSaveCourses: (updatedCourses: LMSCourse[]) => Promise<void>;
   onLogActivity: (activity: string) => void;
+  announcements: Announcement[];
+  onAddAnnouncement: (ann: Omit<Announcement, 'id' | 'date'>) => void;
+  onEditAnnouncement: (id: string, ann: Omit<Announcement, 'id' | 'date'>) => void;
+  onDeleteAnnouncement: (id: string) => void;
+  regulations: Regulation[];
+  onAddRegulation: (reg: Omit<Regulation, 'id'>) => void;
+  onEditRegulation: (id: string, reg: Omit<Regulation, 'id'>) => void;
+  onDeleteRegulation: (id: string) => void;
 }
 
 export const DashboardAdmin: React.FC<DashboardAdminProps> = ({
@@ -62,7 +70,15 @@ export const DashboardAdmin: React.FC<DashboardAdminProps> = ({
   progressList,
   onSaveProgress,
   onSaveCourses,
-  onLogActivity
+  onLogActivity,
+  announcements,
+  onAddAnnouncement,
+  onEditAnnouncement,
+  onDeleteAnnouncement,
+  regulations,
+  onAddRegulation,
+  onEditRegulation,
+  onDeleteRegulation
 }) => {
   const [activeSubTab, setActiveSubTab] = useState<'pengaturan' | 'user' | 'rekening' | 'log' | 'emulasi' | 'cms' | 'lms'>('pengaturan');
   
@@ -89,7 +105,7 @@ export const DashboardAdmin: React.FC<DashboardAdminProps> = ({
   }, [settings]);
 
   // CMS (Content Management System) Web Pages Editor States
-  const [activeCmsTab, setActiveCmsTab] = useState<'tentang' | 'layanan' | 'berita' | 'galeri' | 'produk'>('tentang');
+  const [activeCmsTab, setActiveCmsTab] = useState<'tentang' | 'layanan' | 'berita' | 'galeri' | 'produk' | 'pengumuman' | 'kebijakan'>('tentang');
   const [showCmsModal, setShowCmsModal] = useState<boolean>(false);
   const [editingCmsItemId, setEditingCmsItemId] = useState<string | null>(null);
   
@@ -105,6 +121,7 @@ export const DashboardAdmin: React.FC<DashboardAdminProps> = ({
     summary: '',
     harga: 0,
     stok: 10,
+    important: false,
   });
 
   const handleOpenCmsEdit = (item: any) => {
@@ -121,6 +138,7 @@ export const DashboardAdmin: React.FC<DashboardAdminProps> = ({
       summary: item.summary || '',
       harga: item.harga || 0,
       stok: item.stok !== undefined ? item.stok : 10,
+      important: item.important || false,
     });
     setShowCmsModal(true);
   };
@@ -139,6 +157,7 @@ export const DashboardAdmin: React.FC<DashboardAdminProps> = ({
       summary: '',
       harga: 0,
       stok: 10,
+      important: false,
     });
     setShowCmsModal(true);
   };
@@ -263,6 +282,36 @@ export const DashboardAdmin: React.FC<DashboardAdminProps> = ({
         setProducts(prev => [...prev, newItem]);
       }
       alert("Katalog Produk Swalayan Koperasi berhasil disimpan!");
+    } else if (activeCmsTab === 'pengumuman') {
+      if (editingCmsItemId) {
+        onEditAnnouncement(editingCmsItemId, {
+          title: cmsForm.title,
+          content: cmsForm.content,
+          important: cmsForm.important
+        });
+      } else {
+        onAddAnnouncement({
+          title: cmsForm.title,
+          content: cmsForm.content,
+          important: cmsForm.important
+        });
+      }
+      alert("Pengumuman Resmi Koperasi berhasil disimpan!");
+    } else if (activeCmsTab === 'kebijakan') {
+      if (editingCmsItemId) {
+        onEditRegulation(editingCmsItemId, {
+          title: cmsForm.title,
+          content: cmsForm.content,
+          order: Number(cmsForm.order) || 1
+        });
+      } else {
+        onAddRegulation({
+          title: cmsForm.title,
+          content: cmsForm.content,
+          order: Number(cmsForm.order) || 1
+        });
+      }
+      alert("Kebijakan & Regulasi Resmi berhasil disimpan!");
     }
 
     setShowCmsModal(false);
@@ -282,6 +331,10 @@ export const DashboardAdmin: React.FC<DashboardAdminProps> = ({
       setGalleryItems(prev => prev.filter(item => item.id !== id));
     } else if (activeCmsTab === 'produk') {
       setProducts(prev => prev.filter(item => item.id !== id));
+    } else if (activeCmsTab === 'pengumuman') {
+      onDeleteAnnouncement(id);
+    } else if (activeCmsTab === 'kebijakan') {
+      onDeleteRegulation(id);
     }
     alert("Item berhasil dihapus!");
   };
@@ -1001,7 +1054,9 @@ export const DashboardAdmin: React.FC<DashboardAdminProps> = ({
                 { id: 'layanan', lbl: '2. Unit Layanan KSU IPPI' },
                 { id: 'berita', lbl: '3. Berita, Tips & Kegiatan' },
                 { id: 'galeri', lbl: '4. Galeri Foto & Dokumentasi' },
-                { id: 'produk', lbl: '5. Katalog Barang Swalayan' }
+                { id: 'produk', lbl: '5. Katalog Barang Swalayan' },
+                { id: 'pengumuman', lbl: '6. Pengumuman Beranda (PENTING)' },
+                { id: 'kebijakan', lbl: '7. Kebijakan & Regulasi' }
               ].map((sub) => (
                 <button
                   key={sub.id}
@@ -1040,6 +1095,8 @@ export const DashboardAdmin: React.FC<DashboardAdminProps> = ({
                     else if (activeCmsTab === 'berita') itemsToRender = articles;
                     else if (activeCmsTab === 'galeri') itemsToRender = galleryItems;
                     else if (activeCmsTab === 'produk') itemsToRender = products;
+                    else if (activeCmsTab === 'pengumuman') itemsToRender = announcements;
+                    else if (activeCmsTab === 'kebijakan') itemsToRender = regulations;
 
                     if (itemsToRender.length === 0) {
                       return (
@@ -1062,11 +1119,21 @@ export const DashboardAdmin: React.FC<DashboardAdminProps> = ({
                       return (
                         <tr key={item.id} className="hover:bg-slate-50 transition">
                           <td className="py-3 px-3">
-                            <img 
-                              src={displayImg || "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&q=80&w=60"} 
-                              className="w-12 h-10 object-cover rounded border border-slate-300"
-                              alt="Item Preview" 
-                            />
+                            {activeCmsTab === 'pengumuman' ? (
+                              <div className="w-12 h-10 bg-amber-500/10 border border-amber-500/20 rounded flex items-center justify-center text-amber-500 text-base font-bold select-none">
+                                📣
+                              </div>
+                            ) : activeCmsTab === 'kebijakan' ? (
+                              <div className="w-12 h-10 bg-indigo-50 border border-indigo-200 rounded flex items-center justify-center text-indigo-900 text-base font-bold select-none">
+                                ⚖️
+                              </div>
+                            ) : (
+                              <img 
+                                src={displayImg || "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&q=80&w=60"} 
+                                className="w-12 h-10 object-cover rounded border border-slate-300"
+                                alt="Item Preview" 
+                              />
+                            )}
                           </td>
                           <td className="py-3 px-3 font-bold text-slate-900 max-w-[180px] truncate" title={displayTitle}>
                             {displayTitle}
@@ -1080,18 +1147,23 @@ export const DashboardAdmin: React.FC<DashboardAdminProps> = ({
                                 {item.category}
                               </span>
                             )}
+                            {activeCmsTab === 'pengumuman' && item.important && (
+                              <span className="ml-1.5 px-1.5 py-0.5 bg-red-100 text-red-700 text-[8px] rounded uppercase font-black tracking-wide font-mono animate-pulse">
+                                PENTING
+                              </span>
+                            )}
                           </td>
                           <td className="py-3 px-3 text-slate-500 max-w-[280px] truncate" title={displayDesc}>
                             {displayDesc}
                           </td>
                           <td className="py-3 px-3 text-center font-mono font-bold text-yellow-600">
-                            {item.order !== undefined ? item.order : '-'}
+                            {activeCmsTab === 'pengumuman' ? '-' : (item.order !== undefined ? item.order : '-')}
                           </td>
                           <td className="py-3 px-3 text-center">
                             <span className={`px-2 py-0.5 font-bold rounded-full text-[9px] ${
-                              item.showOnBeranda ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-slate-100 text-slate-500 border border-slate-200'
+                              activeCmsTab === 'pengumuman' || activeCmsTab === 'kebijakan' || item.showOnBeranda ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-slate-100 text-slate-500 border border-slate-200'
                             }`}>
-                              {item.showOnBeranda ? 'YA' : 'TIDAK'}
+                              {activeCmsTab === 'pengumuman' || activeCmsTab === 'kebijakan' || item.showOnBeranda ? 'YA' : 'TIDAK'}
                             </span>
                           </td>
                           <td className="py-3 px-3 truncate max-w-[120px] font-mono text-slate-400" title={item.externalUrl || "Tidak ada"}>
@@ -1144,13 +1216,13 @@ export const DashboardAdmin: React.FC<DashboardAdminProps> = ({
                 {/* Title Input */}
                 <div className="sm:col-span-2">
                   <label className="block text-[10px] font-bold text-slate-500 mb-0.5 uppercase mb-1">
-                    {activeCmsTab === 'produk' ? 'Nama Produk' : 'Judul Konten Utama'}
+                    {activeCmsTab === 'produk' ? 'Nama Produk' : activeCmsTab === 'pengumuman' ? 'Headline Pengumuman Koperasi (Megaphone)' : activeCmsTab === 'kebijakan' ? 'Judul Kebijakan & Regulasi Resmi' : 'Judul Konten Utama'}
                   </label>
                   <input
                     type="text"
                     required
                     className="w-full bg-slate-50 border border-slate-350 p-2.5 rounded text-xs outline-none focus:border-blue-900"
-                    placeholder="Contoh: Profil Pengurus Baru / Susu Bayi Ultra"
+                    placeholder={activeCmsTab === 'pengumuman' ? "Contoh: Pengumuman Jadwal RAT Koperasi / Libur Hari Raya" : activeCmsTab === 'kebijakan' ? "Contoh: Syarat & Ketentuan Keanggotaan" : "Contoh: Profil Pengurus Baru / Susu Bayi Ultra"}
                     value={cmsForm.title}
                     onChange={(e) => setCmsForm({ ...cmsForm, title: e.target.value })}
                   />
@@ -1226,69 +1298,95 @@ export const DashboardAdmin: React.FC<DashboardAdminProps> = ({
                 )}
 
                 {/* Sorting order & display order */}
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-500 mb-0.5 uppercase mb-1">NoUrutan Tampilan (Order)</label>
-                  <input
-                    type="number"
-                    required
-                    min="1"
-                    className="w-full bg-slate-50 border border-slate-350 p-2 rounded text-xs font-mono"
-                    value={cmsForm.order}
-                    onChange={(e) => setCmsForm({ ...cmsForm, order: Number(e.target.value) || 1 })}
-                  />
-                </div>
-
-                {/* Show on beranda checkbox */}
-                <div className="flex items-center gap-2 pt-4">
-                  <input
-                    type="checkbox"
-                    id="showOnBerandaCheckbox"
-                    className="w-4 h-4 text-blue-900 border-slate-300 rounded focus:ring-blue-900 cursor-pointer"
-                    checked={cmsForm.showOnBeranda}
-                    onChange={(e) => setCmsForm({ ...cmsForm, showOnBeranda: e.target.checked })}
-                  />
-                  <label htmlFor="showOnBerandaCheckbox" className="text-[10px] uppercase tracking-wide font-black select-none text-slate-700 cursor-pointer">
-                    Tampilkan di Beranda (Homepage)
-                  </label>
-                </div>
-
-                {/* External externalUrl Link */}
-                <div className="sm:col-span-2">
-                  <label className="block text-[10px] font-bold text-slate-500 mb-0.5 uppercase mb-1">Link Tautan Luar (External URL - Optional)</label>
-                  <input
-                    type="text"
-                    className="w-full bg-slate-50 border border-slate-350 p-2 rounded text-xs font-mono outline-none"
-                    placeholder="Contoh: https://facebook.com/ippi-jatim atau link luar lainnya"
-                    value={cmsForm.externalUrl}
-                    onChange={(e) => setCmsForm({ ...cmsForm, externalUrl: e.target.value })}
-                  />
-                  <p className="text-[9px] text-slate-400 mt-0.5">Jika diisi, pengunjung yang mengeklik item ini akan dialihkan ke halaman/alamat URL eksternal tersebut.</p>
-                </div>
-
-                {/* Image Upload Block */}
-                <div className="sm:col-span-2">
-                  <label className="block text-[10px] font-bold text-slate-500 mb-0.5 uppercase mb-1 font-sans">File Foto Utama (Upload Maksimal 2MB)</label>
-                  <div className="flex gap-2.5 items-center">
-                    <label className="flex-1 text-center bg-slate-50 hover:bg-slate-100 p-3 border border-dashed border-slate-350 rounded font-bold cursor-pointer text-[10px] uppercase">
-                      PILIH GAMBAR/FOTO
-                      <input type="file" accept="image/*" className="hidden" onChange={handlePhotoUploadCms} />
-                    </label>
-                    {cmsForm.image && (
-                      <div className="w-16 h-12 rounded overflow-hidden shrink-0 border border-slate-300">
-                        <img src={cmsForm.image} className="w-full h-full object-cover" alt="CMS upload preview" />
-                      </div>
-                    )}
+                {activeCmsTab !== 'pengumuman' && (
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 mb-0.5 uppercase mb-1">NoUrutan Tampilan (Order)</label>
+                    <input
+                      type="number"
+                      required
+                      min="1"
+                      className="w-full bg-slate-50 border border-slate-350 p-2 rounded text-xs font-mono"
+                      value={cmsForm.order}
+                      onChange={(e) => setCmsForm({ ...cmsForm, order: Number(e.target.value) || 1 })}
+                    />
                   </div>
-                </div>
+                )}
+
+                 {/* Show on beranda checkbox */}
+                 {activeCmsTab !== 'pengumuman' && activeCmsTab !== 'kebijakan' && (
+                   <div className="flex items-center gap-2 pt-4">
+                     <input
+                       type="checkbox"
+                       id="showOnBerandaCheckbox"
+                       className="w-4 h-4 text-blue-900 border-slate-300 rounded focus:ring-blue-900 cursor-pointer"
+                       checked={cmsForm.showOnBeranda}
+                       onChange={(e) => setCmsForm({ ...cmsForm, showOnBeranda: e.target.checked })}
+                     />
+                     <label htmlFor="showOnBerandaCheckbox" className="text-[10px] uppercase tracking-wide font-black select-none text-slate-700 cursor-pointer">
+                       Tampilkan di Beranda (Homepage)
+                     </label>
+                   </div>
+                 )}
+
+                 {/* Important Flag (Contreng PENTING) for Announcements */}
+                 {activeCmsTab === 'pengumuman' && (
+                   <div className="flex items-center gap-2.5 pt-2 sm:col-span-2 bg-amber-50 rounded-lg p-3 border border-amber-200">
+                     <input
+                       type="checkbox"
+                       id="cmsForm-important"
+                       className="w-4 h-4 text-amber-600 border-slate-300 bg-white cursor-pointer rounded focus:ring-amber-550 shrink-0"
+                       checked={cmsForm.important}
+                       onChange={(e) => setCmsForm({ ...cmsForm, important: e.target.checked })}
+                     />
+                     <label htmlFor="cmsForm-important" className="text-[10px] uppercase tracking-wider font-extrabold select-none text-amber-900 cursor-pointer leading-wide">
+                       Flag / Tandai sebagai Pengumuman Resmi Paling Penting (Tampilkan Label &ldquo;PENTING&rdquo; di Beranda)
+                     </label>
+                   </div>
+                 )}
+
+                 {/* External externalUrl Link */}
+                 {activeCmsTab !== 'pengumuman' && activeCmsTab !== 'kebijakan' && (
+                   <div className="sm:col-span-2">
+                     <label className="block text-[10px] font-bold text-slate-500 mb-0.5 uppercase mb-1">Link Tautan Luar (External URL - Optional)</label>
+                     <input
+                       type="text"
+                       className="w-full bg-slate-50 border border-slate-350 p-2 rounded text-xs font-mono outline-none"
+                       placeholder="Contoh: https://facebook.com/ippi-jatim atau link luar lainnya"
+                       value={cmsForm.externalUrl}
+                       onChange={(e) => setCmsForm({ ...cmsForm, externalUrl: e.target.value })}
+                     />
+                     <p className="text-[9px] text-slate-400 mt-0.5">Jika diisi, pengunjung yang mengeklik item ini akan dialihkan ke halaman/alamat URL eksternal tersebut.</p>
+                   </div>
+                 )}
+
+                 {/* Image Upload Block */}
+                 {activeCmsTab !== 'pengumuman' && activeCmsTab !== 'kebijakan' && (
+                   <div className="sm:col-span-2">
+                     <label className="block text-[10px] font-bold text-slate-500 mb-0.5 uppercase mb-1 font-sans">File Foto Utama (Upload Maksimal 2MB)</label>
+                     <div className="flex gap-2.5 items-center">
+                       <label className="flex-1 text-center bg-slate-50 hover:bg-slate-100 p-3 border border-dashed border-slate-350 rounded font-bold cursor-pointer text-[10px] uppercase">
+                         PILIH GAMBAR/FOTO
+                         <input type="file" accept="image/*" className="hidden" onChange={handlePhotoUploadCms} />
+                       </label>
+                       {cmsForm.image && (
+                         <div className="w-16 h-12 rounded overflow-hidden shrink-0 border border-slate-300">
+                           <img src={cmsForm.image} className="w-full h-full object-cover" alt="CMS upload preview" />
+                         </div>
+                       )}
+                     </div>
+                   </div>
+                 )}
 
                 {/* Main Content Description */}
                 <div className="sm:col-span-2">
-                  <label className="block text-[10px] font-bold text-slate-500 mb-0.5 uppercase mb-1">Deskripsi / Detail Narasi Konten</label>
+                  <label className="block text-[10px] font-bold text-slate-500 mb-0.5 uppercase mb-1">
+                    {activeCmsTab === 'pengumuman' ? 'Isi Deskripsi / Detail Pengumuman Resmi' : activeCmsTab === 'kebijakan' ? 'Isi Dokumen / Kebijakan Lengkap (Mendukung Newline)' : 'Deskripsi / Detail Narasi Konten'}
+                  </label>
                   <textarea
-                    rows={4}
+                    rows={activeCmsTab === 'kebijakan' ? 8 : 4}
                     required
                     className="w-full bg-slate-50 border border-slate-350 p-2.5 rounded text-xs outline-none focus:border-blue-900 leading-relaxed font-sans"
-                    placeholder="Tulis informasi detailnya di sini dengan lengkap..."
+                    placeholder={activeCmsTab === 'kebijakan' ? "Tulis isi kebijakan, peraturan, syarat, atau FAQ secara detail di sini..." : "Tulis informasi detailnya di sini dengan lengkap..."}
                     value={cmsForm.content}
                     onChange={(e) => setCmsForm({ ...cmsForm, content: e.target.value })}
                   />

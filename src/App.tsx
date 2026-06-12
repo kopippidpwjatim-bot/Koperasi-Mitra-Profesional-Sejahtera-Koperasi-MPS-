@@ -54,7 +54,8 @@ import {
   LayananItem,
   GalleryItem,
   LMSCourse,
-  LMSUserProgress
+  LMSUserProgress,
+  Regulation
 } from './types';
 
 import {
@@ -89,7 +90,10 @@ import {
   seedInitialData,
   DEFAULT_LOANS,
   DEFAULT_WITHDRAWALS,
-  DEFAULT_VISITOR_LOGS
+  DEFAULT_VISITOR_LOGS,
+  getRegulations,
+  saveRegulations,
+  DEFAULT_REGULATIONS
 } from './database';
 
 const getLocalOrFallback = <T,>(key: string, fallback: T): T => {
@@ -116,6 +120,7 @@ export default function App() {
   const [tentangItems, setTentangItems] = useState<TentangItem[]>(() => getLocalOrFallback('kop_tentang_items', DEFAULT_TENTANG_ITEMS));
   const [layananItems, setLayananItems] = useState<LayananItem[]>(() => getLocalOrFallback('kop_layanan_items', DEFAULT_LAYANAN_ITEMS));
   const [galleryItems, setGalleryItems] = useState<GalleryItem[]>(() => getLocalOrFallback('kop_gallery_items', DEFAULT_GALLERY_ITEMS));
+  const [regulations, setRegulations] = useState<Regulation[]>(() => getLocalOrFallback('kop_regulations', DEFAULT_REGULATIONS));
   
   const [activeMember, setActiveMember] = useState<Member | null>(null);
   const [impersonatedRole, setImpersonatedRole] = useState<UserRole | null>(null);
@@ -149,6 +154,7 @@ export default function App() {
           getTentangItems().then(val => { if (active) setTentangItems(val); }),
           getLayananItems().then(val => { if (active) setLayananItems(val); }),
           getGalleryItems().then(val => { if (active) setGalleryItems(val); }),
+          getRegulations().then(val => { if (active) setRegulations(val); }),
           getLoans().then(val => { if (active) setLoans(val); }),
           getWithdrawals().then(val => { if (active) setWithdrawals(val); }),
           getVisitorLogs().then(val => { if (active) setVisitorLogs(val); }),
@@ -224,6 +230,12 @@ export default function App() {
       saveGalleryItems(galleryItems);
     }
   }, [galleryItems, hasLoadedFromDB]);
+
+  React.useEffect(() => {
+    if (hasLoadedFromDB) {
+      saveRegulations(regulations);
+    }
+  }, [regulations, hasLoadedFromDB]);
 
   React.useEffect(() => {
     if (hasLoadedFromDB) {
@@ -497,6 +509,22 @@ export default function App() {
 
   const handleDeleteAnnouncement = (id: string) => {
     setAnnouncements(prev => prev.filter(a => a.id !== id));
+  };
+
+  const handleAddRegulation = (reg: Omit<Regulation, 'id'>) => {
+    const newReg: Regulation = {
+      ...reg,
+      id: `reg-${Date.now()}`
+    };
+    setRegulations(prev => [...prev, newReg]);
+  };
+
+  const handleEditRegulation = (id: string, updated: Omit<Regulation, 'id'>) => {
+    setRegulations(prev => prev.map(r => r.id === id ? { ...r, ...updated } : r));
+  };
+
+  const handleDeleteRegulation = (id: string) => {
+    setRegulations(prev => prev.filter(r => r.id !== id));
   };
 
   // Log controls
@@ -897,6 +925,7 @@ export default function App() {
             tentangItems={tentangItems}
             layananItems={layananItems}
             galleryItems={galleryItems}
+            regulations={regulations}
             onOpenAuth={handleOpenAuth}
             guestCart={guestCart}
             setGuestCart={setGuestCart}
@@ -1001,6 +1030,14 @@ export default function App() {
                   onSaveProgress={handleSaveLMSProgress}
                   onSaveCourses={handleSaveLMSCourses}
                   onLogActivity={handleLMSLogActivity}
+                  announcements={announcements}
+                  onAddAnnouncement={handleAddAnnouncement}
+                  onEditAnnouncement={handleEditAnnouncement}
+                  onDeleteAnnouncement={handleDeleteAnnouncement}
+                  regulations={regulations}
+                  onAddRegulation={handleAddRegulation}
+                  onEditRegulation={handleEditRegulation}
+                  onDeleteRegulation={handleDeleteRegulation}
                 />
               )}
 
@@ -1019,6 +1056,10 @@ export default function App() {
                   onAddAnnouncement={handleAddAnnouncement}
                   onEditAnnouncement={handleEditAnnouncement}
                   onDeleteAnnouncement={handleDeleteAnnouncement}
+                  regulations={regulations}
+                  onAddRegulation={handleAddRegulation}
+                  onEditRegulation={handleEditRegulation}
+                  onDeleteRegulation={handleDeleteRegulation}
                   onLogout={handleLogout}
                   courses={courses}
                   progressList={progressList}

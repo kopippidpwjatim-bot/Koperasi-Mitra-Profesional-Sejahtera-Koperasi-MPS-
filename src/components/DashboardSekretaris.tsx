@@ -3,7 +3,7 @@ import {
   UserCheck, FileText, Newspaper, Megaphone, Printer, 
   Trash2, Plus, LogOut, CheckCircle, Smartphone, MapPin, ExternalLink, BookOpen
 } from 'lucide-react';
-import { Member, Article, Announcement, CooperativeSettings, LMSCourse, LMSUserProgress } from '../types';
+import { Member, Article, Announcement, CooperativeSettings, LMSCourse, LMSUserProgress, Regulation } from '../types';
 import { LMSPortal } from './LMSPortal';
 
 interface DashboardSekretarisProps {
@@ -26,6 +26,10 @@ interface DashboardSekretarisProps {
   onSaveProgress: (updatedProgress: LMSUserProgress) => Promise<void>;
   onSaveCourses: (updatedCourses: LMSCourse[]) => Promise<void>;
   onLogActivity: (activity: string) => void;
+  regulations: Regulation[];
+  onAddRegulation: (reg: Omit<Regulation, 'id'>) => void;
+  onEditRegulation: (id: string, reg: Omit<Regulation, 'id'>) => void;
+  onDeleteRegulation: (id: string) => void;
 }
 
 export const DashboardSekretaris: React.FC<DashboardSekretarisProps> = ({
@@ -47,9 +51,13 @@ export const DashboardSekretaris: React.FC<DashboardSekretarisProps> = ({
   progressList,
   onSaveProgress,
   onSaveCourses,
-  onLogActivity
+  onLogActivity,
+  regulations,
+  onAddRegulation,
+  onEditRegulation,
+  onDeleteRegulation,
 }) => {
-  const [activeTabSec, setActiveTabSec] = useState<'pendaftaran' | 'berita_editor' | 'kop_pdf' | 'lms'>('pendaftaran');
+  const [activeTabSec, setActiveTabSec] = useState<'pendaftaran' | 'berita_editor' | 'kebijakan_editor' | 'kop_pdf' | 'lms'>('pendaftaran');
 
   // Article Form State
   const [artForm, setArtForm] = useState({ title: '', summary: '', content: '', category: 'Tips Keuangan' });
@@ -58,6 +66,10 @@ export const DashboardSekretaris: React.FC<DashboardSekretarisProps> = ({
   // Announcement Form State
   const [annForm, setAnnForm] = useState({ title: '', content: '', important: false });
   const [editingAnnId, setEditingAnnId] = useState<string | null>(null);
+
+  // Regulation Form State
+  const [regForm, setRegForm] = useState({ title: '', content: '', order: 1 });
+  const [editingRegId, setEditingRegId] = useState<string | null>(null);
 
   // Get pending members
   const pendingMembers = members.filter(m => m.status === 'pending');
@@ -143,6 +155,33 @@ export const DashboardSekretaris: React.FC<DashboardSekretarisProps> = ({
     setAnnForm({ title: '', content: '', important: false });
   };
 
+  const handleCreateOrUpdateRegulation = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!regForm.title || !regForm.content) {
+      alert("Kolom judul dan detail kebijakan wajib diisi!");
+      return;
+    }
+    if (editingRegId) {
+      onEditRegulation(editingRegId, regForm);
+      alert("Kebijakan/Regulasi berhasil diperbarui!");
+      setEditingRegId(null);
+    } else {
+      onAddRegulation(regForm);
+      alert("Kebijakan/Regulasi baru berhasil ditambahkan!");
+    }
+    setRegForm({ title: '', content: '', order: regulations.length + 2 });
+  };
+
+  const handleStartEditRegulation = (reg: Regulation) => {
+    setRegForm({ title: reg.title, content: reg.content, order: reg.order || 1 });
+    setEditingRegId(reg.id);
+  };
+
+  const handleCancelEditRegulation = () => {
+    setRegForm({ title: '', content: '', order: regulations.length + 1 });
+    setEditingRegId(null);
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in text-xs text-slate-800">
       
@@ -174,6 +213,7 @@ export const DashboardSekretaris: React.FC<DashboardSekretarisProps> = ({
         {[
           { id: 'pendaftaran', lbl: 'Verifikasi & Approve Anggota Baru', icon: <UserCheck className="w-4 h-4" /> },
           { id: 'berita_editor', lbl: 'Edit Konten Landing Page', icon: <Newspaper className="w-4 h-4" /> },
+          { id: 'kebijakan_editor', lbl: 'Kebijakan & Regulasi Resmi', icon: <FileText className="w-4 h-4" /> },
           { id: 'lms', lbl: 'Pengaturan Kurikulum LMS', icon: <BookOpen className="w-4 h-4" /> },
           { id: 'kop_pdf', lbl: 'Kop Surat & Cetak PDF', icon: <Printer className="w-4 h-4" /> }
         ].map((tab) => (
@@ -487,6 +527,133 @@ export const DashboardSekretaris: React.FC<DashboardSekretarisProps> = ({
 
           </div>
 
+        </div>
+      )}
+
+      {/* ================= TAB 2.5: KEBIJAKAN & REGULASI EDITOR ================= */}
+      {activeTabSec === 'kebijakan_editor' && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-fade-in text-xs mb-6">
+          
+          {/* REGULATION WRITER FORM */}
+          <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-xs space-y-4">
+            <h3 className="text-xs font-black uppercase text-slate-900 flex items-center gap-1.5 pb-2 border-b border-slate-100">
+              <FileText className="w-4 h-4 text-amber-500" /> {editingRegId ? 'Ubah Regulasi & Kebijakan' : 'Tambahkan Regulasi & Kebijakan Baru'}
+            </h3>
+
+            <form onSubmit={handleCreateOrUpdateRegulation} className="space-y-4">
+              <div>
+                <label className="block text-[9.5px] font-bold text-slate-500 mb-1 uppercase">Judul Regulasi / Kebijakan resmi</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Contoh: AD/ART Bab I Ketentuan Keanggotaan"
+                  className="w-full text-xs p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:border-blue-950 focus:bg-white text-slate-900 font-medium outline-none"
+                  value={regForm.title}
+                  onChange={(e) => setRegForm({ ...regForm, title: e.target.value })}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[9.5px] font-bold text-slate-500 mb-1 uppercase">No. Urutan Tampilan</label>
+                  <input
+                    type="number"
+                    required
+                    min={1}
+                    className="w-full text-xs p-2 bg-slate-50 border border-slate-300 rounded-lg focus:border-blue-950 text-slate-900 font-mono font-bold outline-none"
+                    value={regForm.order}
+                    onChange={(e) => setRegForm({ ...regForm, order: Number(e.target.value) || 1 })}
+                  />
+                </div>
+                
+                <div className="flex items-end justify-end">
+                  {editingRegId && (
+                    <button
+                      type="button"
+                      onClick={handleCancelEditRegulation}
+                      className="px-3.5 py-2 text-xs font-bold text-red-600 hover:bg-red-50 rounded-lg border border-red-200 cursor-pointer"
+                    >
+                      Batal Edit
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[9.5px] font-bold text-slate-500 mb-1 uppercase font-sans">Isi / Narasi Detail Dokumen Kebijakan (Mendukung Newline/Baris baru)</label>
+                <textarea
+                  rows={8}
+                  required
+                  placeholder="Tulis pasal-pasal, syarat, aturan, regulasi, AD/ART secara lengkap di sini..."
+                  className="w-full text-xs p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:border-blue-950 focus:bg-white leading-relaxed font-sans text-slate-800 outline-none"
+                  value={regForm.content}
+                  onChange={(e) => setRegForm({ ...regForm, content: e.target.value })}
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="w-full bg-amber-400 hover:bg-amber-500 text-slate-950 font-black py-2.5 px-4 rounded-lg uppercase tracking-wider text-[11px] select-none cursor-pointer transition shadow-xs"
+              >
+                {editingRegId ? 'Simpan Perubahan Regulasi' : 'Publikasikan Regulasi Baru'}
+              </button>
+            </form>
+          </div>
+
+          {/* REGULATION DATABASE LISTS */}
+          <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-xs space-y-4">
+            <h3 className="text-xs font-black uppercase text-blue-950 flex items-center gap-1.5 pb-2 border-b border-slate-100">
+               ⚖️ Dokumen Kebijakan & Regulasi Terpublikasi ({regulations.length})
+            </h3>
+
+            <div className="space-y-3 max-h-[460px] overflow-y-auto pr-1">
+              {regulations.length === 0 ? (
+                <p className="text-slate-400 italic text-center py-8">Belum ada dokumen kebijakan yang terdaftar.</p>
+              ) : (
+                [...regulations]
+                  .sort((a, b) => (a.order || 0) - (b.order || 0))
+                  .map((reg) => (
+                    <div key={reg.id} className="p-3 border rounded-lg bg-slate-50/50 hover:bg-slate-50 transition border-slate-200">
+                      <div className="flex justify-between items-start gap-2">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="bg-indigo-900 text-white text-[9px] font-black w-5 h-5 rounded-full flex items-center justify-center font-mono shrink-0">
+                              {reg.order || '-'}
+                            </span>
+                            <h4 className="font-bold text-xs text-slate-900 leading-tight truncate">{reg.title}</h4>
+                          </div>
+                          <p className="text-[11px] text-slate-500 mt-1.5 line-clamp-3 leading-relaxed whitespace-pre-wrap">
+                            {reg.content}
+                          </p>
+                        </div>
+
+                        <div className="flex flex-col gap-1 items-end shrink-0 ml-2">
+                          <button
+                            type="button"
+                            onClick={() => handleStartEditRegulation(reg)}
+                            className="px-2 py-1 bg-white hover:bg-slate-100 text-slate-700 text-[10px] font-bold border border-slate-300 rounded-md cursor-pointer transition"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (confirm(`Anda yakin ingin menghapus kebijakan: "${reg.title}"?`)) {
+                                onDeleteRegulation(reg.id);
+                                onLogActivity(`Menghapus kebijakan: ${reg.title}`);
+                              }
+                            }}
+                            className="px-2 py-1 bg-white hover:bg-red-50 text-red-600 hover:text-red-750 text-[10px] font-bold border border-red-200 rounded-md cursor-pointer transition"
+                          >
+                            Hapus
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+              )}
+            </div>
+          </div>
         </div>
       )}
 

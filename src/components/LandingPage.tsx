@@ -4,7 +4,7 @@ import {
   MapPin, Clock, Calendar, ChevronRight, Eye, ShieldCheck, HelpCircle, 
   ShoppingCart, ArrowRight, ExternalLink, Bookmark, Search, Filter 
 } from 'lucide-react';
-import { CooperativeSettings, StoreProduct, Article, Announcement, CartItem, Member, TentangItem, LayananItem, GalleryItem, LMSCourse, LMSUserProgress } from '../types';
+import { CooperativeSettings, StoreProduct, Article, Announcement, CartItem, Member, TentangItem, LayananItem, GalleryItem, LMSCourse, LMSUserProgress, Regulation } from '../types';
 import { LMSPortal } from './LMSPortal';
 
 interface LandingPageProps {
@@ -15,6 +15,7 @@ interface LandingPageProps {
   tentangItems: TentangItem[];
   layananItems: LayananItem[];
   galleryItems: GalleryItem[];
+  regulations: Regulation[];
   onOpenAuth: (tab: 'login' | 'register') => void;
   guestCart: CartItem[];
   setGuestCart: React.Dispatch<React.SetStateAction<CartItem[]>>;
@@ -38,6 +39,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   tentangItems,
   layananItems,
   galleryItems,
+  regulations,
   onOpenAuth,
   guestCart,
   setGuestCart,
@@ -60,6 +62,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   // Contact form state
   const [contactForm, setContactForm] = useState({ nama: '', email: '', pesan: '' });
   const [contactSuccess, setContactSuccess] = useState(false);
+  const [selectedReg, setSelectedReg] = useState<Regulation | null>(null);
 
   const categories = ['Semua', ...Array.from(new Set(products.map(p => p.kategori)))];
 
@@ -1130,9 +1133,23 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <div className="space-y-2">
             <h4 className="font-bold text-white uppercase tracking-wider text-xs">Kebijakan & Regulasi</h4>
             <ul className="space-y-1 text-[11px]">
-              <li><button onClick={() => alert("FAQ Pertanyaan Umum:\n1. Siapa yang boleh mendaftar?\nSeluruh pensiunan PT Pos / veteran logistik Jatim.\n2. Berapa iuran bulanan?\nIuran Pokok Rp 500.000 (sekali) & Wajib Rp 50.000/bulan.\nUntuk bantuan lain, silakan klik WhatsApp Floating button.")} className="hover:text-white transition">FAQ - Pertanyaan Umum</button></li>
-              <li><button onClick={() => alert("Syarat & Ketentuan Keanggotaan:\n1. Anggota wajib mengisi formulir pendaftaran secara detail & mengupload pas-foto resmi.\n2. Login memerlukan persetujuan Sekretaris DPW Jatim.\n3. Saldo simpanan wajib ditarik sepenuhnya saat keluar keanggotaan.")} className="hover:text-white transition">Syarat & Ketentuan</button></li>
-              <li><button onClick={() => alert("Kebijakan Privasi Anggota:\nKoperasi menjamin 100% data pribadi, pas foto, nomor handphone, nomor rekening, dan riwayat transaksi finansial Anda disimpan terenkripsi di database internal dan tidak disebarluaskan.")} className="hover:text-white transition">Kebijakan Privasi</button></li>
+              {regulations && regulations.length > 0 ? (
+                regulations
+                  .slice()
+                  .sort((a, b) => (a.order || 0) - (b.order || 0))
+                  .map((reg) => (
+                    <li key={reg.id}>
+                      <button
+                        onClick={() => setSelectedReg(reg)}
+                        className="hover:text-white transition cursor-pointer text-left block"
+                      >
+                        {reg.title}
+                      </button>
+                    </li>
+                  ))
+              ) : (
+                <li className="text-slate-500 italic">Belum ada konten</li>
+              )}
             </ul>
           </div>
 
@@ -1245,6 +1262,42 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   </form>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* REGULATION DETAIL MODAL */}
+      {selectedReg && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in" id="regulationModal">
+          <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-200 flex flex-col max-h-[85vh]">
+            <div className="bg-indigo-950 text-white p-5 flex justify-between items-center">
+              <div>
+                <p className="text-[10px] uppercase font-black tracking-widest text-[#dca415] mb-0.5">Kebijakan & Regulasi Resmi</p>
+                <h3 className="text-xs sm:text-sm font-black uppercase tracking-wide">{selectedReg.title}</h3>
+              </div>
+              <button
+                onClick={() => setSelectedReg(null)}
+                className="text-white/80 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition text-xs font-black cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div className="p-5 overflow-y-auto space-y-4 text-xs text-slate-700 leading-relaxed bg-slate-50">
+              <div className="bg-white p-5 rounded-lg border border-slate-200 shadow-xs whitespace-pre-wrap font-sans text-xs">
+                {selectedReg.content}
+              </div>
+            </div>
+
+            <div className="border-t p-4 bg-white flex justify-end">
+              <button
+                type="button"
+                onClick={() => setSelectedReg(null)}
+                className="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-[#ffffff] font-extrabold text-[10px] uppercase tracking-wider rounded-lg shadow cursor-pointer transition"
+              >
+                Tutup Kebijakan
+              </button>
             </div>
           </div>
         </div>
