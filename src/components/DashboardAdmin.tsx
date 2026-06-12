@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { 
   Settings, Users, ShieldAlert, History, RefreshCw, Printer, 
-  Trash2, Edit, Plus, FileText, CheckCircle2, UserCheck, Search, Eye, Upload, Wallet 
+  Trash2, Edit, Plus, FileText, CheckCircle2, UserCheck, Search, Eye, Upload, Wallet, BookOpen
 } from 'lucide-react';
-import { Member, Transaction, CooperativeSettings, VisitorLog, StoreProduct, Article, Announcement, TentangItem, LayananItem, GalleryItem } from '../types';
+import { Member, Transaction, CooperativeSettings, VisitorLog, StoreProduct, Article, Announcement, TentangItem, LayananItem, GalleryItem, LMSCourse, LMSUserProgress } from '../types';
 import { DEFAULT_LOGO_SVG } from '../data/defaultData';
+import { LMSPortal } from './LMSPortal';
 
 interface DashboardAdminProps {
   adminMember: Member;
@@ -28,6 +29,11 @@ interface DashboardAdminProps {
   onClearLogs: () => void;
   onRefreshLogs: () => void;
   onEmulateRole: (role: string) => void;
+  courses: LMSCourse[];
+  progressList: LMSUserProgress[];
+  onSaveProgress: (updatedProgress: LMSUserProgress) => Promise<void>;
+  onSaveCourses: (updatedCourses: LMSCourse[]) => Promise<void>;
+  onLogActivity: (activity: string) => void;
 }
 
 export const DashboardAdmin: React.FC<DashboardAdminProps> = ({
@@ -51,9 +57,14 @@ export const DashboardAdmin: React.FC<DashboardAdminProps> = ({
   onAddMember,
   onClearLogs,
   onRefreshLogs,
-  onEmulateRole
+  onEmulateRole,
+  courses,
+  progressList,
+  onSaveProgress,
+  onSaveCourses,
+  onLogActivity
 }) => {
-  const [activeSubTab, setActiveSubTab] = useState<'pengaturan' | 'user' | 'rekening' | 'log' | 'emulasi' | 'cms'>('pengaturan');
+  const [activeSubTab, setActiveSubTab] = useState<'pengaturan' | 'user' | 'rekening' | 'log' | 'emulasi' | 'cms' | 'lms'>('pengaturan');
   
   // Settings Form State
   const [coopName, setCoopName] = useState(settings.namaSekretariat);
@@ -62,6 +73,8 @@ export const DashboardAdmin: React.FC<DashboardAdminProps> = ({
   const [coopPhone, setCoopPhone] = useState(settings.noTelpWA);
   const [coopEmail, setCoopEmail] = useState(settings.email);
   const [coopLogo, setCoopLogo] = useState(settings.logo);
+  const [coopTtdKetua, setCoopTtdKetua] = useState(settings.tandatanganKetua || '');
+  const [coopTtdSekretaris, setCoopTtdSekretaris] = useState(settings.tandatanganSekretaris || '');
 
   // Sync settings when they change dynamically
   React.useEffect(() => {
@@ -71,6 +84,8 @@ export const DashboardAdmin: React.FC<DashboardAdminProps> = ({
     setCoopPhone(settings.noTelpWA);
     setCoopEmail(settings.email);
     setCoopLogo(settings.logo);
+    setCoopTtdKetua(settings.tandatanganKetua || '');
+    setCoopTtdSekretaris(settings.tandatanganSekretaris || '');
   }, [settings]);
 
   // CMS (Content Management System) Web Pages Editor States
@@ -304,7 +319,9 @@ export const DashboardAdmin: React.FC<DashboardAdminProps> = ({
       noIjinPendirian: coopIjin,
       noTelpWA: coopPhone,
       email: coopEmail,
-      logo: coopLogo
+      logo: coopLogo,
+      tandatanganKetua: coopTtdKetua,
+      tandatanganSekretaris: coopTtdSekretaris
     });
     alert("Pengaturan Koperasi Berhasil Diperbarui!");
   };
@@ -332,6 +349,52 @@ export const DashboardAdmin: React.FC<DashboardAdminProps> = ({
       onUpdateSettings({ logo: DEFAULT_LOGO_SVG });
       alert("Logo Koperasi telah dikembalikan ke default!");
     }
+  };
+
+  const handleTtdKetuaUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        alert("Ukuran file tanda tangan Ketua maksimal adalah 2MB!");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setCoopTtdKetua(reader.result as string);
+        onUpdateSettings({ tandatanganKetua: reader.result as string });
+        alert("Tanda tangan Ketua berhasil diupload!");
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleTtdSekretarisUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        alert("Ukuran file tanda tangan Sekretaris maksimal adalah 2MB!");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setCoopTtdSekretaris(reader.result as string);
+        onUpdateSettings({ tandatanganSekretaris: reader.result as string });
+        alert("Tanda tangan Sekretaris berhasil diupload!");
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleResetTtdKetua = () => {
+    setCoopTtdKetua('');
+    onUpdateSettings({ tandatanganKetua: '' });
+    alert("Tanda tangan Ketua dikosongkan!");
+  };
+
+  const handleResetTtdSekretaris = () => {
+    setCoopTtdSekretaris('');
+    onUpdateSettings({ tandatanganSekretaris: '' });
+    alert("Tanda tangan Sekretaris dikosongkan!");
   };
 
   const handlePrintKopSurat = () => {
@@ -472,6 +535,7 @@ export const DashboardAdmin: React.FC<DashboardAdminProps> = ({
             { id: 'pengaturan', lbl: 'Pengaturan Koperasi', icon: <Settings className="w-4 h-4" /> },
             { id: 'cms', lbl: 'Kelola Konten & Beranda', icon: <FileText className="w-4 h-4" /> },
             { id: 'user', lbl: 'Kelola User / Pengguna', icon: <Users className="w-4 h-4" /> },
+            { id: 'lms', lbl: 'Pengaturan Kurikulum LMS', icon: <BookOpen className="w-4 h-4" /> },
             { id: 'rekening', lbl: 'Otoritas No Rekening', icon: <Wallet className="w-4 h-4" /> },
             { id: 'log', lbl: 'Log Visitor & Aktivitas', icon: <History className="w-4 h-4" /> },
             { id: 'emulasi', lbl: 'Emulasi Role Pengawas', icon: <UserCheck className="w-4 h-4" /> }
@@ -566,31 +630,100 @@ export const DashboardAdmin: React.FC<DashboardAdminProps> = ({
               </form>
             </div>
 
-             {/* Logo upload block */}
-             <div className="lg:col-span-4 bg-white border border-slate-200 rounded-xl p-6 shadow-xs flex flex-col items-center justify-between space-y-6">
-               <div className="text-center">
-                 <h4 className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Logo Lambang Koperasi</h4>
-                 <div className="w-36 h-36 border border-slate-200 rounded-full p-2 bg-slate-50 flex items-center justify-center overflow-hidden mx-auto mt-4 shadow-sm">
-                   <img src={coopLogo} className="w-full h-full object-contain" alt="Coop Logo Preview" />
+             {/* Logo and Signatures column */}
+             <div className="lg:col-span-4 space-y-6">
+               {/* Logo upload block */}
+               <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-xs flex flex-col items-center justify-between space-y-6">
+                 <div className="text-center">
+                   <h4 className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Logo Lambang Koperasi</h4>
+                   <div className="w-36 h-36 border border-slate-200 rounded-full p-2 bg-slate-50 flex items-center justify-center overflow-hidden mx-auto mt-4 shadow-sm">
+                     <img src={coopLogo} className="w-full h-full object-contain" alt="Coop Logo Preview" />
+                   </div>
+                   <p className="text-[10px] text-slate-500 mt-2 max-w-[180px] mx-auto leading-relaxed font-sans">
+                     Kop surat dan KTA menggunakan logo resmi Koperasi ini secara real-time.
+                   </p>
                  </div>
-                 <p className="text-[10px] text-slate-500 mt-2 max-w-[180px] mx-auto leading-relaxed font-sans">
-                   Kop surat dan KTA menggunakan logo resmi Koperasi ini secara real-time.
-                 </p>
+
+                 <div className="w-full space-y-2">
+                   <label className="w-full flex items-center justify-center gap-2 py-3 bg-slate-900 hover:bg-black text-[#ffffff] font-extrabold rounded-lg text-xs uppercase cursor-pointer select-none">
+                     <Upload className="w-4 h-4 text-slate-400" />
+                     Upload Logo Baru
+                     <input type="file" accept="image/*" className="hidden" onChange={handleLogoUploadInSettings} />
+                   </label>
+                   <button
+                     type="button"
+                     onClick={handleResetLogo}
+                     className="w-full py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-700 font-extrabold rounded-lg text-[10px] uppercase cursor-pointer select-none border border-slate-300"
+                   >
+                     Reset Logo Ke Default
+                   </button>
+                 </div>
                </div>
 
-               <div className="w-full space-y-2">
-                 <label className="w-full flex items-center justify-center gap-2 py-3 bg-slate-900 hover:bg-black text-[#ffffff] font-extrabold rounded-lg text-xs uppercase cursor-pointer select-none">
-                   <Upload className="w-4 h-4 text-slate-400" />
-                   Upload Logo Baru
-                   <input type="file" accept="image/*" className="hidden" onChange={handleLogoUploadInSettings} />
-                 </label>
-                 <button
-                   type="button"
-                   onClick={handleResetLogo}
-                   className="w-full py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-700 font-extrabold rounded-lg text-[10px] uppercase cursor-pointer select-none border border-slate-300"
-                 >
-                   Reset Logo Ke Default
-                 </button>
+               {/* Signatures upload block */}
+               <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-xs space-y-6">
+                 <div>
+                   <h4 className="text-[11px] font-black uppercase text-blue-950 tracking-wider">Tanda Tangan Pengurus (LMS)</h4>
+                   <p className="text-[10px] text-slate-500 mt-1 leading-relaxed">
+                     Upload gambar tanda tangan digital transparan (PNG/SVG) untuk disematkan otomatis pada cetakan Sertifikat Kelulusan.
+                   </p>
+                 </div>
+
+                 {/* TTD Ketua */}
+                 <div className="border border-slate-150 rounded-xl p-4 bg-slate-50/50 space-y-3">
+                   <div className="flex justify-between items-center pb-2 border-b border-slate-155">
+                     <span className="text-[10px] font-black text-slate-600 uppercase tracking-wider">Tanda Tangan Ketua</span>
+                     {coopTtdKetua && (
+                       <button
+                         type="button"
+                         onClick={handleResetTtdKetua}
+                         className="text-[9px] text-red-650 hover:underline font-bold"
+                       >
+                         Kosongkan
+                       </button>
+                     )}
+                   </div>
+                   <div className="h-16 border border-slate-200 rounded-lg bg-white flex items-center justify-center overflow-hidden p-2 shadow-xs relative">
+                     {coopTtdKetua ? (
+                       <img src={coopTtdKetua} className="max-h-full max-w-full object-contain" alt="Tanda Tangan Ketua" />
+                     ) : (
+                       <span className="text-[10px] text-slate-400 italic font-mono">[ Belum Diupload / Kosong ]</span>
+                     )}
+                   </div>
+                   <label className="w-full flex items-center justify-center gap-1.5 py-2 bg-slate-900 hover:bg-black text-[#ffffff] font-extrabold rounded-lg text-[10px] uppercase cursor-pointer select-none">
+                     <Upload className="w-3.5 h-3.5 text-slate-400" />
+                     Upload TTD Ketua
+                     <input type="file" accept="image/*" className="hidden" onChange={handleTtdKetuaUpload} />
+                   </label>
+                 </div>
+
+                 {/* TTD Sekretaris */}
+                 <div className="border border-slate-150 rounded-xl p-4 bg-slate-50/50 space-y-3">
+                   <div className="flex justify-between items-center pb-2 border-b border-slate-155">
+                     <span className="text-[10px] font-black text-slate-600 uppercase tracking-wider">Tanda Tangan Sekretaris</span>
+                     {coopTtdSekretaris && (
+                       <button
+                         type="button"
+                         onClick={handleResetTtdSekretaris}
+                         className="text-[9px] text-red-650 hover:underline font-bold"
+                       >
+                         Kosongkan
+                       </button>
+                     )}
+                   </div>
+                   <div className="h-16 border border-slate-200 rounded-lg bg-white flex items-center justify-center overflow-hidden p-2 shadow-xs relative">
+                     {coopTtdSekretaris ? (
+                       <img src={coopTtdSekretaris} className="max-h-full max-w-full object-contain" alt="Tanda Tangan Sekretaris" />
+                     ) : (
+                       <span className="text-[10px] text-slate-400 italic font-mono">[ Belum Diupload / Kosong ]</span>
+                     )}
+                   </div>
+                   <label className="w-full flex items-center justify-center gap-1.5 py-2 bg-slate-900 hover:bg-black text-[#ffffff] font-extrabold rounded-lg text-[10px] uppercase cursor-pointer select-none">
+                     <Upload className="w-3.5 h-3.5 text-slate-400" />
+                     Upload TTD Sekretaris
+                     <input type="file" accept="image/*" className="hidden" onChange={handleTtdSekretarisUpload} />
+                   </label>
+                 </div>
                </div>
              </div>
           </div>
@@ -1181,6 +1314,29 @@ export const DashboardAdmin: React.FC<DashboardAdminProps> = ({
 
             </form>
           </div>
+        </div>
+      )}
+
+      {/* ================= TAB 7: LMS COURSE CURRICULUM MANAGEMENT ================= */}
+      {activeSubTab === 'lms' && (
+        <div className="bg-slate-950 text-white border border-slate-800 rounded-xl overflow-hidden shadow-xs mt-6 p-6">
+          <div className="border-b border-white/5 pb-4 mb-4">
+            <h3 className="text-sm font-black uppercase text-amber-400 flex items-center gap-1.5 font-sans">
+              <BookOpen className="w-5 h-5 text-blue-450" /> Kurikulum LMS & Manajemen Soal Kuis
+            </h3>
+            <p className="text-slate-400 text-[11px] mt-0.5">Tambah, ubah, dan hapus modul kursus, pembelajaran sub-bab materi, tautan media luar, serta pertanyaan kuis secara terintegrasi.</p>
+          </div>
+          
+          <LMSPortal
+            currentUser={adminMember}
+            courses={courses}
+            progressList={progressList}
+            onSaveProgress={onSaveProgress}
+            onSaveCourses={onSaveCourses}
+            onLogActivity={onLogActivity}
+            settings={settings}
+            members={members}
+          />
         </div>
       )}
 

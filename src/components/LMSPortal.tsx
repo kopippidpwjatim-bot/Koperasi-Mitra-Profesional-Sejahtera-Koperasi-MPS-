@@ -17,9 +17,11 @@ import {
   ChevronRight, 
   FileText,
   BookmarkCheck,
-  AlertCircle
+  AlertCircle,
+  ExternalLink,
+  Edit
 } from 'lucide-react';
-import { LMSCourse, LMSUserProgress, Member, UserRole } from '../types';
+import { LMSCourse, LMSUserProgress, Member, UserRole, CooperativeSettings } from '../types';
 
 interface LMSPortalProps {
   currentUser: Member | null;
@@ -28,6 +30,8 @@ interface LMSPortalProps {
   onSaveProgress: (updatedProgress: LMSUserProgress) => Promise<void>;
   onSaveCourses: (updatedCourses: LMSCourse[]) => Promise<void>;
   onLogActivity: (activity: string) => void;
+  settings: CooperativeSettings;
+  members: Member[];
 }
 
 export const LMSPortal: React.FC<LMSPortalProps> = ({
@@ -36,10 +40,22 @@ export const LMSPortal: React.FC<LMSPortalProps> = ({
   progressList,
   onSaveProgress,
   onSaveCourses,
-  onLogActivity
+  onLogActivity,
+  settings,
+  members
 }) => {
   // If not logged in, show a state prompting him to log in to track progress, but allow browsing courses
   const isGuest = !currentUser;
+
+  // Dynamically resolve Chairman & Secretary from managed users
+  const ketuaMember = members.find(m => m.role === 'ketua');
+  const sekretarisMember = members.find(m => m.role === 'sekretaris');
+
+  const ketuaFullName = ketuaMember ? ketuaMember.nama : "Prof. Dr. H. Slamet Purwanto, M.E.";
+  const sekretarisFullName = sekretarisMember ? sekretarisMember.nama : "Drs. Mohammad Anshori, M.Si.";
+  
+  const ketuaSignLabel = ketuaMember ? ketuaMember.nama.split(',')[0].trim() : "Prof. Slamet";
+  const sekretarisSignLabel = sekretarisMember ? sekretarisMember.nama.split(',')[0].trim() : "Drs. M. Anshori";
   
   // Find current user's progress or return a default empty progress
   const userProgress = progressList.find(p => p.memberId === currentUser?.id) || {
@@ -65,6 +81,7 @@ export const LMSPortal: React.FC<LMSPortalProps> = ({
   // Admin and category filter states
   const [activeCategory, setActiveCategory] = useState<string>('Semua');
   const [showAdminTab, setShowAdminTab] = useState<boolean>(false);
+  const [editingCourseId, setEditingCourseId] = useState<string | null>(null);
 
   // Custom course creator state (admin only)
   const [newCourse, setNewCourse] = useState({
@@ -73,8 +90,10 @@ export const LMSPortal: React.FC<LMSPortalProps> = ({
     instructor: '',
     description: '',
     duration: '2 Jam',
+    image: '',
+    externalUrl: '',
     lessons: [
-      { id: 'new-l1', title: 'Materi Bab 1', content: 'Tulis detail isi materi Bab 1 di sini...', duration: '15 Menit', order: 1 }
+      { id: 'new-l1', title: 'Materi Bab 1', content: 'Tulis detail isi materi Bab 1 di sini...', duration: '15 Menit', order: 1, externalUrl: '' }
     ],
     quiz: {
       passingScore: 70,
@@ -225,22 +244,52 @@ export const LMSPortal: React.FC<LMSPortalProps> = ({
       return;
     }
 
-    const created: LMSCourse = {
-      id: `course-${Date.now()}`,
-      title: newCourse.title,
-      category: newCourse.category,
-      instructor: newCourse.instructor,
-      description: newCourse.description || 'Tidak ada deskripsi rincian.',
-      duration: newCourse.duration,
-      image: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 250" width="100%" height="100%"><rect width="400" height="250" rx="15" fill="%231e293b"/><text x="200" y="120" font-family="sans-serif" font-weight="bold" font-size="16" fill="%23ffffff" text-anchor="middle">${newCourse.title.substring(0, 30)}...</text><text x="200" y="150" font-family="sans-serif" font-size="12" fill="%2338bdf8" text-anchor="middle">Instruktur: ${newCourse.instructor}</text></svg>`,
-      lessons: newCourse.lessons,
-      quiz: newCourse.quiz
-    };
+    const defaultImg = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 250" width="100%" height="100%"><rect width="400" height="250" rx="15" fill="%231e293b"/><text x="200" y="120" font-family="sans-serif" font-weight="bold" font-size="16" fill="%23ffffff" text-anchor="middle">${newCourse.title.substring(0, 30)}...</text><text x="200" y="150" font-family="sans-serif" font-size="12" fill="%2338bdf8" text-anchor="middle">Instruktur: ${newCourse.instructor}</text></svg>`;
 
-    const updated = [...courses, created];
-    await onSaveCourses(updated);
-    onLogActivity(`Menambahkan materi kursus pembelajaran baru "${created.title}"`);
-    alert("Kursus LMS baru berhasil didaftarkan secara permanen!");
+    if (editingCourseId) {
+      // Edit mode
+      const updated = courses.map(c => {
+        if (c.id === editingCourseId) {
+          return {
+            ...c,
+            title: newCourse.title,
+            category: newCourse.category,
+            instructor: newCourse.instructor,
+            description: newCourse.description || 'Tidak ada deskripsi rincian.',
+            duration: newCourse.duration,
+            image: newCourse.image || defaultImg,
+            lessons: newCourse.lessons,
+            quiz: newCourse.quiz,
+            externalUrl: newCourse.externalUrl
+          };
+        }
+        return c;
+      });
+
+      await onSaveCourses(updated);
+      onLogActivity(`Memperbarui data kursus LMS "${newCourse.title}"`);
+      alert("Kursus LMS berhasil diperbarui secara permanen!");
+      setEditingCourseId(null);
+    } else {
+      // Create mode
+      const created: LMSCourse = {
+        id: `course-${Date.now()}`,
+        title: newCourse.title,
+        category: newCourse.category,
+        instructor: newCourse.instructor,
+        description: newCourse.description || 'Tidak ada deskripsi rincian.',
+        duration: newCourse.duration,
+        image: newCourse.image || defaultImg,
+        lessons: newCourse.lessons,
+        quiz: newCourse.quiz,
+        externalUrl: newCourse.externalUrl
+      };
+
+      const updated = [...courses, created];
+      await onSaveCourses(updated);
+      onLogActivity(`Menambahkan materi kursus pembelajaran baru "${created.title}"`);
+      alert("Kursus LMS baru berhasil didaftarkan secara permanen!");
+    }
     
     // reset form
     setNewCourse({
@@ -249,10 +298,35 @@ export const LMSPortal: React.FC<LMSPortalProps> = ({
       instructor: '',
       description: '',
       duration: '2 Jam',
-      lessons: [{ id: 'new-l1', title: 'Materi Bab 1', content: 'Tulis detail...', duration: '15 Menit', order: 1 }],
-      quiz: { passingScore: 70, questions: [{ id: 'new-q1', questionText: 'Apa pengertian wirausaha?', options: ['A', 'B', 'C', 'D'], correctOptionIndex: 0 }] }
+      image: '',
+      externalUrl: '',
+      lessons: [{ id: 'new-l1', title: 'Materi Bab 1', content: 'Tulis detail isi materi Bab 1 di sini...', duration: '15 Menit', order: 1, externalUrl: '' }],
+      quiz: { passingScore: 70, questions: [{ id: 'new-q1', questionText: 'Apa pengertian wirausaha menurut UU?', options: ['Pilihan A', 'Pilihan B', 'Pilihan C', 'Pilihan D'], correctOptionIndex: 0 }] }
     });
     setShowAdminTab(false);
+  };
+
+  const handleEditClick = (course: LMSCourse) => {
+    setEditingCourseId(course.id);
+    setNewCourse({
+      title: course.title,
+      category: course.category,
+      instructor: course.instructor,
+      description: course.description,
+      duration: course.duration,
+      image: course.image || '',
+      externalUrl: course.externalUrl || '',
+      lessons: course.lessons.map(l => ({
+        id: l.id,
+        title: l.title,
+        content: l.content,
+        duration: l.duration,
+        order: l.order,
+        externalUrl: l.externalUrl || ''
+      })),
+      quiz: course.quiz
+    });
+    setShowAdminTab(true);
   };
 
   const handleDeleteCourse = async (courseId: string) => {
@@ -410,9 +484,14 @@ export const LMSPortal: React.FC<LMSPortalProps> = ({
               
               <div className="relative z-10 flex flex-col items-center">
                 
-                {/* Vintage Badge Element */}
-                <div className="w-20 h-20 mb-4 bg-amber-50 border-4 border-amber-500 rounded-full flex items-center justify-center text-amber-600 transform hover:rotate-12 transition-all duration-500 shadow-md">
-                  <Award className="w-10 h-10" />
+                {/* Dynamic Logo and Vintage Badge Element */}
+                <div className="flex justify-center items-center gap-6 mb-4">
+                  {settings.logo ? (
+                    <img src={settings.logo} className="h-16 w-16 object-contain" alt="Logo Resmi Koperasi" />
+                  ) : null}
+                  <div className="w-16 h-16 bg-amber-50 border-4 border-amber-500 rounded-full flex items-center justify-center text-amber-600 shadow-sm">
+                    <Award className="w-8 h-8" />
+                  </div>
                 </div>
 
                 <p className="text-amber-700 font-extrabold tracking-widest text-xs uppercase mb-1">
@@ -422,7 +501,7 @@ export const LMSPortal: React.FC<LMSPortalProps> = ({
                   Surat Keputusan Pendirian AHU-0008412.AH.01.26.TAHUN-2024
                 </p>
 
-                <h1 className="text-2xl md:text-4xl font-serif font-black text-slate-950 tracking-tight leading-none mb-1">
+                <h1 className="text-2xl md:text-3xl font-serif font-black text-slate-950 tracking-tight leading-none mb-1">
                   SERTIFIKAT KELULUSAN
                 </h1>
                 <p className="text-xs md:text-sm text-slate-600 font-medium tracking-wide uppercase border-t border-b border-slate-300 py-1 px-8 mb-6">
@@ -431,7 +510,7 @@ export const LMSPortal: React.FC<LMSPortalProps> = ({
 
                 <p className="text-xs text-slate-500 font-medium italic mb-2">Dengan ini menyatakan bahwa anggota koperasi:</p>
                 
-                <h2 className="text-xl md:text-3xl font-black text-blue-950 tracking-tight mb-2 underline ornament underline-offset-8">
+                <h2 className="text-xl md:text-3xl font-black text-blue-950 tracking-tight mb-2 underline ornament underline-offset-8 font-serif">
                   {userProgress.memberName || currentUser?.nama || 'Nama Peserta'}
                 </h2>
                 
@@ -445,7 +524,7 @@ export const LMSPortal: React.FC<LMSPortalProps> = ({
                   Telah merampungkan seluruh kurikulum, uji bab, serta evaluasi komprehensif interaktif secara penuh, dengan pencapaian akademis memuaskan untuk program pembelajaran:
                 </p>
 
-                <h3 className="text-md md:text-xl font-bold text-slate-900 bg-slate-50 border border-slate-200/80 px-6 py-2 rounded-xl inline-block mb-6 shadow-sm">
+                <h3 className="text-md md:text-lg font-bold text-slate-900 bg-slate-50 border border-slate-200/80 px-6 py-2 rounded-xl inline-block mb-6 shadow-sm">
                   {activeCertCourse.title}
                 </h3>
 
@@ -453,28 +532,36 @@ export const LMSPortal: React.FC<LMSPortalProps> = ({
                   Kelulusan tervalidasi pada tanggal {userProgress.certifiedAt[activeCertCourse.id] || new Date().toLocaleDateString('id-ID')} dengan Skor Sempurna {userProgress.quizScores[activeCertCourse.id] || 100}%
                 </p>
 
-                {/* Signatures */}
+                {/* Dynamic Signatures from managed user database / settings upload */}
                 <div className="grid grid-cols-2 gap-12 w-full max-w-lg border-t border-slate-200 pt-6 mt-4">
                   <div className="text-center">
                     <p className="text-[10px] text-slate-400 uppercase font-black tracking-wider leading-none">Mengesahkan,</p>
-                    <div className="h-10 flex items-end justify-center">
-                      <span className="font-serif italic font-bold text-slate-800 text-sm">Prof. Slamet</span>
+                    <div className="h-12 flex items-center justify-center py-1">
+                      {settings.tandatanganKetua ? (
+                        <img src={settings.tandatanganKetua} className="max-h-full max-w-[120px] object-contain mx-auto" alt="Tanda Tangan Ketua Koperasi" />
+                      ) : (
+                        <div className="h-12"></div>
+                      )}
                     </div>
-                    <p className="text-xs font-bold text-slate-900 border-t border-slate-300 pt-1 mt-1 leading-none">
-                      Prof. Dr. H. Slamet Purwanto, M.E.
+                    <p className="text-[11px] font-bold text-slate-900 border-t border-slate-300 pt-1 mt-1 leading-none">
+                      {ketuaFullName}
                     </p>
-                    <p className="text-[10px] text-slate-500 font-mono uppercase mt-0.5">Ketua Koperasi</p>
+                    <p className="text-[9px] text-slate-500 font-mono uppercase mt-0.5">Ketua Koperasi</p>
                   </div>
 
                   <div className="text-center">
                     <p className="text-[10px] text-slate-400 uppercase font-black tracking-wider leading-none">Menyetujui,</p>
-                    <div className="h-10 flex items-end justify-center">
-                      <span className="font-serif italic font-bold text-slate-800 text-sm">Drs. M. Anshori</span>
+                    <div className="h-12 flex items-center justify-center py-1">
+                      {settings.tandatanganSekretaris ? (
+                        <img src={settings.tandatanganSekretaris} className="max-h-full max-w-[120px] object-contain mx-auto" alt="Tanda Tangan Sekretaris Koperasi" />
+                      ) : (
+                        <div className="h-12"></div>
+                      )}
                     </div>
-                    <p className="text-xs font-bold text-slate-900 border-t border-slate-300 pt-1 mt-1 leading-none">
-                      Drs. Mohammad Anshori, M.Si.
+                    <p className="text-[11px] font-bold text-slate-900 border-t border-slate-300 pt-1 mt-1 leading-none">
+                      {sekretarisFullName}
                     </p>
-                    <p className="text-[10px] text-slate-500 font-mono uppercase mt-0.5">Sekretaris Koperasi</p>
+                    <p className="text-[9px] text-slate-500 font-mono uppercase mt-0.5">Sekretaris Koperasi</p>
                   </div>
                 </div>
 
@@ -501,6 +588,25 @@ export const LMSPortal: React.FC<LMSPortalProps> = ({
                 <p className="text-[11px] text-slate-400 font-medium mt-1">
                   Oleh: {selectedCourse.instructor}
                 </p>
+
+                {/* Main Course-level Dynamic External URL (Zoom/Meet/Drive/PDF) */}
+                {selectedCourse.externalUrl && (
+                  <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-xl space-y-1.5">
+                    <p className="text-[9px] font-black text-blue-400 uppercase tracking-widest leading-none">Tautan Utama Pembelajaran</p>
+                    <a
+                      href={selectedCourse.externalUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-between gap-1.5 px-3 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-[10px] font-extrabold uppercase tracking-wide leading-none transition-all cursor-pointer shadow-sm active:scale-95"
+                    >
+                      <span className="flex items-center gap-1.5 truncate">
+                        <ExternalLink className="w-3.5 h-3.5" />
+                        Buka Kelas / Jurnal Luar
+                      </span>
+                      <span>&rarr;</span>
+                    </a>
+                  </div>
+                )}
 
                 <div className="mt-6 space-y-2.5">
                   <p className="text-[10px] font-extrabold tracking-wider text-slate-500 uppercase">DAFTAR SILABUS MATERI</p>
@@ -605,6 +711,25 @@ export const LMSPortal: React.FC<LMSPortalProps> = ({
                       ⏱️ {selectedCourse.lessons[activeLessonIndex].duration}
                     </span>
                   </div>
+
+                  {/* Dynamic sub-bab lesson-level external url link block (Zoom, Meet, GDrive, Youtube, slides etc.) */}
+                  {selectedCourse.lessons[activeLessonIndex].externalUrl && (
+                    <div className="mb-6 p-4 bg-emerald-500/10 border border-emerald-550/20 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 text-xs">
+                      <div className="space-y-0.5">
+                        <p className="text-[10px] font-black text-emerald-400 uppercase tracking-widest leading-none">Bahan Pendukung Interaktif</p>
+                        <p className="text-slate-400 text-[11px] leading-relaxed">Tersedia tautan luar jurnalis, presentasi, zoom meeting, slide, atau referensi media khalayak bab ini.</p>
+                      </div>
+                      <a
+                        href={selectedCourse.lessons[activeLessonIndex].externalUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold uppercase rounded-lg text-[10px] tracking-wider shrink-0 transition-all cursor-pointer shadow-sm active:scale-95 whitespace-nowrap"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                        Buka Referensi Bab
+                      </a>
+                    </div>
+                  )}
 
                   {/* Render Lesson Content conforming to Markdown rules */}
                   <div 
@@ -808,7 +933,33 @@ export const LMSPortal: React.FC<LMSPortalProps> = ({
 
             {/* Sub-section 1: Add New Course */}
             <div className="bg-slate-900/60 p-5 rounded-xl border border-slate-850 space-y-4">
-              <h3 className="text-sm font-black text-amber-400 uppercase tracking-widest border-b border-white/5 pb-2">Buat Modul Pelatihan / Kursus Baru</h3>
+              <div className="flex justify-between items-center border-b border-white/5 pb-2">
+                <h3 className="text-sm font-black text-amber-400 uppercase tracking-widest">
+                  {editingCourseId ? "Sunting Modul Pelatihan / Kursus" : "Buat Modul Pelatihan / Kursus Baru"}
+                </h3>
+                {editingCourseId && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditingCourseId(null);
+                      setNewCourse({
+                        title: '',
+                        category: 'UMKM Modern',
+                        instructor: '',
+                        description: '',
+                        duration: '2 Jam',
+                        image: '',
+                        externalUrl: '',
+                        lessons: [{ id: 'new-l1', title: 'Materi Bab 1', content: 'Tulis detail isi materi Bab 1 di sini...', duration: '15 Menit', order: 1, externalUrl: '' }],
+                        quiz: { passingScore: 70, questions: [{ id: 'new-q1', questionText: 'Apa pengertian wirausaha menurut UU?', options: ['Pilihan A', 'Pilihan B', 'Pilihan C', 'Pilihan D'], correctOptionIndex: 0 }] }
+                      });
+                    }}
+                    className="px-3 py-1 bg-red-600/20 hover:bg-red-600 text-red-200 text-[10px] font-bold rounded-lg transition"
+                  >
+                    Batal Sunting
+                  </button>
+                )}
+              </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -858,6 +1009,41 @@ export const LMSPortal: React.FC<LMSPortalProps> = ({
                   />
                 </div>
 
+                <div>
+                  <label className="block text-[10px] text-slate-400 font-extrabold uppercase mb-1">Tautan URL Luar Kursus (Opsional, e.g. Link Zoom / Meet)</label>
+                  <input
+                    type="text"
+                    value={newCourse.externalUrl}
+                    onChange={(e) => setNewCourse(prev => ({ ...prev, externalUrl: e.target.value }))}
+                    placeholder="https://zoom.us/j/examples..."
+                    className="w-full bg-slate-950 text-white border border-slate-800 px-3 py-2 rounded-xl text-xs placeholder:text-slate-600 focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] text-slate-400 font-extrabold uppercase mb-1">Foto Sampul Kursus (Opsional)</label>
+                  <div className="flex gap-2 items-center">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onloadend = () => {
+                            setNewCourse(prev => ({ ...prev, image: reader.result as string }));
+                          };
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                      className="text-xs text-slate-400 bg-slate-950 border border-slate-800 rounded-xl px-2 py-1.5 w-full cursor-pointer focus:outline-none"
+                    />
+                    {newCourse.image && (
+                      <img src={newCourse.image} alt="Sampul preview" className="w-10 h-10 object-cover rounded-lg border border-slate-800 shrink-0" />
+                    )}
+                  </div>
+                </div>
+
                 <div className="md:col-span-2">
                   <label className="block text-[10px] text-slate-400 font-extrabold uppercase mb-1">Deskripsi Singkat Silabus</label>
                   <textarea
@@ -884,46 +1070,79 @@ export const LMSPortal: React.FC<LMSPortalProps> = ({
                 </div>
 
                 {newCourse.lessons.map((less, lessIdx) => (
-                  <div key={lessIdx} className="grid grid-cols-1 md:grid-cols-12 gap-2 bg-slate-950 p-2.5 rounded-lg border border-slate-850 text-xs text-slate-300">
-                    <div className="md:col-span-1 flex items-center justify-center font-bold text-slate-500">
-                      Bab {lessIdx + 1}
+                  <div key={lessIdx} className="bg-slate-950 p-3.5 rounded-xl border border-slate-850 space-y-2.5 text-xs text-slate-300">
+                    <div className="flex justify-between items-center border-b border-white/5 pb-1.5">
+                      <span className="font-extrabold text-[10px] text-blue-400 uppercase">Bab {lessIdx + 1}</span>
+                      {newCourse.lessons.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const updated = newCourse.lessons.filter((_, i) => i !== lessIdx);
+                            setNewCourse(prev => ({ ...prev, lessons: updated }));
+                          }}
+                          className="text-[9px] font-black text-red-400 hover:text-red-300 uppercase tracking-wider"
+                        >
+                          Hapus Slot Bab
+                        </button>
+                      )}
                     </div>
-                    <div className="md:col-span-4">
+
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-2">
+                      <div className="md:col-span-4">
+                        <label className="block text-[9px] text-slate-500 font-bold uppercase mb-0.5">Judul Materi Bab</label>
+                        <input
+                          type="text"
+                          value={less.title}
+                          onChange={(e) => {
+                            const updated = [...newCourse.lessons];
+                            updated[lessIdx].title = e.target.value;
+                            setNewCourse(prev => ({ ...prev, lessons: updated }));
+                          }}
+                          placeholder="Nama sub-materi"
+                          className="w-full bg-slate-900 border border-slate-800 px-2.5 py-1.5 rounded-lg text-xs"
+                        />
+                      </div>
+                      <div className="md:col-span-6">
+                        <label className="block text-[9px] text-slate-500 font-bold uppercase mb-0.5">Isi Ringkasan / Buku Bacaan Pembelajaran</label>
+                        <textarea
+                          rows={2}
+                          value={less.content}
+                          onChange={(e) => {
+                            const updated = [...newCourse.lessons];
+                            updated[lessIdx].content = e.target.value;
+                            setNewCourse(prev => ({ ...prev, lessons: updated }));
+                          }}
+                          placeholder="Isi pembelajaran materi..."
+                          className="w-full bg-slate-900 border border-slate-800 px-2.5 py-1.5 rounded-lg text-xs"
+                        />
+                      </div>
+                      <div className="md:col-span-2">
+                        <label className="block text-[9px] text-slate-500 font-bold uppercase mb-0.5">Durasi</label>
+                        <input
+                          type="text"
+                          value={less.duration}
+                          onChange={(e) => {
+                            const updated = [...newCourse.lessons];
+                            updated[lessIdx].duration = e.target.value;
+                            setNewCourse(prev => ({ ...prev, lessons: updated }));
+                          }}
+                          placeholder="15 Menit"
+                          className="w-full bg-slate-900 border border-slate-800 px-2.5 py-1.5 rounded-lg text-xs"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-[9px] text-slate-500 font-bold uppercase mb-0.5">Tautan URL Luar Materi Bab (Opsional, e.g. Video YouTube / Slides / GDrive)</label>
                       <input
                         type="text"
-                        value={less.title}
+                        value={less.externalUrl || ''}
                         onChange={(e) => {
                           const updated = [...newCourse.lessons];
-                          updated[lessIdx].title = e.target.value;
+                          updated[lessIdx].externalUrl = e.target.value;
                           setNewCourse(prev => ({ ...prev, lessons: updated }));
                         }}
-                        placeholder="Nama sub-materi"
-                        className="w-full bg-slate-900 border border-slate-800 px-2.5 py-1 rounded-lg text-xs"
-                      />
-                    </div>
-                    <div className="md:col-span-5">
-                      <textarea
-                        rows={1}
-                        value={less.content}
-                        onChange={(e) => {
-                          const updated = [...newCourse.lessons];
-                          updated[lessIdx].content = e.target.value;
-                          setNewCourse(prev => ({ ...prev, lessons: updated }));
-                        }}
-                        placeholder="Isi pembelajaran materi..."
-                        className="w-full bg-slate-900 border border-slate-800 px-2.5 py-1 rounded-lg text-xs"
-                      />
-                    </div>
-                    <div className="md:col-span-2">
-                      <input
-                        type="text"
-                        value={less.duration}
-                        onChange={(e) => {
-                          const updated = [...newCourse.lessons];
-                          updated[lessIdx].duration = e.target.value;
-                          setNewCourse(prev => ({ ...prev, lessons: updated }));
-                        }}
-                        placeholder="15 Mnt"
+                        placeholder="https://youtube.com/watch?v=..."
                         className="w-full bg-slate-900 border border-slate-800 px-2.5 py-1 rounded-lg text-xs"
                       />
                     </div>
@@ -946,8 +1165,22 @@ export const LMSPortal: React.FC<LMSPortalProps> = ({
 
                 {newCourse.quiz.questions.map((q, qIndex) => (
                   <div key={qIndex} className="p-3 bg-slate-950 rounded-lg border border-slate-850 space-y-2 text-xs">
-                    <div>
+                    <div className="flex justify-between items-center">
                       <span className="font-extrabold text-[10px] text-amber-500 mr-2 uppercase">Soal {qIndex + 1}</span>
+                      {newCourse.quiz.questions.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const updated = newCourse.quiz.questions.filter((_, idx) => idx !== qIndex);
+                            setNewCourse(prev => ({ ...prev, quiz: { ...prev.quiz, questions: updated } }));
+                          }}
+                          className="text-[9px] font-black text-red-450 hover:text-red-400 hover:underline uppercase tracking-wider transition-all cursor-pointer"
+                        >
+                          Hapus Soal
+                        </button>
+                      )}
+                    </div>
+                    <div>
                       <input
                         type="text"
                         value={q.questionText}
@@ -1025,14 +1258,24 @@ export const LMSPortal: React.FC<LMSPortalProps> = ({
                       <p className="text-[10px] text-slate-400 font-medium mt-0.5">Instruktur: {course.instructor} • {course.lessons.length} Bab</p>
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteCourse(course.id)}
-                      className="p-2.5 bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white rounded-xl border border-red-500/20 hover:border-red-500 transition shrink-0 cursor-pointer"
-                      title="Hapus Kelas"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => handleEditClick(course)}
+                        className="p-2.5 bg-amber-500/10 hover:bg-amber-500 text-amber-400 hover:text-white rounded-xl border border-amber-500/20 hover:border-amber-400 transition cursor-pointer"
+                        title="Edit Kursus"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteCourse(course.id)}
+                        className="p-2.5 bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white rounded-xl border border-red-500/20 hover:border-red-500 transition cursor-pointer"
+                        title="Hapus Kelas"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>

@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { 
   UserCheck, FileText, Newspaper, Megaphone, Printer, 
-  Trash2, Plus, LogOut, CheckCircle, Smartphone, MapPin, ExternalLink 
+  Trash2, Plus, LogOut, CheckCircle, Smartphone, MapPin, ExternalLink, BookOpen
 } from 'lucide-react';
-import { Member, Article, Announcement, CooperativeSettings } from '../types';
+import { Member, Article, Announcement, CooperativeSettings, LMSCourse, LMSUserProgress } from '../types';
+import { LMSPortal } from './LMSPortal';
 
 interface DashboardSekretarisProps {
   secretaryMember: Member;
@@ -14,10 +15,17 @@ interface DashboardSekretarisProps {
   onApproveMember: (id: string) => void;
   onRejectMember: (id: string) => void;
   onAddArticle: (art: Omit<Article, 'id' | 'date'>) => void;
+  onEditArticle: (id: string, art: Omit<Article, 'id' | 'date'>) => void;
   onDeleteArticle: (id: string) => void;
   onAddAnnouncement: (ann: Omit<Announcement, 'id' | 'date'>) => void;
+  onEditAnnouncement: (id: string, ann: Omit<Announcement, 'id' | 'date'>) => void;
   onDeleteAnnouncement: (id: string) => void;
   onLogout: () => void;
+  courses: LMSCourse[];
+  progressList: LMSUserProgress[];
+  onSaveProgress: (updatedProgress: LMSUserProgress) => Promise<void>;
+  onSaveCourses: (updatedCourses: LMSCourse[]) => Promise<void>;
+  onLogActivity: (activity: string) => void;
 }
 
 export const DashboardSekretaris: React.FC<DashboardSekretarisProps> = ({
@@ -29,18 +37,27 @@ export const DashboardSekretaris: React.FC<DashboardSekretarisProps> = ({
   onApproveMember,
   onRejectMember,
   onAddArticle,
+  onEditArticle,
   onDeleteArticle,
   onAddAnnouncement,
+  onEditAnnouncement,
   onDeleteAnnouncement,
-  onLogout
+  onLogout,
+  courses,
+  progressList,
+  onSaveProgress,
+  onSaveCourses,
+  onLogActivity
 }) => {
-  const [activeTabSec, setActiveTabSec] = useState<'pendaftaran' | 'berita_editor' | 'kop_pdf'>('pendaftaran');
+  const [activeTabSec, setActiveTabSec] = useState<'pendaftaran' | 'berita_editor' | 'kop_pdf' | 'lms'>('pendaftaran');
 
   // Article Form State
   const [artForm, setArtForm] = useState({ title: '', summary: '', content: '', category: 'Tips Keuangan' });
+  const [editingArtId, setEditingArtId] = useState<string | null>(null);
   
   // Announcement Form State
   const [annForm, setAnnForm] = useState({ title: '', content: '', important: false });
+  const [editingAnnId, setEditingAnnId] = useState<string | null>(null);
 
   // Get pending members
   const pendingMembers = members.filter(m => m.status === 'pending');
@@ -98,8 +115,14 @@ export const DashboardSekretaris: React.FC<DashboardSekretarisProps> = ({
       alert("Kolom judul dan konten artikel wajib diisi!");
       return;
     }
-    onAddArticle(artForm);
-    alert("Artikel berita murni dipublikasikan ke Landing Page!");
+    if (editingArtId) {
+      onEditArticle(editingArtId, artForm);
+      alert("Artikel berhasil diperbarui!");
+      setEditingArtId(null);
+    } else {
+      onAddArticle(artForm);
+      alert("Artikel berita murni dipublikasikan ke Landing Page!");
+    }
     setArtForm({ title: '', summary: '', content: '', category: 'Tips Keuangan' });
   };
 
@@ -109,8 +132,14 @@ export const DashboardSekretaris: React.FC<DashboardSekretarisProps> = ({
       alert("Kolom pengumuman wajib diisi seluruhnya!");
       return;
     }
-    onAddAnnouncement(annForm);
-    alert("Pengumuman berhasil disematkan di beranda depan!");
+    if (editingAnnId) {
+      onEditAnnouncement(editingAnnId, annForm);
+      alert("Pengumuman berhasil diperbarui!");
+      setEditingAnnId(null);
+    } else {
+      onAddAnnouncement(annForm);
+      alert("Pengumuman berhasil disematkan di beranda depan!");
+    }
     setAnnForm({ title: '', content: '', important: false });
   };
 
@@ -145,6 +174,7 @@ export const DashboardSekretaris: React.FC<DashboardSekretarisProps> = ({
         {[
           { id: 'pendaftaran', lbl: 'Verifikasi & Approve Anggota Baru', icon: <UserCheck className="w-4 h-4" /> },
           { id: 'berita_editor', lbl: 'Edit Konten Landing Page', icon: <Newspaper className="w-4 h-4" /> },
+          { id: 'lms', lbl: 'Pengaturan Kurikulum LMS', icon: <BookOpen className="w-4 h-4" /> },
           { id: 'kop_pdf', lbl: 'Kop Surat & Cetak PDF', icon: <Printer className="w-4 h-4" /> }
         ].map((tab) => (
           <button
@@ -289,12 +319,26 @@ export const DashboardSekretaris: React.FC<DashboardSekretarisProps> = ({
                 />
               </div>
 
-              <button
-                type="submit"
-                className="px-5 py-2.5 bg-indigo-900 hover:bg-black font-extrabold text-[#ffffff] rounded-lg text-xs leading-none uppercase tracking-wide cursor-pointer"
-              >
-                Simpan & Upload Artikel
-              </button>
+              <div className="flex gap-2">
+                <button
+                  type="submit"
+                  className="px-5 py-2.5 bg-indigo-900 hover:bg-black font-extrabold text-[#ffffff] rounded-lg text-xs leading-none uppercase tracking-wide cursor-pointer"
+                >
+                  {editingArtId ? "Perbarui Artikel" : "Simpan & Upload Artikel"}
+                </button>
+                {editingArtId && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditingArtId(null);
+                      setArtForm({ title: '', summary: '', content: '', category: 'Tips Keuangan' });
+                    }}
+                    className="px-4 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-lg text-xs leading-none uppercase cursor-pointer"
+                  >
+                    Batal
+                  </button>
+                )}
+              </div>
             </form>
 
             {/* Existing Articles manager */}
@@ -303,15 +347,33 @@ export const DashboardSekretaris: React.FC<DashboardSekretarisProps> = ({
               <div className="divide-y divide-slate-100 max-h-44 overflow-y-auto pr-1">
                 {articles.map((art) => (
                   <div key={art.id} className="py-2 flex justify-between items-center text-[10.5px]">
-                    <span className="truncate max-w-[200px] font-bold text-slate-800">{art.title}</span>
-                    <button
-                      onClick={() => {
-                        if (confirm("Hapus artikel ini dari frontpage?")) onDeleteArticle(art.id);
-                      }}
-                      className="text-red-600 p-1 hover:bg-red-50 rounded"
-                    >
-                      Hapus
-                    </button>
+                    <span className="truncate max-w-[150px] font-bold text-slate-800">{art.title}</span>
+                    <div className="flex gap-1">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditingArtId(art.id);
+                          setArtForm({
+                            title: art.title,
+                            summary: art.summary,
+                            content: art.content,
+                            category: art.category
+                          });
+                        }}
+                        className="text-blue-600 px-2 py-0.5 hover:bg-blue-50 rounded font-bold"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (confirm("Hapus artikel ini dari frontpage?")) onDeleteArticle(art.id);
+                        }}
+                        className="text-red-650 px-2 py-0.5 hover:bg-red-50 rounded font-bold"
+                      >
+                        Hapus
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -363,12 +425,26 @@ export const DashboardSekretaris: React.FC<DashboardSekretarisProps> = ({
                 </label>
               </div>
 
-              <button
-                type="submit"
-                className="px-5 py-2.5 bg-slate-900 hover:bg-slate-950 font-extrabold text-white rounded-lg text-xs leading-none uppercase tracking-wide cursor-pointer"
-              >
-                Sematkan Pengumuman
-              </button>
+              <div className="flex gap-2">
+                <button
+                  type="submit"
+                  className="px-5 py-2.5 bg-slate-900 hover:bg-slate-950 font-extrabold text-white rounded-lg text-xs leading-none uppercase tracking-wide cursor-pointer"
+                >
+                  {editingAnnId ? "Perbarui Pengumuman" : "Sematkan Pengumuman"}
+                </button>
+                {editingAnnId && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditingAnnId(null);
+                      setAnnForm({ title: '', content: '', important: false });
+                    }}
+                    className="px-4 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-lg text-xs leading-none uppercase cursor-pointer"
+                  >
+                    Batal
+                  </button>
+                )}
+              </div>
             </form>
 
             <div className="pt-4 border-t border-slate-150 space-y-2">
@@ -376,17 +452,34 @@ export const DashboardSekretaris: React.FC<DashboardSekretarisProps> = ({
               <div className="divide-y divide-slate-100 max-h-44 overflow-y-auto pr-1">
                 {announcements.map((ann) => (
                   <div key={ann.id} className="py-2 flex justify-between items-center text-[10.5px]">
-                    <span className="truncate max-w-[200px] font-bold text-slate-850">
+                    <span className="truncate max-w-[150px] font-bold text-slate-850">
                       {ann.title} {ann.important && '⚠️'}
                     </span>
-                    <button
-                      onClick={() => {
-                        if (confirm("Hapus pengumuman ini?")) onDeleteAnnouncement(ann.id);
-                      }}
-                      className="text-red-500 p-1 hover:bg-red-50 rounded"
-                    >
-                      Hapus
-                    </button>
+                    <div className="flex gap-1">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditingAnnId(ann.id);
+                          setAnnForm({
+                            title: ann.title,
+                            content: ann.content,
+                            important: ann.important
+                          });
+                        }}
+                        className="text-blue-600 px-2 py-0.5 hover:bg-blue-50 rounded font-bold"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (confirm("Hapus pengumuman ini?")) onDeleteAnnouncement(ann.id);
+                        }}
+                        className="text-red-500 px-2 py-0.5 hover:bg-red-50 rounded font-bold"
+                      >
+                        Hapus
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -443,6 +536,29 @@ export const DashboardSekretaris: React.FC<DashboardSekretarisProps> = ({
               <Printer className="w-4 h-4" /> Cetak Kop Surat Resmi ke PDF
             </button>
           </div>
+        </div>
+      )}
+
+      {/* ================= TAB 4: LMS COURSE CURRICULUM MANAGEMENT ================= */}
+      {activeTabSec === 'lms' && (
+        <div className="bg-slate-950 text-white border border-slate-800 rounded-xl overflow-hidden shadow-xs p-6">
+          <div className="border-b border-white/5 pb-4 mb-4">
+            <h3 className="text-sm font-black uppercase text-amber-400 flex items-center gap-1.5 font-sans">
+              <BookOpen className="w-5 h-5 text-indigo-400" /> Kurikulum LMS & Manajemen Soal Kuis (Sekretaris)
+            </h3>
+            <p className="text-slate-400 text-[11px] mt-0.5">Tambah, ubah, dan hapus modul kursus, pembelajaran sub-bab materi, tautan media luar, serta pertanyaan kuis secara terintegrasi.</p>
+          </div>
+          
+          <LMSPortal
+            currentUser={secretaryMember}
+            courses={courses}
+            progressList={progressList}
+            onSaveProgress={onSaveProgress}
+            onSaveCourses={onSaveCourses}
+            onLogActivity={onLogActivity}
+            settings={settings}
+            members={members}
+          />
         </div>
       )}
 

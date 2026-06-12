@@ -27,6 +27,7 @@ interface DashboardAnggotaProps {
   onSaveProgress: (updatedProgress: LMSUserProgress) => Promise<void>;
   onSaveCourses: (updatedCourses: LMSCourse[]) => Promise<void>;
   onLogActivity: (activity: string) => void;
+  members: Member[];
 }
 
 export const DashboardAnggota: React.FC<DashboardAnggotaProps> = ({
@@ -44,7 +45,8 @@ export const DashboardAnggota: React.FC<DashboardAnggotaProps> = ({
   progressList,
   onSaveProgress,
   onSaveCourses,
-  onLogActivity
+  onLogActivity,
+  members
 }) => {
   const [activeTab, setActiveTab] = useState<'ringkasan' | 'layanan' | 'kta' | 'profil' | 'lms'>('ringkasan');
   const [isEditingProfile, setIsEditingProfile] = useState<boolean>(false);
@@ -734,6 +736,8 @@ export const DashboardAnggota: React.FC<DashboardAnggotaProps> = ({
               onSaveProgress={onSaveProgress}
               onSaveCourses={onSaveCourses}
               onLogActivity={onLogActivity}
+              settings={settings}
+              members={members}
             />
           )}
 

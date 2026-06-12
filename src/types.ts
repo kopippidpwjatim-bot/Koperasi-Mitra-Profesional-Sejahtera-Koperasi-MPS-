@@ -55,6 +55,8 @@ export interface CooperativeSettings {
   noIjinPendirian: string;
   noTelpWA: string;
   email: string;
+  tandatanganKetua?: string; // Base64 / Image/SVG
+  tandatanganSekretaris?: string; // Base64 / Image/SVG
 }
 
 export interface StoreProduct {
@@ -166,6 +168,7 @@ export interface LMSLesson {
   content: string; // Detail materi (HTML/Text)
   duration: string; // Durasi baca
   order: number;
+  externalUrl?: string; // Tautan/Link luar Zoom, Drive, PDF
 }
 
 export interface LMSQuestion {
@@ -190,6 +193,7 @@ export interface LMSCourse {
   image: string; // URL / SVG base64
   lessons: LMSLesson[];
   quiz: LMSQuiz;
+  externalUrl?: string; // Tautan/Link luar Zoom, Drive, PDF
 }
 
 export interface LMSUserProgress {

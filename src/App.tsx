@@ -474,6 +474,10 @@ export default function App() {
     setArticles(prev => [newArt, ...prev]);
   };
 
+  const handleEditArticle = (id: string, updated: Omit<Article, 'id' | 'date'>) => {
+    setArticles(prev => prev.map(a => a.id === id ? { ...a, ...updated } : a));
+  };
+
   const handleDeleteArticle = (id: string) => {
     setArticles(prev => prev.filter(a => a.id !== id));
   };
@@ -485,6 +489,10 @@ export default function App() {
       date: new Date().toISOString().split('T')[0]
     };
     setAnnouncements(prev => [newAnn, ...prev]);
+  };
+
+  const handleEditAnnouncement = (id: string, updated: Omit<Announcement, 'id' | 'date'>) => {
+    setAnnouncements(prev => prev.map(a => a.id === id ? { ...a, ...updated } : a));
   };
 
   const handleDeleteAnnouncement = (id: string) => {
@@ -899,6 +907,7 @@ export default function App() {
             onSaveProgress={handleSaveLMSProgress}
             onSaveCourses={handleSaveLMSCourses}
             onLogActivity={handleLMSLogActivity}
+            members={members}
           />
         ) : (
           <div className="min-h-screen flex flex-col bg-slate-100">
@@ -960,6 +969,7 @@ export default function App() {
                   onSaveProgress={handleSaveLMSProgress}
                   onSaveCourses={handleSaveLMSCourses}
                   onLogActivity={handleLMSLogActivity}
+                  members={members}
                 />
               )}
 
@@ -986,6 +996,11 @@ export default function App() {
                   onClearLogs={handleClearLogs}
                   onRefreshLogs={handleRefreshLogs}
                   onEmulateRole={handleEmulateRole}
+                  courses={courses}
+                  progressList={progressList}
+                  onSaveProgress={handleSaveLMSProgress}
+                  onSaveCourses={handleSaveLMSCourses}
+                  onLogActivity={handleLMSLogActivity}
                 />
               )}
 
@@ -999,10 +1014,17 @@ export default function App() {
                   onApproveMember={handleApproveMember}
                   onRejectMember={handleRejectMember}
                   onAddArticle={handleAddArticle}
+                  onEditArticle={handleEditArticle}
                   onDeleteArticle={handleDeleteArticle}
                   onAddAnnouncement={handleAddAnnouncement}
+                  onEditAnnouncement={handleEditAnnouncement}
                   onDeleteAnnouncement={handleDeleteAnnouncement}
                   onLogout={handleLogout}
+                  courses={courses}
+                  progressList={progressList}
+                  onSaveProgress={handleSaveLMSProgress}
+                  onSaveCourses={handleSaveLMSCourses}
+                  onLogActivity={handleLMSLogActivity}
                 />
               )}
 

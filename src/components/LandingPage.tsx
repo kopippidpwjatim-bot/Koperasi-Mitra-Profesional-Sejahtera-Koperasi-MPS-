@@ -27,6 +27,7 @@ interface LandingPageProps {
   onSaveProgress: (updatedProgress: LMSUserProgress) => Promise<void>;
   onSaveCourses: (updatedCourses: LMSCourse[]) => Promise<void>;
   onLogActivity: (activity: string) => void;
+  members: Member[];
 }
 
 export const LandingPage: React.FC<LandingPageProps> = ({
@@ -46,7 +47,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   progressList,
   onSaveProgress,
   onSaveCourses,
-  onLogActivity
+  onLogActivity,
+  members
 }) => {
   const [activeTab, setActiveTab] = useState<'beranda' | 'tentang' | 'layanan' | 'berita' | 'galeri' | 'kontak' | 'lms'>('beranda');
   const [selectedCategory, setSelectedCategory] = useState<string>('Semua');
@@ -972,7 +974,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 onSaveProgress={onSaveProgress}
                 onSaveCourses={onSaveCourses}
                 onLogActivity={onLogActivity}
-                onOpenAuth={() => onOpenAuth('login')}
+                settings={settings}
+                members={members}
               />
             </div>
           </div>
