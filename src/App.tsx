@@ -74,7 +74,8 @@ import {
   getWithdrawals,
   saveWithdrawals,
   getVisitorLogs,
-  saveVisitorLogs
+  saveVisitorLogs,
+  seedInitialData
 } from './database';
 
 export default function App() {
@@ -83,14 +84,14 @@ export default function App() {
 
   // Global States (initially empty, populated asynchronously on mount)
   const [settings, setSettings] = useState<CooperativeSettings>(DEFAULT_SETTINGS);
-  const [members, setMembers] = useState<Member[]>(DEFAULT_MEMBERS);
-  const [products, setProducts] = useState<StoreProduct[]>(DEFAULT_PRODUCTS);
-  const [transactions, setTransactions] = useState<Transaction[]>(DEFAULT_TRANSACTIONS);
-  const [articles, setArticles] = useState<Article[]>(DEFAULT_ARTICLES);
-  const [announcements, setAnnouncements] = useState<Announcement[]>(DEFAULT_ANNOUNCEMENTS);
-  const [tentangItems, setTentangItems] = useState<TentangItem[]>(DEFAULT_TENTANG_ITEMS);
-  const [layananItems, setLayananItems] = useState<LayananItem[]>(DEFAULT_LAYANAN_ITEMS);
-  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>(DEFAULT_GALLERY_ITEMS);
+  const [members, setMembers] = useState<Member[]>([]);
+  const [products, setProducts] = useState<StoreProduct[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const [tentangItems, setTentangItems] = useState<TentangItem[]>([]);
+  const [layananItems, setLayananItems] = useState<LayananItem[]>([]);
+  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
   
   const [activeMember, setActiveMember] = useState<Member | null>(null);
   const [impersonatedRole, setImpersonatedRole] = useState<UserRole | null>(null);
@@ -984,6 +985,49 @@ export default function App() {
           members={members}
           initialTab={authTab}
           settings={settings}
+          onSeed={async () => {
+            await seedInitialData();
+            // Reload all states from newly seeded Firebase collections instantly
+            const [
+              dbSettings,
+              dbMembers,
+              dbProducts,
+              dbTransactions,
+              dbArticles,
+              dbAnnouncements,
+              dbTentang,
+              dbLayanan,
+              dbGallery,
+              dbLoans,
+              dbWithdrawals,
+              dbLogs
+            ] = await Promise.all([
+              getCooperativeSettings(),
+              getMembers(),
+              getProducts(),
+              getTransactions(),
+              getArticles(),
+              getAnnouncements(),
+              getTentangItems(),
+              getLayananItems(),
+              getGalleryItems(),
+              getLoans(),
+              getWithdrawals(),
+              getVisitorLogs()
+            ]);
+            setSettings(dbSettings);
+            setMembers(dbMembers);
+            setProducts(dbProducts);
+            setTransactions(dbTransactions);
+            setArticles(dbArticles);
+            setAnnouncements(dbAnnouncements);
+            setTentangItems(dbTentang);
+            setLayananItems(dbLayanan);
+            setGalleryItems(dbGallery);
+            setLoans(dbLoans);
+            setWithdrawals(dbWithdrawals);
+            setVisitorLogs(dbLogs);
+          }}
         />
       )}
 

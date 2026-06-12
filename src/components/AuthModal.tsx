@@ -9,6 +9,7 @@ interface AuthModalProps {
   members: Member[];
   initialTab?: 'login' | 'register';
   settings: { noTelpWA: string };
+  onSeed?: () => Promise<void>;
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({
@@ -17,10 +18,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   onRegister,
   members,
   initialTab = 'login',
-  settings
+  settings,
+  onSeed
 }) => {
   const [activeTab, setActiveTab] = useState<'login' | 'register'>(initialTab);
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [isSeeding, setIsSeeding] = useState<boolean>(false);
   
   // Login Form
   const [loginForm, setLoginForm] = useState({ identifier: '', password: '' });
@@ -259,6 +262,36 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               {/* ================= LOGIN ACTIVE FORM ================= */}
               {activeTab === 'login' && (
                 <form onSubmit={executeLogin} className="space-y-4 pt-4">
+                  {members.length === 0 && onSeed && (
+                    <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-2 text-xs">
+                      <div className="flex gap-2">
+                        <Sparkles className="w-4 h-4 text-amber-600 shrink-0 mt-0.5 animate-pulse" />
+                        <div>
+                          <p className="font-bold text-amber-900 uppercase tracking-wide text-[10px]">Database Firestore Kosong</p>
+                          <p className="text-amber-700 font-medium leading-relaxed mt-0.5">Pangkalan data tidak mendeteksi adanya anggota terdaftar. Silakan klik tombol di bawah untuk menginisialisasi akun pengurus bawaan (Admin, dll) agar bisa log in.</p>
+                          <button
+                            type="button"
+                            onClick={async () => {
+                              setIsSeeding(true);
+                              try {
+                                await onSeed();
+                                alert("Database berhasil diinisialisasi secara permanen!");
+                              } catch (err: any) {
+                                alert("Gagal menginisialisasi database: " + err.message);
+                              } finally {
+                                setIsSeeding(false);
+                              }
+                            }}
+                            disabled={isSeeding}
+                            className="mt-2.5 px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-md font-bold transition flex items-center gap-1.5 text-[10px] uppercase tracking-wide cursor-pointer disabled:opacity-50"
+                          >
+                            {isSeeding ? "Menginisialisasi..." : "Inisialisasi Database Sekarang"}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   {loginError && (
                     <div className="text-xs font-black bg-red-50 text-red-700 border border-red-200 p-2.5 rounded-lg leading-relaxed">
                       ❌ {loginError}

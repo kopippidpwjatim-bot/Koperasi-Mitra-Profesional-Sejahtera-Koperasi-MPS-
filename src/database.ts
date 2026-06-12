@@ -102,16 +102,16 @@ async function loadData<T>(key: string, collectionName: string, defaultValue: T)
   if (isFirebaseReady && db) {
     try {
       if (Array.isArray(defaultValue)) {
-        // Fetch list
-        const snapshot = await getDocs(collection(db, collectionName));
-        if (!snapshot.empty) {
-          const list: any[] = [];
-          snapshot.forEach(doc => {
-            list.push({ ...doc.data() });
-          });
-          // Update LocalStorage cache
-          localStorage.setItem(key, JSON.stringify(list));
-          return list as unknown as T;
+        // Fetch single doc list wrapper to ensure absolute deletion recovery with no orphaned records
+        const docRef = doc(db, collectionName, 'main');
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const loaded = docSnap.data();
+          if (loaded && Array.isArray(loaded.list)) {
+            // Update LocalStorage cache
+            localStorage.setItem(key, JSON.stringify(loaded.list));
+            return loaded.list as unknown as T;
+          }
         }
       } else {
         // Fetch single doc config
@@ -147,13 +147,8 @@ async function saveData<T>(key: string, collectionName: string, data: T): Promis
   if (isFirebaseReady && db) {
     try {
       if (Array.isArray(data)) {
-        // To preserve simple setup, we store as item documents or grouped doc for fast batching.
-        // Let's store elements as individually named docs for list reliability.
-        for (const item of data) {
-          if (item && item.id) {
-            await setDoc(doc(db, collectionName, String(item.id)), item);
-          }
-        }
+        // Store as a single document wrapper to bypass multiple doc overhead and securely keep additions/updates/deletions atomically synchronized
+        await setDoc(doc(db, collectionName, 'main'), { list: data });
       } else {
         await setDoc(doc(db, collectionName, 'main'), data as any);
       }
@@ -175,7 +170,7 @@ export async function saveCooperativeSettings(settings: CooperativeSettings): Pr
 }
 
 export async function getMembers(): Promise<Member[]> {
-  return loadData<Member[]>('kop_members', 'members', DEFAULT_MEMBERS);
+  return loadData<Member[]>('kop_members', 'members', []);
 }
 
 export async function saveMembers(members: Member[]): Promise<void> {
@@ -183,7 +178,7 @@ export async function saveMembers(members: Member[]): Promise<void> {
 }
 
 export async function getProducts(): Promise<StoreProduct[]> {
-  return loadData<StoreProduct[]>('kop_products', 'products', DEFAULT_PRODUCTS);
+  return loadData<StoreProduct[]>('kop_products', 'products', []);
 }
 
 export async function saveProducts(products: StoreProduct[]): Promise<void> {
@@ -191,7 +186,7 @@ export async function saveProducts(products: StoreProduct[]): Promise<void> {
 }
 
 export async function getTransactions(): Promise<Transaction[]> {
-  return loadData<Transaction[]>('kop_transactions', 'transactions', DEFAULT_TRANSACTIONS);
+  return loadData<Transaction[]>('kop_transactions', 'transactions', []);
 }
 
 export async function saveTransactions(transactions: Transaction[]): Promise<void> {
@@ -199,7 +194,7 @@ export async function saveTransactions(transactions: Transaction[]): Promise<voi
 }
 
 export async function getArticles(): Promise<Article[]> {
-  return loadData<Article[]>('kop_articles', 'articles', DEFAULT_ARTICLES);
+  return loadData<Article[]>('kop_articles', 'articles', []);
 }
 
 export async function saveArticles(articles: Article[]): Promise<void> {
@@ -207,7 +202,7 @@ export async function saveArticles(articles: Article[]): Promise<void> {
 }
 
 export async function getAnnouncements(): Promise<Announcement[]> {
-  return loadData<Announcement[]>('kop_announcements', 'announcements', DEFAULT_ANNOUNCEMENTS);
+  return loadData<Announcement[]>('kop_announcements', 'announcements', []);
 }
 
 export async function saveAnnouncements(announcements: Announcement[]): Promise<void> {
@@ -215,7 +210,7 @@ export async function saveAnnouncements(announcements: Announcement[]): Promise<
 }
 
 export async function getTentangItems(): Promise<TentangItem[]> {
-  return loadData<TentangItem[]>('kop_tentang_items', 'tentang_items', DEFAULT_TENTANG_ITEMS);
+  return loadData<TentangItem[]>('kop_tentang_items', 'tentang_items', []);
 }
 
 export async function saveTentangItems(items: TentangItem[]): Promise<void> {
@@ -223,7 +218,7 @@ export async function saveTentangItems(items: TentangItem[]): Promise<void> {
 }
 
 export async function getLayananItems(): Promise<LayananItem[]> {
-  return loadData<LayananItem[]>('kop_layanan_items', 'layanan_items', DEFAULT_LAYANAN_ITEMS);
+  return loadData<LayananItem[]>('kop_layanan_items', 'layanan_items', []);
 }
 
 export async function saveLayananItems(items: LayananItem[]): Promise<void> {
@@ -231,7 +226,7 @@ export async function saveLayananItems(items: LayananItem[]): Promise<void> {
 }
 
 export async function getGalleryItems(): Promise<GalleryItem[]> {
-  return loadData<GalleryItem[]>('kop_gallery_items', 'gallery_items', DEFAULT_GALLERY_ITEMS);
+  return loadData<GalleryItem[]>('kop_gallery_items', 'gallery_items', []);
 }
 
 export async function saveGalleryItems(items: GalleryItem[]): Promise<void> {
@@ -239,11 +234,36 @@ export async function saveGalleryItems(items: GalleryItem[]): Promise<void> {
 }
 
 export async function getLoans(): Promise<LoanApplication[]> {
+  return loadData<LoanApplication[]>('kop_loans', 'loans', []);
+}
+
+export async function saveLoans(loans: LoanApplication[]): Promise<void> {
+  await saveData<LoanApplication[]>('kop_loans', 'loans', loans);
+}
+
+export async function getWithdrawals(): Promise<WithdrawalRequest[]> {
+  return loadData<WithdrawalRequest[]>('kop_withdrawals', 'withdrawals', []);
+}
+
+export async function saveWithdrawals(withdrawals: WithdrawalRequest[]): Promise<void> {
+  await saveData<WithdrawalRequest[]>('kop_withdrawals', 'withdrawals', withdrawals);
+}
+
+export async function getVisitorLogs(): Promise<VisitorLog[]> {
+  return loadData<VisitorLog[]>('kop_visitor_logs', 'visitor_logs', []);
+}
+
+export async function saveVisitorLogs(logs: VisitorLog[]): Promise<void> {
+  await saveData<VisitorLog[]>('kop_visitor_logs', 'visitor_logs', logs);
+}
+
+// Multi-resource database initialization seed function
+export async function seedInitialData(): Promise<void> {
   const defaultLoans: LoanApplication[] = [
     {
       id: 'loan-sample-1',
-      memberId: 'anggota-1',
-      memberName: 'Mohammad Muslih, S.H., M.M.',
+      memberId: 'member-2', // slamet
+      memberName: 'Slamet Purwanto',
       jumlah: 5000000,
       tenor: 12,
       bungaBulanan: 1.0,
@@ -253,33 +273,19 @@ export async function getLoans(): Promise<LoanApplication[]> {
       tanggalPengajuan: '2026-06-10'
     }
   ];
-  return loadData<LoanApplication[]>('kop_loans', 'loans', defaultLoans);
-}
 
-export async function saveLoans(loans: LoanApplication[]): Promise<void> {
-  await saveData<LoanApplication[]>('kop_loans', 'loans', loans);
-}
-
-export async function getWithdrawals(): Promise<WithdrawalRequest[]> {
   const defaultWithdrawals: WithdrawalRequest[] = [
     {
       id: 'withdraw-sample-1',
-      memberId: 'anggota-1',
-      memberName: 'Mohammad Muslih, S.H., M.M.',
+      memberId: 'member-2',
+      memberName: 'Slamet Purwanto',
       jumlah: 150000,
       jenisSimpanan: 'Sukarela',
       status: 'pending',
       tanggalPengajuan: '2026-06-11'
     }
   ];
-  return loadData<WithdrawalRequest[]>('kop_withdrawals', 'withdrawals', defaultWithdrawals);
-}
 
-export async function saveWithdrawals(withdrawals: WithdrawalRequest[]): Promise<void> {
-  await saveData<WithdrawalRequest[]>('kop_withdrawals', 'withdrawals', withdrawals);
-}
-
-export async function getVisitorLogs(): Promise<VisitorLog[]> {
   const defaultLogs: VisitorLog[] = [
     { 
       id: 'log-1', 
@@ -287,22 +293,22 @@ export async function getVisitorLogs(): Promise<VisitorLog[]> {
       email: 'admin@koperasi-ippi.com', 
       role: 'admin', 
       timestamp: new Date().toLocaleTimeString('id-ID') + ' WIB', 
-      activity: 'Login administratif berhasil' 
-    },
-    { 
-      id: 'log-2', 
-      nama: 'Mohammad Muslih, S.H.', 
-      email: 'Ikatanppi@gmail.com', 
-      role: 'anggota', 
-      timestamp: new Date(Date.now() - 1700000).toLocaleTimeString('id-ID') + ' WIB', 
-      activity: 'Mengunduh digital KTA elektrik' 
+      activity: 'Inisialisasi database aman berhasil dilakukan' 
     }
   ];
-  return loadData<VisitorLog[]>('kop_visitor_logs', 'visitor_logs', defaultLogs);
-}
 
-export async function saveVisitorLogs(logs: VisitorLog[]): Promise<void> {
-  await saveData<VisitorLog[]>('kop_visitor_logs', 'visitor_logs', logs);
+  await saveCooperativeSettings(DEFAULT_SETTINGS);
+  await saveMembers(DEFAULT_MEMBERS);
+  await saveProducts(DEFAULT_PRODUCTS);
+  await saveTransactions(DEFAULT_TRANSACTIONS);
+  await saveArticles(DEFAULT_ARTICLES);
+  await saveAnnouncements(DEFAULT_ANNOUNCEMENTS);
+  await saveTentangItems(DEFAULT_TENTANG_ITEMS);
+  await saveLayananItems(DEFAULT_LAYANAN_ITEMS);
+  await saveGalleryItems(DEFAULT_GALLERY_ITEMS);
+  await saveLoans(defaultLoans);
+  await saveWithdrawals(defaultWithdrawals);
+  await saveVisitorLogs(defaultLogs);
 }
 
 // Global persistence tester as required by Firestore Security verification
