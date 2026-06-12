@@ -1,6 +1,6 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { getFirestore, doc, getDoc, setDoc, collection, getDocs } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, getDocFromServer, setDoc, collection, getDocs } from 'firebase/firestore';
 import firebaseConfig from './firebase-applet-config.json';
 
 import {
@@ -40,7 +40,7 @@ let auth: any = null;
 if (isFirebaseReady) {
   try {
     app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
-    db = getFirestore(app);
+    db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
     auth = getAuth(app);
   } catch (err) {
     console.error("Failed to initialize Firebase:", err);
@@ -317,7 +317,7 @@ export async function testFirestoreConnection() {
   if (isFirebaseReady && db) {
     try {
       const docRef = doc(db, 'test', 'connection');
-      await getDoc(docRef);
+      await getDocFromServer(docRef);
     } catch (error) {
       if (error instanceof Error && error.message.includes('the client is offline')) {
         console.error("Please check your Firebase configuration.");
