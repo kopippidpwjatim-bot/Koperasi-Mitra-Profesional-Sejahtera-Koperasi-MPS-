@@ -119,58 +119,38 @@ export default function App() {
   const [loans, setLoans] = useState<LoanApplication[]>(() => getLocalOrFallback('kop_loans', DEFAULT_LOANS));
   const [withdrawals, setWithdrawals] = useState<WithdrawalRequest[]>(() => getLocalOrFallback('kop_withdrawals', DEFAULT_WITHDRAWALS));
 
-  // 1. ASYNC FETCHING ON PORTAL INITIALIZATION (EFFECT MANDATE FIRST TURN)
+  // 1. ASYNC PROGRESSIVE FETCHING ON PORTAL INITIALIZATION (NO-BLOCKING, SEAMLESS DB RETRIEVAL)
   React.useEffect(() => {
+    let active = true;
     async function loadCofigurationFromDatabase() {
       try {
-        const [
-          dbSettings,
-          dbMembers,
-          dbProducts,
-          dbTransactions,
-          dbArticles,
-          dbAnnouncements,
-          dbTentang,
-          dbLayanan,
-          dbGallery,
-          dbLoans,
-          dbWithdrawals,
-          dbLogs
-        ] = await Promise.all([
-          getCooperativeSettings(),
-          getMembers(),
-          getProducts(),
-          getTransactions(),
-          getArticles(),
-          getAnnouncements(),
-          getTentangItems(),
-          getLayananItems(),
-          getGalleryItems(),
-          getLoans(),
-          getWithdrawals(),
-          getVisitorLogs()
+        await Promise.all([
+          getCooperativeSettings().then(val => { if (active) setSettings(val); }),
+          getMembers().then(val => { if (active) setMembers(val); }),
+          getProducts().then(val => { if (active) setProducts(val); }),
+          getTransactions().then(val => { if (active) setTransactions(val); }),
+          getArticles().then(val => { if (active) setArticles(val); }),
+          getAnnouncements().then(val => { if (active) setAnnouncements(val); }),
+          getTentangItems().then(val => { if (active) setTentangItems(val); }),
+          getLayananItems().then(val => { if (active) setLayananItems(val); }),
+          getGalleryItems().then(val => { if (active) setGalleryItems(val); }),
+          getLoans().then(val => { if (active) setLoans(val); }),
+          getWithdrawals().then(val => { if (active) setWithdrawals(val); }),
+          getVisitorLogs().then(val => { if (active) setVisitorLogs(val); })
         ]);
-
-        setSettings(dbSettings);
-        setMembers(dbMembers);
-        setProducts(dbProducts);
-        setTransactions(dbTransactions);
-        setArticles(dbArticles);
-        setAnnouncements(dbAnnouncements);
-        setTentangItems(dbTentang);
-        setLayananItems(dbLayanan);
-        setGalleryItems(dbGallery);
-        setLoans(dbLoans);
-        setWithdrawals(dbWithdrawals);
-        setVisitorLogs(dbLogs);
       } catch (e) {
         console.error("Database connection fallback default:", e);
       } finally {
-        setHasLoadedFromDB(true);
-        setIsLoading(false);
+        if (active) {
+          setHasLoadedFromDB(true);
+          setIsLoading(false);
+        }
       }
     }
     loadCofigurationFromDatabase();
+    return () => {
+      active = false;
+    };
   }, []);
 
   // 2. REACTIVE WRITERS BACKWARD SYNCING
