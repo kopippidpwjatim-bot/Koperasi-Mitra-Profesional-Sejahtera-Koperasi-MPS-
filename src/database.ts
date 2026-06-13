@@ -95,10 +95,15 @@ function handleFirestoreError(error: unknown, operationType: OperationType, path
 async function loadData<T>(key: string, collectionName: string, defaultValue: T): Promise<T> {
   // 1. Try to fetch from LocalStorage first (super fast and persistent)
   let localData: T | null = null;
+  let localUpdatedAt = 0;
   try {
     const saved = localStorage.getItem(key);
     if (saved) {
       localData = JSON.parse(saved);
+    }
+    const savedTime = localStorage.getItem(`${key}_updatedAt`);
+    if (savedTime) {
+      localUpdatedAt = Number(savedTime) || 0;
     }
   } catch (e) {
     console.warn(`Failed reading ${key} from localStorage:`, e);
@@ -107,27 +112,42 @@ async function loadData<T>(key: string, collectionName: string, defaultValue: T)
   // 2. Try Firestore if it's prepared and available
   if (isFirebaseReady && db) {
     try {
-      if (Array.isArray(defaultValue)) {
-        // Fetch single doc list wrapper to ensure absolute deletion recovery with no orphaned records
-        const docRef = doc(db, collectionName, 'main');
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          const loaded = docSnap.data();
-          if (loaded && Array.isArray(loaded.list)) {
-            // Update LocalStorage cache
-            localStorage.setItem(key, JSON.stringify(loaded.list));
-            return loaded.list as unknown as T;
-          }
+      const docRef = doc(db, collectionName, 'main');
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const loaded = docSnap.data();
+        const firestoreUpdatedAt = loaded?._updatedAt || 0;
+
+        // Compare timestamps: if local storage has a newer updated time, use local but sync Firestore
+        if (localData !== null && localUpdatedAt > firestoreUpdatedAt) {
+          console.log(`Local data for ${collectionName} is newer than Firestore (${localUpdatedAt} > ${firestoreUpdatedAt}). Syncing back to Firestore...`);
+          const listPayload = Array.isArray(localData)
+            ? { list: localData, _updatedAt: localUpdatedAt }
+            : { ...localData as any, _updatedAt: localUpdatedAt };
+          
+          setDoc(doc(db, collectionName, 'main'), listPayload).catch(err => {
+            console.warn(`Background sync to Firestore failed for ${collectionName}:`, err);
+          });
+          return localData;
         }
-      } else {
-        // Fetch single doc config
-        const docRef = doc(db, collectionName, 'main');
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          const data = docSnap.data() as T;
-          // Update LocalStorage cache
-          localStorage.setItem(key, JSON.stringify(data));
-          return data;
+
+        // Otherwise, Firestore is newer or equal
+        if (loaded) {
+          if (Array.isArray(defaultValue)) {
+            const listData = Array.isArray(loaded.list) ? loaded.list : [];
+            localStorage.setItem(key, JSON.stringify(listData));
+            localStorage.setItem(`${key}_updatedAt`, String(firestoreUpdatedAt || Date.now()));
+            return listData as unknown as T;
+          } else {
+            const objData = { ...loaded };
+            // Clean up framework-injected metadata fields
+            delete objData._updatedAt;
+            delete objData.list;
+            
+            localStorage.setItem(key, JSON.stringify(objData));
+            localStorage.setItem(`${key}_updatedAt`, String(firestoreUpdatedAt || Date.now()));
+            return objData as unknown as T;
+          }
         }
       }
     } catch (err) {
@@ -142,9 +162,12 @@ async function loadData<T>(key: string, collectionName: string, defaultValue: T)
 
 // Helper to save data to both Firestore & LocalStorage
 async function saveData<T>(key: string, collectionName: string, data: T): Promise<void> {
+  const timestamp = Date.now();
+
   // 1. Always save to LocalStorage immediately
   try {
     localStorage.setItem(key, JSON.stringify(data));
+    localStorage.setItem(`${key}_updatedAt`, String(timestamp));
   } catch (e) {
     console.warn(`Failed writing ${key} to localStorage:`, e);
   }
@@ -152,12 +175,11 @@ async function saveData<T>(key: string, collectionName: string, data: T): Promis
   // 2. Async save to Firestore if initialized
   if (isFirebaseReady && db) {
     try {
-      if (Array.isArray(data)) {
-        // Store as a single document wrapper to bypass multiple doc overhead and securely keep additions/updates/deletions atomically synchronized
-        await setDoc(doc(db, collectionName, 'main'), { list: data });
-      } else {
-        await setDoc(doc(db, collectionName, 'main'), data as any);
-      }
+      const payload = Array.isArray(data)
+        ? { list: data, _updatedAt: timestamp }
+        : { ...data as any, _updatedAt: timestamp };
+
+      await setDoc(doc(db, collectionName, 'main'), payload);
     } catch (err) {
       // conform to Firestore security instructions
       handleFirestoreError(err, OperationType.WRITE, collectionName);
