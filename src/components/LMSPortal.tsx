@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+// @ts-ignore
+import bestBadgeImg from '../assets/images/best_badge_1781354597229.jpg';
 import { 
   Award, 
   BookOpen, 
@@ -476,29 +478,50 @@ export const LMSPortal: React.FC<LMSPortalProps> = ({
             {/* THE AWESOME PRINTABLE CERTIFICATE */}
             <div 
               id="printable-cert-frame"
-              className="bg-white text-slate-900 border-8 border-double border-amber-600 p-8 md:p-12 rounded-2xl relative overflow-hidden shadow-2xl mx-auto max-w-4xl text-center"
-              style={{ fontFamily: "'Inter', sans-serif" }}
+              className="text-slate-900 border-[10px] border-double border-amber-500/80 p-8 md:p-12 rounded-3xl relative overflow-hidden shadow-2xl mx-auto max-w-4xl text-center transition-all duration-300"
+              style={{ 
+                fontFamily: "'Inter', sans-serif",
+                background: "linear-gradient(135deg, rgba(255,245,245,0.92) 0%, rgba(255,251,240,0.96) 25%, rgba(240,253,244,0.94) 50%, rgba(240,249,255,0.95) 75%, rgba(250,245,255,0.93) 100%)" 
+              }}
             >
+              {/* Soft Rainbow Modern Decorative Backdrops (Aurora Pastel) */}
+              <div className="absolute top-[-120px] left-[-120px] w-[380px] h-[380px] rounded-full bg-pink-300/25 blur-3xl pointer-events-none"></div>
+              <div className="absolute top-[-80px] right-[-120px] w-[350px] h-[350px] rounded-full bg-violet-300/20 blur-3xl pointer-events-none"></div>
+              <div className="absolute bottom-[-150px] left-[15%] w-[420px] h-[420px] rounded-full bg-yellow-200/30 blur-3xl pointer-events-none"></div>
+              <div className="absolute bottom-[-100px] right-[-120px] w-[350px] h-[350px] rounded-full bg-teal-100/30 blur-3xl pointer-events-none"></div>
+              <div className="absolute top-[25%] left-[25%] w-[380px] h-[280px] rounded-full bg-orange-200/15 blur-3xl pointer-events-none"></div>
+              
+              {/* Brand Logo/Badge di Kanan Atas */}
+              <div className="absolute top-4 right-6 md:top-6 md:right-8 select-none pointer-events-none z-20">
+                <img 
+                  src={settings.logoBrand || bestBadgeImg} 
+                  className="h-20 w-20 object-contain transform hover:scale-105 transition-transform duration-300"
+                  alt="Premium IPPI Brand Badge" 
+                  referrerPolicy="no-referrer"
+                />
+              </div>
+
               {/* Gold watermark logos */}
-              <div className="absolute inset-0 bg-[radial-gradient(#dca41510_1.5px,transparent_1.5px)] [background-size:20px_20px] pointer-events-none"></div>
+              <div className="absolute inset-0 bg-[radial-gradient(#dca41508_1.5px,transparent_1.5px)] [background-size:20px_20px] pointer-events-none"></div>
               
               <div className="relative z-10 flex flex-col items-center">
                 
-                {/* Dynamic Logo and Vintage Badge Element */}
-                <div className="flex justify-center items-center gap-6 mb-4">
+                {/* Logo Koperasi di tengah-tengah diatas tulisan KOPERASI IPPI DPW JAWA TIMUR */}
+                <div className="flex justify-center items-center mb-3">
                   {settings.logo ? (
-                    <img src={settings.logo} className="h-16 w-16 object-contain" alt="Logo Resmi Koperasi" />
-                  ) : null}
-                  <div className="w-16 h-16 bg-amber-50 border-4 border-amber-500 rounded-full flex items-center justify-center text-amber-600 shadow-sm">
-                    <Award className="w-8 h-8" />
-                  </div>
+                    <img src={settings.logo} className="h-20 w-20 object-contain drop-shadow-sm transform transition duration-300 hover:scale-105" alt="Logo Resmi Koperasi" />
+                  ) : (
+                    <div className="w-16 h-16 bg-amber-50/90 border-2 border-dashed border-amber-500 rounded-full flex items-center justify-center text-amber-600 shadow-xs">
+                      <Award className="w-8 h-8" />
+                    </div>
+                  )}
                 </div>
 
-                <p className="text-amber-700 font-extrabold tracking-widest text-xs uppercase mb-1">
-                  Koperasi IPPI DPW Jawa Timur
+                <p className="text-[#0c4a80] font-extrabold tracking-widest text-xs md:text-sm uppercase mb-1 drop-shadow-xs">
+                  KOPERASI IPPI DPW JAWA TIMUR
                 </p>
-                <p className="text-[10px] text-slate-500 font-semibold tracking-wider italic uppercase mb-4">
-                  Surat Keputusan Pendirian AHU-0008412.AH.01.26.TAHUN-2024
+                <p className="text-[9px] text-[#dca415] font-bold tracking-widest uppercase mb-4 max-w-xs md:max-w-md mx-auto">
+                  SK PENDIRIAN: {settings.noIjinPendirian || 'AHU-0008412.AH.01.26.TAHUN-2024'}
                 </p>
 
                 <h1 className="text-2xl md:text-3xl font-serif font-black text-slate-950 tracking-tight leading-none mb-1">

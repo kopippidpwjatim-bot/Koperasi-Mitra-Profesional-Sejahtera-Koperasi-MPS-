@@ -50,6 +50,7 @@ export interface Transaction {
 
 export interface CooperativeSettings {
   logo: string; // Base64
+  logoBrand?: string; // Base64 / Image/SVG brand logo (Certificates)
   namaSekretariat: string;
   alamatSekretariat: string;
   noIjinPendirian: string;

@@ -5,6 +5,8 @@ import {
 } from 'lucide-react';
 import { Member, Transaction, CooperativeSettings, VisitorLog, StoreProduct, Article, Announcement, TentangItem, LayananItem, GalleryItem, LMSCourse, LMSUserProgress, Regulation } from '../types';
 import { DEFAULT_LOGO_SVG } from '../data/defaultData';
+// @ts-ignore
+import bestBadgeImg from '../assets/images/best_badge_1781354597229.jpg';
 import { LMSPortal } from './LMSPortal';
 
 interface DashboardAdminProps {
@@ -89,6 +91,7 @@ export const DashboardAdmin: React.FC<DashboardAdminProps> = ({
   const [coopPhone, setCoopPhone] = useState(settings.noTelpWA);
   const [coopEmail, setCoopEmail] = useState(settings.email);
   const [coopLogo, setCoopLogo] = useState(settings.logo);
+  const [coopLogoBrand, setCoopLogoBrand] = useState(settings.logoBrand || '');
   const [coopTtdKetua, setCoopTtdKetua] = useState(settings.tandatanganKetua || '');
   const [coopTtdSekretaris, setCoopTtdSekretaris] = useState(settings.tandatanganSekretaris || '');
 
@@ -100,6 +103,7 @@ export const DashboardAdmin: React.FC<DashboardAdminProps> = ({
     setCoopPhone(settings.noTelpWA);
     setCoopEmail(settings.email);
     setCoopLogo(settings.logo);
+    setCoopLogoBrand(settings.logoBrand || '');
     setCoopTtdKetua(settings.tandatanganKetua || '');
     setCoopTtdSekretaris(settings.tandatanganSekretaris || '');
   }, [settings]);
@@ -373,6 +377,7 @@ export const DashboardAdmin: React.FC<DashboardAdminProps> = ({
       noTelpWA: coopPhone,
       email: coopEmail,
       logo: coopLogo,
+      logoBrand: coopLogoBrand,
       tandatanganKetua: coopTtdKetua,
       tandatanganSekretaris: coopTtdSekretaris
     });
@@ -401,6 +406,31 @@ export const DashboardAdmin: React.FC<DashboardAdminProps> = ({
       setCoopLogo(DEFAULT_LOGO_SVG);
       onUpdateSettings({ logo: DEFAULT_LOGO_SVG });
       alert("Logo Koperasi telah dikembalikan ke default!");
+    }
+  };
+
+  const handleLogoBrandUploadInSettings = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        alert("Ukuran file logo brand maksimal adalah 2MB!");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setCoopLogoBrand(reader.result as string);
+        onUpdateSettings({ logoBrand: reader.result as string });
+        alert("Logo Brand Sertifikat diperbarui!");
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleResetLogoBrand = () => {
+    if (window.confirm("Apakah Anda yakin ingin mengembalikan logo brand sertifikat ke default?")) {
+      setCoopLogoBrand('');
+      onUpdateSettings({ logoBrand: '' });
+      alert("Logo Brand Sertifikat telah dikembalikan ke default!");
     }
   };
 
@@ -711,6 +741,34 @@ export const DashboardAdmin: React.FC<DashboardAdminProps> = ({
                      Reset Logo Ke Default
                    </button>
                  </div>
+
+                {/* Logo Brand upload block */}
+                <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-xs flex flex-col items-center justify-between space-y-6">
+                  <div className="text-center">
+                    <h4 className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Logo Brand Sertifikat (Kanan Atas)</h4>
+                    <div className="w-36 h-36 border border-slate-200 rounded-full p-2 bg-slate-50 flex items-center justify-center overflow-hidden mx-auto mt-4 shadow-sm">
+                      <img src={coopLogoBrand || bestBadgeImg} className="w-full h-full object-contain" alt="Brand Logo Preview" />
+                    </div>
+                    <p className="text-[10px] text-slate-500 mt-2 max-w-[180px] mx-auto leading-relaxed font-sans">
+                      Disematkan di pojok kanan atas seluruh lembaran Sertifikat Kelulusan resmi.
+                    </p>
+                  </div>
+
+                  <div className="w-full space-y-2">
+                    <label className="w-full flex items-center justify-center gap-2 py-3 bg-slate-900 hover:bg-black text-[#ffffff] font-extrabold rounded-lg text-xs uppercase cursor-pointer select-none">
+                      <Upload className="w-4 h-4 text-slate-400" />
+                      Upload Brand Baru
+                      <input type="file" accept="image/*" className="hidden" onChange={handleLogoBrandUploadInSettings} />
+                    </label>
+                    <button
+                      type="button"
+                      onClick={handleResetLogoBrand}
+                      className="w-full py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-700 font-extrabold rounded-lg text-[10px] uppercase cursor-pointer select-none border border-slate-300"
+                    >
+                      Reset Brand Ke Default
+                    </button>
+                  </div>
+                </div>
                </div>
 
                {/* Signatures upload block */}
