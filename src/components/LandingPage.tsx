@@ -415,7 +415,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <div className="flex justify-between items-end">
                   <div>
                     <span className="text-xs uppercase tracking-widest text-[#dca415] font-black">BULLETIN TERBARU</span>
-                    <h2 className="text-2xl font-extrabold text-[#0c4a80] leading-tight">Berita d& Kegiatan Beranda</h2>
+                    <h2 className="text-2xl font-extrabold text-[#0c4a80] leading-tight">Berita dan Kegiatan Beranda</h2>
                   </div>
                   <button onClick={() => setActiveTab('berita')} className="text-xs font-bold text-blue-950 hover:underline flex items-center gap-1 cursor-pointer">
                     Lihat Semua Berita <ChevronRight className="w-4 h-4" />
