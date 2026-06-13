@@ -109,6 +109,18 @@ export default function App() {
   // Database status loading flag: initialized to false so the user can browse instantly using local/fallback states
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [hasLoadedFromDB, setHasLoadedFromDB] = useState<boolean>(false);
+  const isInitialLoadRef = React.useRef(true);
+
+  React.useEffect(() => {
+    if (hasLoadedFromDB) {
+      // Delay disabling the initial load lock slightly to ensure all batched state updates have applied
+      const timer = setTimeout(() => {
+        isInitialLoadRef.current = false;
+        console.log("Database load finished. CMS Write synchronization active.");
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [hasLoadedFromDB]);
 
   // Global States (synchronously loaded from localStorage or imports for a 0ms fully populated first paint)
   const [settings, setSettings] = useState<CooperativeSettings>(() => getLocalOrFallback('kop_settings', DEFAULT_SETTINGS));
@@ -178,91 +190,91 @@ export default function App() {
 
   // 2. REACTIVE WRITERS BACKWARD SYNCING
   React.useEffect(() => {
-    if (hasLoadedFromDB) {
+    if (hasLoadedFromDB && !isInitialLoadRef.current) {
       saveCooperativeSettings(settings);
     }
   }, [settings, hasLoadedFromDB]);
 
   React.useEffect(() => {
-    if (hasLoadedFromDB) {
+    if (hasLoadedFromDB && !isInitialLoadRef.current) {
       saveMembers(members);
     }
   }, [members, hasLoadedFromDB]);
 
   React.useEffect(() => {
-    if (hasLoadedFromDB) {
+    if (hasLoadedFromDB && !isInitialLoadRef.current) {
       saveProducts(products);
     }
   }, [products, hasLoadedFromDB]);
 
   React.useEffect(() => {
-    if (hasLoadedFromDB) {
+    if (hasLoadedFromDB && !isInitialLoadRef.current) {
       saveTransactions(transactions);
     }
   }, [transactions, hasLoadedFromDB]);
 
   React.useEffect(() => {
-    if (hasLoadedFromDB) {
+    if (hasLoadedFromDB && !isInitialLoadRef.current) {
       saveArticles(articles);
     }
   }, [articles, hasLoadedFromDB]);
 
   React.useEffect(() => {
-    if (hasLoadedFromDB) {
+    if (hasLoadedFromDB && !isInitialLoadRef.current) {
       saveAnnouncements(announcements);
     }
   }, [announcements, hasLoadedFromDB]);
 
   React.useEffect(() => {
-    if (hasLoadedFromDB) {
+    if (hasLoadedFromDB && !isInitialLoadRef.current) {
       saveTentangItems(tentangItems);
     }
   }, [tentangItems, hasLoadedFromDB]);
 
   React.useEffect(() => {
-    if (hasLoadedFromDB) {
+    if (hasLoadedFromDB && !isInitialLoadRef.current) {
       saveLayananItems(layananItems);
     }
   }, [layananItems, hasLoadedFromDB]);
 
   React.useEffect(() => {
-    if (hasLoadedFromDB) {
+    if (hasLoadedFromDB && !isInitialLoadRef.current) {
       saveGalleryItems(galleryItems);
     }
   }, [galleryItems, hasLoadedFromDB]);
 
   React.useEffect(() => {
-    if (hasLoadedFromDB) {
+    if (hasLoadedFromDB && !isInitialLoadRef.current) {
       saveRegulations(regulations);
     }
   }, [regulations, hasLoadedFromDB]);
 
   React.useEffect(() => {
-    if (hasLoadedFromDB) {
+    if (hasLoadedFromDB && !isInitialLoadRef.current) {
       saveLoans(loans);
     }
   }, [loans, hasLoadedFromDB]);
 
   React.useEffect(() => {
-    if (hasLoadedFromDB) {
+    if (hasLoadedFromDB && !isInitialLoadRef.current) {
       saveWithdrawals(withdrawals);
     }
   }, [withdrawals, hasLoadedFromDB]);
 
   React.useEffect(() => {
-    if (hasLoadedFromDB) {
+    if (hasLoadedFromDB && !isInitialLoadRef.current) {
       saveVisitorLogs(visitorLogs);
     }
   }, [visitorLogs, hasLoadedFromDB]);
 
   React.useEffect(() => {
-    if (hasLoadedFromDB) {
+    if (hasLoadedFromDB && !isInitialLoadRef.current) {
       saveLMSCourses(courses);
     }
   }, [courses, hasLoadedFromDB]);
 
   React.useEffect(() => {
-    if (hasLoadedFromDB) {
+    if (hasLoadedFromDB && !isInitialLoadRef.current) {
       saveLMSProgress(progressList);
     }
   }, [progressList, hasLoadedFromDB]);
