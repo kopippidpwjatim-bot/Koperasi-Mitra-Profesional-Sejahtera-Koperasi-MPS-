@@ -12,6 +12,53 @@ interface AuthModalProps {
   onSeed?: () => Promise<void>;
 }
 
+const compressImage = (file: File, maxWidth = 200, maxHeight = 200, quality = 0.7): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          resolve(event.target?.result as string);
+          return;
+        }
+
+        ctx.drawImage(img, 0, 0, width, height);
+        const dataUrl = canvas.toDataURL('image/jpeg', quality);
+        resolve(dataUrl);
+      };
+      img.onerror = (err) => {
+        reject(err);
+      };
+      img.src = event.target?.result as string;
+    };
+    reader.onerror = (err) => {
+      reject(err);
+    };
+    reader.readAsDataURL(file);
+  });
+};
+
 export const AuthModal: React.FC<AuthModalProps> = ({
   onClose,
   onLogin,
@@ -51,15 +98,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 2 * 1024 * 1024) {
-        alert("Ukuran foto maksimal adalah 2MB!");
-        return;
-      }
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setRegisterForm(prev => ({ ...prev, photo: reader.result as string }));
-      };
-      reader.readAsDataURL(file);
+      compressImage(file, 200, 200, 0.7)
+        .then((compressedBase64) => {
+          setRegisterForm(prev => ({ ...prev, photo: compressedBase64 }));
+        })
+        .catch((err) => {
+          console.error("Gagal mengompresi foto: ", err);
+          alert("Gagal memproses gambar. Coba gambar lain.");
+        });
     }
   };
 

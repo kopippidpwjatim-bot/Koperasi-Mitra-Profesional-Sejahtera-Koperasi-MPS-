@@ -653,11 +653,14 @@ export const DashboardAdmin: React.FC<DashboardAdminProps> = ({
   const handlePhotoUploadUserForm = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setUserForm(prev => ({ ...prev, photo: reader.result as string }));
-      };
-      reader.readAsDataURL(file);
+      compressImage(file, 200, 200, 0.7)
+        .then((compressedBase64) => {
+          setUserForm(prev => ({ ...prev, photo: compressedBase64 }));
+        })
+        .catch((err) => {
+          console.error("Gagal mengompresi foto: ", err);
+          alert("Gagal memproses gambar. Coba gambar lain.");
+        });
     }
   };
 
