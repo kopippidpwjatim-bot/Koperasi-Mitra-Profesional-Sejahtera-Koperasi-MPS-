@@ -104,7 +104,8 @@ import {
   getPollVotes,
   savePollVotes,
   DEFAULT_POLL_SETTINGS,
-  DEFAULT_POLL_CANDIDATES
+  DEFAULT_POLL_CANDIDATES,
+  subscribeData
 } from './database';
 
 const getLocalOrFallback = <T,>(key: string, fallback: T): T => {
@@ -206,6 +207,36 @@ export default function App() {
       active = false;
     };
   }, []);
+
+  // 1.5. REAL-TIME DATABASE SYNC
+  React.useEffect(() => {
+    if (!hasLoadedFromDB) return;
+
+    const unsubscribes = [
+      subscribeData<CooperativeSettings>('kop_settings', 'settings', setSettings),
+      subscribeData<Member[]>('kop_members', 'members', setMembers),
+      subscribeData<StoreProduct[]>('kop_products', 'products', setProducts),
+      subscribeData<Transaction[]>('kop_transactions', 'transactions', setTransactions),
+      subscribeData<Article[]>('kop_articles', 'articles', setArticles),
+      subscribeData<Announcement[]>('kop_announcements', 'announcements', setAnnouncements),
+      subscribeData<TentangItem[]>('kop_tentang_items', 'tentang_items', setTentangItems),
+      subscribeData<LayananItem[]>('kop_layanan_items', 'layanan_items', setLayananItems),
+      subscribeData<GalleryItem[]>('kop_gallery_items', 'gallery_items', setGalleryItems),
+      subscribeData<Regulation[]>('kop_regulations', 'regulations', setRegulations),
+      subscribeData<LoanApplication[]>('kop_loans', 'loans', setLoans),
+      subscribeData<WithdrawalRequest[]>('kop_withdrawals', 'withdrawals', setWithdrawals),
+      subscribeData<VisitorLog[]>('kop_visitor_logs', 'visitor_logs', setVisitorLogs),
+      subscribeData<LMSCourse[]>('kop_lms_courses', 'lms_courses', setCourses),
+      subscribeData<LMSUserProgress[]>('kop_lms_progress', 'lms_progress', setProgressList),
+      subscribeData<PollSettings>('kop_poll_settings', 'poll_settings', setPollSettings),
+      subscribeData<PollCandidate[]>('kop_poll_candidates', 'poll_candidates', setPollCandidates),
+      subscribeData<PollVote[]>('kop_poll_votes', 'poll_votes', setPollVotes)
+    ];
+
+    return () => {
+      unsubscribes.forEach(unsub => unsub());
+    };
+  }, [hasLoadedFromDB]);
 
   // 2. REACTIVE WRITERS BACKWARD SYNCING
   React.useEffect(() => {

@@ -1,6 +1,6 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { getFirestore, doc, getDoc, getDocFromServer, setDoc, collection, getDocs } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, getDocFromServer, setDoc, collection, getDocs, onSnapshot } from 'firebase/firestore';
 import firebaseConfig from './firebase-applet-config.json';
 
 import {
@@ -94,6 +94,9 @@ function handleFirestoreError(error: unknown, operationType: OperationType, path
 
 // ----------------- Database APIs (Unified LocalStorage + Firestore Sync) -----------------
 
+// Track the last known server state (as JSON string) to prevent redundant writes or update loops.
+const lastKnownServerStates: Record<string, string> = {};
+
 // Helper to load simple array/object with fallback to default and LocalStorage
 async function loadData<T>(key: string, collectionName: string, defaultValue: T): Promise<T> {
   // 1. Try to fetch from LocalStorage first (super fast and persistent)
@@ -111,6 +114,8 @@ async function loadData<T>(key: string, collectionName: string, defaultValue: T)
   } catch (e) {
     console.warn(`Failed reading ${key} from localStorage:`, e);
   }
+
+  let finalData: T;
 
   // 2. Try Firestore if it's prepared and available
   if (isFirebaseReady && db) {
@@ -131,6 +136,8 @@ async function loadData<T>(key: string, collectionName: string, defaultValue: T)
           setDoc(doc(db, collectionName, 'main'), listPayload).catch(err => {
             console.warn(`Background sync to Firestore failed for ${collectionName}:`, err);
           });
+          
+          lastKnownServerStates[collectionName] = JSON.stringify(localData);
           return localData;
         }
 
@@ -140,6 +147,7 @@ async function loadData<T>(key: string, collectionName: string, defaultValue: T)
             const listData = Array.isArray(loaded.list) ? loaded.list : [];
             localStorage.setItem(key, JSON.stringify(listData));
             localStorage.setItem(`${key}_updatedAt`, String(firestoreUpdatedAt || Date.now()));
+            lastKnownServerStates[collectionName] = JSON.stringify(listData);
             return listData as unknown as T;
           } else {
             const objData = { ...loaded };
@@ -149,6 +157,7 @@ async function loadData<T>(key: string, collectionName: string, defaultValue: T)
             
             localStorage.setItem(key, JSON.stringify(objData));
             localStorage.setItem(`${key}_updatedAt`, String(firestoreUpdatedAt || Date.now()));
+            lastKnownServerStates[collectionName] = JSON.stringify(objData);
             return objData as unknown as T;
           }
         }
@@ -160,19 +169,27 @@ async function loadData<T>(key: string, collectionName: string, defaultValue: T)
   }
 
   // Fallback pattern
-  return localData !== null ? localData : defaultValue;
+  finalData = localData !== null ? localData : defaultValue;
+  lastKnownServerStates[collectionName] = JSON.stringify(finalData);
+  return finalData;
 }
 
 // Helper to save data to both Firestore & LocalStorage
 async function saveData<T>(key: string, collectionName: string, data: T): Promise<void> {
   const timestamp = Date.now();
+  const serialized = JSON.stringify(data);
 
   // 1. Always save to LocalStorage immediately
   try {
-    localStorage.setItem(key, JSON.stringify(data));
+    localStorage.setItem(key, serialized);
     localStorage.setItem(`${key}_updatedAt`, String(timestamp));
   } catch (e) {
     console.warn(`Failed writing ${key} to localStorage:`, e);
+  }
+
+  // If new data is identical to the last known server state, prevent redundant write to avoid recursion & quota waste
+  if (lastKnownServerStates[collectionName] === serialized) {
+    return;
   }
 
   // 2. Async save to Firestore if initialized
@@ -183,11 +200,65 @@ async function saveData<T>(key: string, collectionName: string, data: T): Promis
         : { ...data as any, _updatedAt: timestamp };
 
       await setDoc(doc(db, collectionName, 'main'), payload);
+      // Update last known state now that it's successfully pushed to server
+      lastKnownServerStates[collectionName] = serialized;
     } catch (err) {
       // conform to Firestore security instructions
       handleFirestoreError(err, OperationType.WRITE, collectionName);
     }
   }
+}
+
+// Real-time listener subscription API
+export function subscribeData<T>(
+  key: string,
+  collectionName: string,
+  callback: (data: T) => void
+): () => void {
+  if (isFirebaseReady && db) {
+    try {
+      const docRef = doc(db, collectionName, 'main');
+      const unsubscribe = onSnapshot(docRef, (docSnap) => {
+        if (docSnap.exists()) {
+          const loaded = docSnap.data();
+          const firestoreUpdatedAt = loaded?._updatedAt || 0;
+          
+          let dataToUse: any = null;
+          if (Array.isArray(loaded.list)) {
+            dataToUse = loaded.list;
+          } else {
+            const objData = { ...loaded };
+            delete objData._updatedAt;
+            delete objData.list;
+            dataToUse = objData;
+          }
+
+          const serialized = JSON.stringify(dataToUse);
+          
+          // Only propagate update if server data actually changed compared to our last known server write/read
+          if (lastKnownServerStates[collectionName] !== serialized) {
+            console.log(`[REALTIME_SYNC] Collection '${collectionName}' updated on server. Propagating to client components...`);
+            
+            // Sync local state copy reference
+            lastKnownServerStates[collectionName] = serialized;
+            
+            // Persist to LocalStorage synchronously
+            localStorage.setItem(key, serialized);
+            localStorage.setItem(`${key}_updatedAt`, String(firestoreUpdatedAt || Date.now()));
+            
+            // Deliver updated state to React
+            callback(dataToUse as unknown as T);
+          }
+        }
+      }, (err) => {
+        console.warn(`Firestore real-time subscription failed for ${collectionName}:`, err);
+      });
+      return unsubscribe;
+    } catch (err) {
+      console.warn(`Firestore subscription setup failed for ${collectionName}:`, err);
+    }
+  }
+  return () => {};
 }
 
 // ----------------- Public CRUD Services -----------------
