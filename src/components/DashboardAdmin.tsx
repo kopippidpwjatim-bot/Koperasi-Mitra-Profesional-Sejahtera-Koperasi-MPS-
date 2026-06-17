@@ -54,6 +54,53 @@ interface DashboardAdminProps {
   onClearPollVotes: () => void;
 }
 
+const compressImage = (file: File, maxWidth = 200, maxHeight = 200, quality = 0.7): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          resolve(event.target?.result as string);
+          return;
+        }
+
+        ctx.drawImage(img, 0, 0, width, height);
+        const dataUrl = canvas.toDataURL('image/jpeg', quality);
+        resolve(dataUrl);
+      };
+      img.onerror = (err) => {
+        reject(err);
+      };
+      img.src = event.target?.result as string;
+    };
+    reader.onerror = (err) => {
+      reject(err);
+    };
+    reader.readAsDataURL(file);
+  });
+};
+
 export const DashboardAdmin: React.FC<DashboardAdminProps> = ({
   adminMember,
   settings,
@@ -115,6 +162,8 @@ export const DashboardAdmin: React.FC<DashboardAdminProps> = ({
   const [isPollActive, setIsPollActive] = useState(pollSettings.isPollingActive);
   const [showResultsToMembers, setShowResultsToMembers] = useState(pollSettings.showResultsToMembers);
   const [editingCandidates, setEditingCandidates] = useState<PollCandidate[]>(pollCandidates);
+  const [showResetVotesConfirm, setShowResetVotesConfirm] = useState(false);
+  const [candidateToConfirmDelete, setCandidateToConfirmDelete] = useState<string | null>(null);
 
   // Sync settings and poll when they change dynamically
   React.useEffect(() => {
@@ -1649,17 +1698,37 @@ export const DashboardAdmin: React.FC<DashboardAdminProps> = ({
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-slate-800 flex gap-2 justify-end mt-4">
-                  <button 
-                    onClick={() => {
-                      if (window.confirm("PERINGATAN KRITIS: Apakah Anda yakin ingin menghapus seluruh log perolehan suara? Tindakan ini akan mengosongkan riwayat pemilu!")) {
-                        onClearPollVotes();
-                      }
-                    }}
-                    className="flex items-center gap-1 px-3 py-2 bg-rose-950/40 hover:bg-rose-900 text-rose-400 border border-rose-900 font-bold uppercase text-[10px] rounded-lg transition"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" /> Reset Seluruh Suara Pemilih
-                  </button>
+                <div className="pt-4 border-t border-slate-800 flex flex-wrap gap-2 justify-end items-center mt-4">
+                  {showResetVotesConfirm ? (
+                    <div className="flex flex-wrap items-center gap-2 bg-rose-950/80 border border-rose-500 rounded-lg p-2.5">
+                      <span className="text-[10px] font-bold text-rose-200 uppercase">⚠️ YAKIN HAPUS SELURUH SUARA? TIDAK BISA DI-UNDO!</span>
+                      <button 
+                        type="button"
+                        onClick={() => {
+                          onClearPollVotes();
+                          setShowResetVotesConfirm(false);
+                        }}
+                        className="px-2.5 py-1 bg-rose-600 hover:bg-rose-700 text-white font-extrabold uppercase text-[10px] rounded transition"
+                      >
+                        YA, RESET SEKARANG
+                      </button>
+                      <button 
+                        type="button"
+                        onClick={() => setShowResetVotesConfirm(false)}
+                        className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold uppercase text-[10px] rounded transition"
+                      >
+                        Batal
+                      </button>
+                    </div>
+                  ) : (
+                    <button 
+                      type="button"
+                      onClick={() => setShowResetVotesConfirm(true)}
+                      className="flex items-center gap-1 px-3 py-2 bg-rose-950/40 hover:bg-rose-900 text-rose-400 border border-rose-900 font-bold uppercase text-[10px] rounded-lg transition"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" /> Reset Seluruh Suara Pemilih
+                    </button>
+                  )}
                 </div>
 
               </div>
@@ -1696,17 +1765,39 @@ export const DashboardAdmin: React.FC<DashboardAdminProps> = ({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {editingCandidates.map((c, i) => (
                     <div key={c.id} className="bg-slate-50/50 border border-slate-200 rounded-xl p-4.5 space-y-3 relative">
-                      <button 
-                        onClick={() => {
-                          if (window.confirm("Apakah Anda yakin ingin menghapus calon kandidat ini beserta isian datanya?")) {
-                            setEditingCandidates(editingCandidates.filter(item => item.id !== c.id));
-                          }
-                        }}
-                        className="absolute top-4 right-4 p-1.5 hover:bg-red-50 text-red-600 rounded-lg transition cursor-pointer"
-                        title="Hapus Calon"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                      <div className="absolute top-4 right-4 flex items-center gap-1.5 z-10">
+                        {candidateToConfirmDelete === c.id ? (
+                          <div className="flex items-center gap-1 bg-red-55 border border-red-200 rounded-lg p-1">
+                            <span className="text-[9px] font-black text-red-600 uppercase">Yakin?</span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setEditingCandidates(editingCandidates.filter(item => item.id !== c.id));
+                                setCandidateToConfirmDelete(null);
+                              }}
+                              className="px-1.5 py-0.5 bg-red-600 hover:bg-red-700 text-white font-extrabold uppercase text-[8px] rounded cursor-pointer transition"
+                            >
+                              Ya
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setCandidateToConfirmDelete(null)}
+                              className="px-1 py-0.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold uppercase text-[8px] rounded cursor-pointer transition"
+                            >
+                              No
+                            </button>
+                          </div>
+                        ) : (
+                          <button 
+                            type="button"
+                            onClick={() => setCandidateToConfirmDelete(c.id)}
+                            className="p-1.5 hover:bg-red-50 text-red-600 rounded-lg transition cursor-pointer"
+                            title="Hapus Calon"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
 
                       <div className="flex gap-4 items-center border-b border-slate-200 pb-3">
                         <div className="w-14 h-14 bg-blue-900 border border-[#dca415] rounded-full overflow-hidden flex items-center justify-center text-white font-extrabold text-base uppercase shadow-inner shrink-0 relative">
@@ -1727,20 +1818,20 @@ export const DashboardAdmin: React.FC<DashboardAdminProps> = ({
                             onChange={(e) => {
                               const file = e.target.files?.[0];
                               if (file) {
-                                if (file.size > 2 * 1024 * 1024) {
-                                  alert("Ukuran file maksimal adalah 2MB!");
-                                  return;
-                                }
-                                const reader = new FileReader();
-                                reader.onloadend = () => {
-                                  const updated = [...editingCandidates];
-                                  updated[i] = {
-                                    ...updated[i],
-                                    photo: reader.result as string
-                                  };
-                                  setEditingCandidates(updated);
-                                };
-                                reader.readAsDataURL(file);
+                                // Mengompresi gambar otomatis agar ukurannya kecil (5-15KB) sehingga sinkronisasi antar perangkat lancar dan cepat
+                                compressImage(file, 200, 200, 0.7)
+                                  .then((compressedBase64) => {
+                                    const updated = [...editingCandidates];
+                                    updated[i] = {
+                                      ...updated[i],
+                                      photo: compressedBase64
+                                    };
+                                    setEditingCandidates(updated);
+                                  })
+                                  .catch((err) => {
+                                    console.error("Gagal mengompresi foto: ", err);
+                                    alert("Gagal memproses gambar. Coba gambar lain.");
+                                  });
                               }
                             }}
                           />
