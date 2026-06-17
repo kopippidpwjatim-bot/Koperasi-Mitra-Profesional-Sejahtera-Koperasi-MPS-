@@ -55,7 +55,10 @@ import {
   GalleryItem,
   LMSCourse,
   LMSUserProgress,
-  Regulation
+  Regulation,
+  PollCandidate,
+  PollVote,
+  PollSettings
 } from './types';
 
 import {
@@ -93,7 +96,15 @@ import {
   DEFAULT_VISITOR_LOGS,
   getRegulations,
   saveRegulations,
-  DEFAULT_REGULATIONS
+  DEFAULT_REGULATIONS,
+  getPollSettings,
+  savePollSettings,
+  getPollCandidates,
+  savePollCandidates,
+  getPollVotes,
+  savePollVotes,
+  DEFAULT_POLL_SETTINGS,
+  DEFAULT_POLL_CANDIDATES
 } from './database';
 
 const getLocalOrFallback = <T,>(key: string, fallback: T): T => {
@@ -151,6 +162,11 @@ export default function App() {
   const [courses, setCourses] = useState<LMSCourse[]>(() => getLocalOrFallback('kop_lms_courses', DEFAULT_LMS_COURSES));
   const [progressList, setProgressList] = useState<LMSUserProgress[]>(() => getLocalOrFallback('kop_lms_progress', []));
 
+  // Election / Polling States
+  const [pollSettings, setPollSettings] = useState<PollSettings>(() => getLocalOrFallback('kop_poll_settings', DEFAULT_POLL_SETTINGS));
+  const [pollCandidates, setPollCandidates] = useState<PollCandidate[]>(() => getLocalOrFallback('kop_poll_candidates', DEFAULT_POLL_CANDIDATES));
+  const [pollVotes, setPollVotes] = useState<PollVote[]>(() => getLocalOrFallback('kop_poll_votes', []));
+
   // 1. ASYNC PROGRESSIVE FETCHING ON PORTAL INITIALIZATION (NO-BLOCKING, SEAMLESS DB RETRIEVAL)
   React.useEffect(() => {
     let active = true;
@@ -171,7 +187,10 @@ export default function App() {
           getWithdrawals().then(val => { if (active) setWithdrawals(val); }),
           getVisitorLogs().then(val => { if (active) setVisitorLogs(val); }),
           getLMSCourses().then(val => { if (active) setCourses(val); }),
-          getLMSProgress().then(val => { if (active) setProgressList(val); })
+          getLMSProgress().then(val => { if (active) setProgressList(val); }),
+          getPollSettings().then(val => { if (active) setPollSettings(val); }),
+          getPollCandidates().then(val => { if (active) setPollCandidates(val); }),
+          getPollVotes().then(val => { if (active) setPollVotes(val); })
         ]);
       } catch (e) {
         console.error("Database connection fallback default:", e);
@@ -278,6 +297,24 @@ export default function App() {
       saveLMSProgress(progressList);
     }
   }, [progressList, hasLoadedFromDB]);
+
+  React.useEffect(() => {
+    if (hasLoadedFromDB && !isInitialLoadRef.current) {
+      savePollSettings(pollSettings);
+    }
+  }, [pollSettings, hasLoadedFromDB]);
+
+  React.useEffect(() => {
+    if (hasLoadedFromDB && !isInitialLoadRef.current) {
+      savePollCandidates(pollCandidates);
+    }
+  }, [pollCandidates, hasLoadedFromDB]);
+
+  React.useEffect(() => {
+    if (hasLoadedFromDB && !isInitialLoadRef.current) {
+      savePollVotes(pollVotes);
+    }
+  }, [pollVotes, hasLoadedFromDB]);
 
   // Auth triggers
   const handleOpenAuth = (tab: 'login' | 'register') => {
@@ -896,6 +933,51 @@ export default function App() {
     setVisitorLogs(prev => [newLog, ...prev]);
   };
 
+  const handleCastVote = async (candidateId: string) => {
+    if (!activeMember) {
+      alert("Anda harus masuk/login sebagai anggota terlebih dahulu.");
+      return;
+    }
+    // Check if voter already cast their vote
+    const hasVoted = pollVotes.some(v => v.memberId === activeMember.id);
+    if (hasVoted) {
+      alert("Anda sudah memberikan suara sebelumnya. Satu anggota hanya dapat memilih satu kali.");
+      return;
+    }
+    // Check if poll is active
+    if (!pollSettings.isPollingActive) {
+      alert("Pemilihan Ketua saat ini tidak sedang aktif atau ditutup.");
+      return;
+    }
+    const end = new Date(pollSettings.endDate);
+    if (end && Date.now() > end.getTime()) {
+      alert("Maaf, batas waktu pemilihan telah berakhir.");
+      return;
+    }
+
+    const newVote: PollVote = {
+      memberId: activeMember.id,
+      memberName: activeMember.nama,
+      candidateId,
+      timestamp: new Date().toLocaleDateString('id-ID') + ' ' + new Date().toLocaleTimeString('id-ID') + ' WIB'
+    };
+
+    const updatedVotes = [...pollVotes, newVote];
+    setPollVotes(updatedVotes);
+
+    const logMsg = `MEMILIH KETUA: ${activeMember.nama} menyalurkan hak suaranya dalam Pemilihan Ketua Koperasi.`;
+    const newVoteLog: VisitorLog = {
+      id: `log-${Date.now()}`,
+      nama: activeMember.nama,
+      email: activeMember.email,
+      role: activeMember.role,
+      timestamp: new Date().toLocaleTimeString('id-ID') + ' WIB',
+      activity: logMsg
+    };
+    setVisitorLogs(prev => [newVoteLog, ...prev]);
+    alert(`Terima kasih! Suara Anda berhasil dikirim untuk Calon Ketua pilihan Anda.`);
+  };
+
   // Determine active view based on log status (and emulation role)
   const resolvedRole: UserRole | null = impersonatedRole || (activeMember ? activeMember.role : null);
 
@@ -1011,6 +1093,10 @@ export default function App() {
                   onSaveCourses={handleSaveLMSCourses}
                   onLogActivity={handleLMSLogActivity}
                   members={members}
+                  pollSettings={pollSettings}
+                  pollCandidates={pollCandidates}
+                  pollVotes={pollVotes}
+                  onCastVote={handleCastVote}
                 />
               )}
 
@@ -1050,6 +1136,18 @@ export default function App() {
                   onAddRegulation={handleAddRegulation}
                   onEditRegulation={handleEditRegulation}
                   onDeleteRegulation={handleDeleteRegulation}
+                  pollSettings={pollSettings}
+                  onUpdatePollSettings={(newSettings: PollSettings) => {
+                    setPollSettings(newSettings);
+                    alert("Suara & Pengaturan Pemilu sukses diubah!");
+                  }}
+                  pollCandidates={pollCandidates}
+                  onUpdatePollCandidates={setPollCandidates}
+                  pollVotes={pollVotes}
+                  onClearPollVotes={() => {
+                    setPollVotes([]);
+                    alert("Seluruh riwayat suara pemilu berhasil direset ke nol!");
+                  }}
                 />
               )}
 

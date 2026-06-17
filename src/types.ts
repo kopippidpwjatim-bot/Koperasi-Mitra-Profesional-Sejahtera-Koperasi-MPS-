@@ -213,3 +213,25 @@ export interface LMSUserProgress {
   certifiedAt: { [courseId: string]: string }; // Tanggal kelulusan tiap kursus
 }
 
+export interface PollCandidate {
+  id: string;
+  nama: string;
+  visiMisi: string;
+  photo?: string; // photo base64 or fallback
+}
+
+export interface PollVote {
+  memberId: string;
+  memberName: string;
+  candidateId: string;
+  timestamp: string;
+}
+
+export interface PollSettings {
+  isPollingActive: boolean; // Pilihan ditampilkan atau tidak (checkbox)
+  endDate: string; // Polling berakhir kapan
+  showResultsToMembers: boolean; // Pilihan apakah anggota bisa mengakses/melihat hasil
+  pollTitle: string; // Judul polling
+}
+
+

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { 
   Settings, Users, ShieldAlert, History, RefreshCw, Printer, 
-  Trash2, Edit, Plus, FileText, CheckCircle2, UserCheck, Search, Eye, Upload, Wallet, BookOpen
+  Trash2, Edit, Plus, FileText, CheckCircle2, UserCheck, Search, Eye, Upload, Wallet, BookOpen, CheckSquare
 } from 'lucide-react';
-import { Member, Transaction, CooperativeSettings, VisitorLog, StoreProduct, Article, Announcement, TentangItem, LayananItem, GalleryItem, LMSCourse, LMSUserProgress, Regulation } from '../types';
+import { Member, Transaction, CooperativeSettings, VisitorLog, StoreProduct, Article, Announcement, TentangItem, LayananItem, GalleryItem, LMSCourse, LMSUserProgress, Regulation, PollSettings, PollCandidate, PollVote } from '../types';
 import { DEFAULT_LOGO_SVG } from '../data/defaultData';
 // @ts-ignore
 import bestBadgeImg from '../assets/images/best_badge_1781354597229.jpg';
@@ -44,6 +44,14 @@ interface DashboardAdminProps {
   onAddRegulation: (reg: Omit<Regulation, 'id'>) => void;
   onEditRegulation: (id: string, reg: Omit<Regulation, 'id'>) => void;
   onDeleteRegulation: (id: string) => void;
+
+  // Polling states
+  pollSettings: PollSettings;
+  onUpdatePollSettings: (newSettings: PollSettings) => void;
+  pollCandidates: PollCandidate[];
+  onUpdatePollCandidates: (newCandidates: PollCandidate[]) => void;
+  pollVotes: PollVote[];
+  onClearPollVotes: () => void;
 }
 
 export const DashboardAdmin: React.FC<DashboardAdminProps> = ({
@@ -80,9 +88,15 @@ export const DashboardAdmin: React.FC<DashboardAdminProps> = ({
   regulations,
   onAddRegulation,
   onEditRegulation,
-  onDeleteRegulation
+  onDeleteRegulation,
+  pollSettings,
+  onUpdatePollSettings,
+  pollCandidates,
+  onUpdatePollCandidates,
+  pollVotes,
+  onClearPollVotes
 }) => {
-  const [activeSubTab, setActiveSubTab] = useState<'pengaturan' | 'user' | 'rekening' | 'log' | 'emulasi' | 'cms' | 'lms'>('pengaturan');
+  const [activeSubTab, setActiveSubTab] = useState<'pengaturan' | 'user' | 'rekening' | 'log' | 'emulasi' | 'cms' | 'lms' | 'pemilu'>('pengaturan');
   
   // Settings Form State
   const [coopName, setCoopName] = useState(settings.namaSekretariat);
@@ -95,7 +109,14 @@ export const DashboardAdmin: React.FC<DashboardAdminProps> = ({
   const [coopTtdKetua, setCoopTtdKetua] = useState(settings.tandatanganKetua || '');
   const [coopTtdSekretaris, setCoopTtdSekretaris] = useState(settings.tandatanganSekretaris || '');
 
-  // Sync settings when they change dynamically
+  // Polling Admin State
+  const [pollTitle, setPollTitle] = useState(pollSettings.pollTitle);
+  const [pollEndDate, setPollEndDate] = useState(pollSettings.endDate);
+  const [isPollActive, setIsPollActive] = useState(pollSettings.isPollingActive);
+  const [showResultsToMembers, setShowResultsToMembers] = useState(pollSettings.showResultsToMembers);
+  const [editingCandidates, setEditingCandidates] = useState<PollCandidate[]>(pollCandidates);
+
+  // Sync settings and poll when they change dynamically
   React.useEffect(() => {
     setCoopName(settings.namaSekretariat);
     setCoopAddress(settings.alamatSekretariat);
@@ -107,6 +128,17 @@ export const DashboardAdmin: React.FC<DashboardAdminProps> = ({
     setCoopTtdKetua(settings.tandatanganKetua || '');
     setCoopTtdSekretaris(settings.tandatanganSekretaris || '');
   }, [settings]);
+
+  React.useEffect(() => {
+    setPollTitle(pollSettings.pollTitle);
+    setPollEndDate(pollSettings.endDate);
+    setIsPollActive(pollSettings.isPollingActive);
+    setShowResultsToMembers(pollSettings.showResultsToMembers);
+  }, [pollSettings]);
+
+  React.useEffect(() => {
+    setEditingCandidates(pollCandidates);
+  }, [pollCandidates]);
 
   // CMS (Content Management System) Web Pages Editor States
   const [activeCmsTab, setActiveCmsTab] = useState<'tentang' | 'layanan' | 'berita' | 'galeri' | 'produk' | 'pengumuman' | 'kebijakan'>('tentang');
@@ -619,6 +651,7 @@ export const DashboardAdmin: React.FC<DashboardAdminProps> = ({
             { id: 'cms', lbl: 'Kelola Konten & Beranda', icon: <FileText className="w-4 h-4" /> },
             { id: 'user', lbl: 'Kelola User / Pengguna', icon: <Users className="w-4 h-4" /> },
             { id: 'lms', lbl: 'Pengaturan Kurikulum LMS', icon: <BookOpen className="w-4 h-4" /> },
+            { id: 'pemilu', lbl: 'Pengaturan Polling / Pemilu', icon: <CheckSquare className="w-4 h-4" /> },
             { id: 'rekening', lbl: 'Otoritas No Rekening', icon: <Wallet className="w-4 h-4" /> },
             { id: 'log', lbl: 'Log Visitor & Aktivitas', icon: <History className="w-4 h-4" /> },
             { id: 'emulasi', lbl: 'Emulasi Role Pengawas', icon: <UserCheck className="w-4 h-4" /> }
@@ -1493,6 +1526,320 @@ export const DashboardAdmin: React.FC<DashboardAdminProps> = ({
             settings={settings}
             members={members}
           />
+        </div>
+      )}
+
+      {/* ================= TAB 8: PEMILU / POLLING MANAGEMENT ================= */}
+      {activeSubTab === 'pemilu' && (
+        <div className="space-y-6 mt-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-xs space-y-6 animate-fade-in">
+            <div className="border-b border-slate-100 pb-4">
+              <h3 className="text-sm font-black uppercase text-blue-900 flex items-center gap-1.5">
+                <CheckSquare className="w-5 h-5 text-amber-500" /> Kontrol Panel Pemilu & Polling Ketua Koperasi
+              </h3>
+              <p className="text-slate-500 text-xs mt-0.5">Atur judul pemilihan, masa berlaku waktu aktif, status kemunculan, hak suara masuk, serta manajemen data visi misi setiap calon kandidat.</p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              
+              {/* Box 1: General Settings Form */}
+              <form 
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  onUpdatePollSettings({
+                    pollTitle,
+                    endDate: pollEndDate,
+                    isPollingActive: isPollActive,
+                    showResultsToMembers
+                  });
+                }}
+                className="space-y-4 bg-slate-50 p-5 rounded-xl border border-slate-200"
+              >
+                <h4 className="text-xs font-black uppercase tracking-wider text-slate-500 mb-2">Konfigurasi Umum Polling</h4>
+                
+                <div className="space-y-1">
+                  <label className="block text-[10px] font-bold text-slate-500 uppercase">Judul Polling Pemilihan</label>
+                  <input 
+                    type="text"
+                    required
+                    className="w-full bg-white border border-slate-250 p-2.5 rounded-lg text-xs outline-none focus:border-blue-900 font-bold"
+                    placeholder="Contoh: Pemilihan Ketua DPW Jawa Timur Periode 2026-2030"
+                    value={pollTitle}
+                    onChange={(e) => setPollTitle(e.target.value)}
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="block text-[10px] font-bold text-slate-500 uppercase">Batas Waktu Berakhir (End Date)</label>
+                  <input 
+                    type="datetime-local"
+                    required
+                    className="w-full bg-white border border-slate-250 p-2.5 rounded-lg text-xs outline-none focus:border-blue-900 font-mono"
+                    value={pollEndDate}
+                    onChange={(e) => setPollEndDate(e.target.value)}
+                  />
+                </div>
+
+                <div className="pt-2 space-y-3">
+                  <div className="flex items-start gap-2.5">
+                    <input 
+                      type="checkbox"
+                      id="isPollActive"
+                      className="mt-0.5 rounded border-slate-350 text-blue-900 focus:ring-blue-900/40 cursor-pointer"
+                      checked={isPollActive}
+                      onChange={(e) => setIsPollActive(e.target.checked)}
+                    />
+                    <label htmlFor="isPollActive" className="block text-xs font-black text-slate-700 cursor-pointer select-none">
+                      Aktifkan poling suara (Bisa dipilih oleh anggota terdaftar)
+                    </label>
+                  </div>
+
+                  <div className="flex items-start gap-2.5">
+                    <input 
+                      type="checkbox"
+                      id="showResultsToMembers"
+                      className="mt-0.5 rounded border-slate-350 text-blue-900 focus:ring-blue-900/40 cursor-pointer"
+                      checked={showResultsToMembers}
+                      onChange={(e) => setShowResultsToMembers(e.target.checked)}
+                    />
+                    <label htmlFor="showResultsToMembers" className="block text-xs font-black text-slate-700 cursor-pointer select-none">
+                      Tampilkan hasil perolehan suara sementara di login anggota (Pilihan Contreng ✓)
+                    </label>
+                  </div>
+                </div>
+
+                <div className="pt-2 border-t border-slate-200 flex justify-end">
+                  <button 
+                    type="submit"
+                    className="px-4 py-2.5 bg-blue-900 hover:bg-blue-950 text-white font-extrabold uppercase tracking-wide text-xs rounded-lg transition-all cursor-pointer"
+                  >
+                    Simpan Konfigurasi Umum & Batas Akhir
+                  </button>
+                </div>
+              </form>
+
+              {/* Box 2: Live Stats & Results */}
+              <div className="bg-slate-900 text-white p-5 rounded-xl border border-slate-800 flex flex-col justify-between">
+                <div>
+                  <div className="flex justify-between items-center mb-4">
+                    <h4 className="text-xs font-black uppercase tracking-wider text-amber-400">Status & Perolehan Suara Terkini</h4>
+                    <span className="bg-white/10 text-white font-mono font-bold text-[10px] px-2.5 py-1 rounded">
+                      Total: {pollVotes.length} Pemilih
+                    </span>
+                  </div>
+
+                  <div className="space-y-4">
+                    {editingCandidates.map((c, index) => {
+                      const votesCount = pollVotes.filter(v => v.candidateId === c.id).length;
+                      const percentage = pollVotes.length === 0 ? 0 : Math.round((votesCount / pollVotes.length) * 100);
+                      
+                      return (
+                        <div key={c.id} className="space-y-1">
+                          <div className="flex justify-between items-center text-xs font-mono font-semibold">
+                            <span>0{index+1}. {c.nama || "Calon Tanpa Nama"}</span>
+                            <span className="text-amber-400">{votesCount} suara ({percentage}%)</span>
+                          </div>
+                          <div className="w-full bg-slate-800 h-3 rounded-full overflow-hidden">
+                            <div className="bg-amber-500 h-full rounded-full transition-all duration-1000" style={{ width: `${percentage}%` }}></div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t border-slate-800 flex gap-2 justify-end mt-4">
+                  <button 
+                    onClick={() => {
+                      if (window.confirm("PERINGATAN KRITIS: Apakah Anda yakin ingin menghapus seluruh log perolehan suara? Tindakan ini akan mengosongkan riwayat pemilu!")) {
+                        onClearPollVotes();
+                      }
+                    }}
+                    className="flex items-center gap-1 px-3 py-2 bg-rose-950/40 hover:bg-rose-900 text-rose-400 border border-rose-900 font-bold uppercase text-[10px] rounded-lg transition"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" /> Reset Seluruh Suara Pemilih
+                  </button>
+                </div>
+
+              </div>
+
+            </div>
+
+            {/* Candidate Configuration */}
+            <div className="border-t border-slate-200 pt-6 space-y-4">
+              <div className="flex justify-between items-center bg-slate-50 p-4 border border-slate-200 rounded-lg">
+                <div>
+                  <h4 className="text-xs font-black uppercase text-slate-850">Manajemen Calon Kandidat Ketua</h4>
+                  <p className="text-slate-550 text-[10px] font-bold">Tambahkan kandidat, ganti nama calon, dan sesuaikan pernyataan visi misi mereka.</p>
+                </div>
+                <button 
+                  onClick={() => {
+                    const newC: PollCandidate = {
+                      id: `candidate-${Date.now()}`,
+                      nama: `Bakal Calon Baru`,
+                      visiMisi: "Visi:\n...\n\nMisi:\n1. ...\n2. ..."
+                    };
+                    setEditingCandidates([...editingCandidates, newC]);
+                  }}
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-100 hover:bg-blue-200 text-blue-900 rounded-lg text-xs font-black cursor-pointer transition"
+                >
+                  <Plus className="w-4 h-4" /> Tambah Calon Baru
+                </button>
+              </div>
+
+              {editingCandidates.length === 0 ? (
+                <div className="text-center py-6 border border-dashed border-slate-250 text-slate-400 text-xs">
+                  Belum ada kandidat yang terdaftar. Hubungi administrator/klik tombol di atas untuk menambah calon.
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {editingCandidates.map((c, i) => (
+                    <div key={c.id} className="bg-slate-50/50 border border-slate-200 rounded-xl p-4.5 space-y-3 relative">
+                      <button 
+                        onClick={() => {
+                          if (window.confirm("Apakah Anda yakin ingin menghapus calon kandidat ini beserta isian datanya?")) {
+                            setEditingCandidates(editingCandidates.filter(item => item.id !== c.id));
+                          }
+                        }}
+                        className="absolute top-4 right-4 p-1.5 hover:bg-red-50 text-red-600 rounded-lg transition cursor-pointer"
+                        title="Hapus Calon"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+
+                      <div className="flex gap-4 items-center border-b border-slate-200 pb-3">
+                        <div className="w-14 h-14 bg-blue-900 border border-[#dca415] rounded-full overflow-hidden flex items-center justify-center text-white font-extrabold text-base uppercase shadow-inner shrink-0 relative">
+                          {c.photo ? (
+                            <img src={c.photo} className="w-full h-full object-cover" alt={c.nama} />
+                          ) : (
+                            c.nama ? (
+                              c.nama.split(' ').filter(n => !n.includes('.') && n.length > 1).map(b => b.charAt(0)).slice(0, 2).join('')
+                            ) : "P"
+                          )}
+                        </div>
+                        <div className="flex-1 space-y-1">
+                          <label className="block text-[9px] font-bold text-slate-500 uppercase">Foto Calon Ketua</label>
+                          <input 
+                            type="file"
+                            accept="image/*"
+                            className="block w-full text-xs text-slate-500 file:mr-3 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-[10px] file:font-bold file:bg-blue-50 file:text-blue-900 hover:file:bg-blue-100 cursor-pointer text-[10px]"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                if (file.size > 2 * 1024 * 1024) {
+                                  alert("Ukuran file maksimal adalah 2MB!");
+                                  return;
+                                }
+                                const reader = new FileReader();
+                                reader.onloadend = () => {
+                                  const updated = [...editingCandidates];
+                                  updated[i] = {
+                                    ...updated[i],
+                                    photo: reader.result as string
+                                  };
+                                  setEditingCandidates(updated);
+                                };
+                                reader.readAsDataURL(file);
+                              }
+                            }}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-1">
+                        <span className="text-[10px] font-mono font-bold text-amber-600">No. Urut 0{i+1}</span>
+                        <input 
+                          type="text"
+                          className="w-full bg-white border border-slate-250 p-2 rounded text-xs outline-none focus:border-blue-950 font-black text-slate-800"
+                          placeholder="Nama lengkap calon beserta gelar"
+                          value={c.nama}
+                          onChange={(e) => {
+                            const updated = [...editingCandidates];
+                            updated[i] = {
+                              ...updated[i],
+                              nama: e.target.value
+                            };
+                            setEditingCandidates(updated);
+                          }}
+                        />
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="block text-[9px] font-bold text-slate-400 uppercase">Pernyataan Visi & Misi</label>
+                        <textarea
+                          rows={4}
+                          className="w-full bg-white border border-slate-250 p-2 rounded text-xs outline-none focus:border-blue-950 text-slate-650 leading-relaxed font-semibold whitespace-pre-wrap"
+                          placeholder="Masukkan Visi & Misi calon..."
+                          value={c.visiMisi}
+                          onChange={(e) => {
+                            const updated = [...editingCandidates];
+                            updated[i] = {
+                              ...updated[i],
+                              visiMisi: e.target.value
+                            };
+                            setEditingCandidates(updated);
+                          }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div className="flex justify-end pt-2 border-t border-slate-100">
+                <button 
+                  onClick={() => {
+                    onUpdatePollCandidates(editingCandidates);
+                    alert("Daftar Calon Ketua Koperasi berhasil disinkronkan ke cloud secara real-time!");
+                  }}
+                  className="px-5 py-2.5 bg-blue-900 hover:bg-blue-950 text-white font-extrabold uppercase text-xs tracking-wider rounded-lg shadow-sm transition-all cursor-pointer"
+                >
+                  Simpan Perubahan Daftar Calon Ketua Koperasi ✓
+                </button>
+              </div>
+
+            </div>
+
+            {/* Audit Logs of Votes (Riwayat Penyalur Suara) */}
+            <div className="border-t border-slate-200 pt-6 space-y-4">
+              <h4 className="text-xs font-black uppercase text-slate-850">Audit Penyalur Hak Suara Masuk</h4>
+              
+              <div className="bg-white border rounded-lg overflow-hidden shadow-xs">
+                <table className="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr className="bg-slate-50 text-slate-500 font-bold uppercase border-b text-[10px]">
+                      <th className="p-3"># No</th>
+                      <th className="p-3">ID Anggota / Nama</th>
+                      <th className="p-3">Kandidat Terpilih</th>
+                      <th className="p-3 font-mono">Timestamp WIB</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y text-slate-700">
+                    {pollVotes.length === 0 ? (
+                      <tr>
+                        <td colSpan={4} className="p-4 text-center text-slate-400 font-medium">Belum ada suara masuk yang tercatat di database kearsipan.</td>
+                      </tr>
+                    ) : (
+                      pollVotes.map((v, i) => {
+                        const candName = editingCandidates.find(item => item.id === v.candidateId)?.nama || "Unknown Candidate";
+                        return (
+                          <tr key={i} className="hover:bg-slate-50 font-medium border-b border-slate-100">
+                            <td className="p-3 text-slate-400">{i+1}</td>
+                            <td className="p-3 text-slate-800 font-bold">{v.memberName}</td>
+                            <td className="p-3 text-blue-900 font-semibold">{candName}</td>
+                            <td className="p-3 font-mono text-slate-400">{v.timestamp}</td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+
         </div>
       )}
 

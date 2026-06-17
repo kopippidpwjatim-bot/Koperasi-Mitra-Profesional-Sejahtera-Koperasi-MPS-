@@ -68,3 +68,86 @@ button:active {
   background: #94a3b8;
 }
 
+/* ========================================== */
+/* PRINT STYLES FOR OFFICIAL CERTIFICATES      */
+/* ========================================== */
+@media print {
+  /* Set document landscape size and remove default browser margins/footers */
+  @page {
+    size: landscape;
+    margin: 0 !important;
+  }
+
+  /* Force browsers to print exact background colors/gradients */
+  html, body {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 297mm !important;
+    height: 210mm !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Hide absolutely everything on the screen by default */
+  body * {
+    visibility: hidden !important;
+  }
+
+  /* Force all selectors to accurately adjust background color */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Make ONLY our official certificate frame and its direct descendants visible */
+  #printable-cert-frame,
+  #printable-cert-frame * {
+    visibility: visible !important;
+  }
+
+  /* Position our certificate box exactly, covering the printable canvas in landscape A4 style */
+  #printable-cert-frame {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 297mm !important;    /* Exact landscape A4 width */
+    height: 210mm !important;   /* Exact landscape A4 height */
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    padding: 3rem !important;
+    border: 12px double #dca415 !important;
+    border-radius: 0px !important; /* Elegant hard corners for printing frames */
+    box-shadow: none !important;
+    background: #fdfbf7 linear-gradient(135deg, rgba(255,245,245,0.92) 0%, rgba(255,251,240,0.96) 25%, rgba(240,253,244,0.94) 50%, rgba(240,249,255,0.95) 75%, rgba(250,245,255,0.93) 100%) !important;
+    overflow: hidden !important;
+    page-break-inside: avoid !important;
+    z-index: 99999999 !important;
+  }
+
+  /* Ensure background auroras render accurately and maintain subtle beautiful aesthetics */
+  #printable-cert-frame [class*="bg-pink-300"],
+  #printable-cert-frame [class*="bg-violet-300"],
+  #printable-cert-frame [class*="bg-yellow-200"],
+  #printable-cert-frame [class*="bg-teal-100"],
+  #printable-cert-frame [class*="bg-orange-200"] {
+    display: block !important;
+    opacity: 0.25 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Force gold watermark dots to display */
+  #printable-cert-frame .absolute.inset-0 {
+    display: block !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
+
+

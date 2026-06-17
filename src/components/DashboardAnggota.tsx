@@ -3,9 +3,9 @@ import {
   User, Wallet, ArrowDownUp, TrendingUp, Cpu, PhoneCall, 
   HelpCircle, CreditCard, Sparkles, LogOut, Edit, Save, 
   ArrowUpRight, ArrowDownLeft, ReceiptText, Sparkle, Percent, CheckCircle,
-  GraduationCap
+  GraduationCap, CheckSquare
 } from 'lucide-react';
-import { Member, Transaction, CooperativeSettings, LoanApplication, WithdrawalRequest, LMSCourse, LMSUserProgress } from '../types';
+import { Member, Transaction, CooperativeSettings, LoanApplication, WithdrawalRequest, LMSCourse, LMSUserProgress, PollSettings, PollCandidate, PollVote } from '../types';
 import { KTA } from './KTA';
 import { LMSPortal } from './LMSPortal';
 
@@ -28,6 +28,12 @@ interface DashboardAnggotaProps {
   onSaveCourses: (updatedCourses: LMSCourse[]) => Promise<void>;
   onLogActivity: (activity: string) => void;
   members: Member[];
+
+  // Polling
+  pollSettings: PollSettings;
+  pollCandidates: PollCandidate[];
+  pollVotes: PollVote[];
+  onCastVote: (candidateId: string) => void;
 }
 
 export const DashboardAnggota: React.FC<DashboardAnggotaProps> = ({
@@ -46,9 +52,39 @@ export const DashboardAnggota: React.FC<DashboardAnggotaProps> = ({
   onSaveProgress,
   onSaveCourses,
   onLogActivity,
-  members
+  members,
+  pollSettings,
+  pollCandidates,
+  pollVotes,
+  onCastVote
 }) => {
-  const [activeTab, setActiveTab] = useState<'ringkasan' | 'layanan' | 'kta' | 'profil' | 'lms'>('ringkasan');
+  const [activeTab, setActiveTab] = useState<'ringkasan' | 'layanan' | 'kta' | 'profil' | 'lms' | 'pemilu'>('ringkasan');
+
+  // Polling helper data
+  const totalVotesCast = pollVotes.length;
+  const voterVote = pollVotes.find(v => v.memberId === member.id);
+  const hasVoted = !!voterVote;
+  const isExpired = new Date() > new Date(pollSettings.endDate);
+  const isPollingOn = pollSettings.isPollingActive && !isExpired;
+
+  const formatDateString = (dtStr: string) => {
+    try {
+      const d = new Date(dtStr);
+      return d.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) + " WIB";
+    } catch(e) {
+      return dtStr;
+    }
+  };
+
+  const getCandidateVotes = (candidateId: string) => {
+    return pollVotes.filter(v => v.candidateId === candidateId).length;
+  };
+
+  const getCandidatePercentage = (candidateId: string) => {
+    if (totalVotesCast === 0) return 0;
+    return Math.round((getCandidateVotes(candidateId) / totalVotesCast) * 100);
+  };
+
   const [isEditingProfile, setIsEditingProfile] = useState<boolean>(false);
   
   // Profile edits
@@ -188,6 +224,7 @@ export const DashboardAnggota: React.FC<DashboardAnggotaProps> = ({
             { id: 'layanan', lbl: 'Layanan Pengajuan', icon: <ArrowDownUp className="w-4 h-4" /> },
             { id: 'kta', lbl: 'Cetak KTA', icon: <CreditCard className="w-4 h-4" /> },
             { id: 'lms', lbl: 'LMS Pembelajaran', icon: <GraduationCap className="w-4 h-4" /> },
+            { id: 'pemilu', lbl: 'Pemilihan Ketua', icon: <CheckSquare className="w-4 h-4" /> },
             { id: 'profil', lbl: 'Sunting Identitas', icon: <User className="w-4 h-4" /> }
           ].map((t) => (
             <button
@@ -739,6 +776,210 @@ export const DashboardAnggota: React.FC<DashboardAnggotaProps> = ({
               settings={settings}
               members={members}
             />
+          )}
+
+          {/* ================= TAB 6: PEMILIHAN KETUA (POLLING SYSTEM) ================= */}
+          {activeTab === 'pemilu' && (
+            <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-xs space-y-8 animate-fade-in">
+              
+              {/* Poll Banner / Header */}
+              <div className="border-b border-slate-100 pb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="p-1 bg-amber-50 rounded-lg text-amber-600 block">
+                      <Sparkles className="w-5 h-5 animate-pulse" />
+                    </span>
+                    <h3 className="text-base sm:text-lg font-black text-slate-900">E-Voting Pemilihan Ketua Koperasi</h3>
+                  </div>
+                  <p className="text-xs text-slate-500 font-bold">{pollSettings.pollTitle}</p>
+                </div>
+
+                <div className="flex flex-col items-start md:items-end gap-1 font-mono">
+                  <div className="flex items-center gap-1.5">
+                    {isPollingOn ? (
+                      <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+                        <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping"></span>
+                        MEMILIH SEKARANG (AKTIF)
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-1 text-[10px] font-bold text-rose-700 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded-full">
+                        TERTUTUP / BERAKHIR
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[10px] text-slate-400 font-bold">Batas Waktu: {formatDateString(pollSettings.endDate)}</p>
+                </div>
+              </div>
+
+              {/* Voter Status Notice */}
+              <div className={`p-4 rounded-xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 ${
+                hasVoted 
+                  ? 'bg-emerald-50/50 border-emerald-200 text-emerald-950' 
+                  : isPollingOn 
+                    ? 'bg-blue-50/50 border-blue-200 text-blue-950' 
+                    : 'bg-slate-50 border-slate-250 text-slate-700'
+              }`}>
+                <div className="space-y-1">
+                  <h4 className="text-xs sm:text-sm font-black flex items-center gap-2">
+                    {hasVoted ? (
+                      <CheckCircle className="w-5 h-5 text-emerald-600 shrink-0" />
+                    ) : (
+                      <CheckSquare className="w-5 h-5 text-blue-600 shrink-0" />
+                    )}
+                    Status Hak Suara Anda
+                  </h4>
+                  <p className="text-xs opacity-90 leading-relaxed font-medium">
+                    {hasVoted 
+                      ? `Anda telah menyalurkan hak suara Anda. Terima kasih atas partisipasi aktif Anda demi kemajuan Koperasi IPPI DPW Jatim!` 
+                      : isPollingOn 
+                        ? `Hak suara Anda tersedia! Silakan telaah Visi & Misi masing-masing calon di bawah ini sebelum menjatuhkan pilihan terbaik Anda.` 
+                        : `Pemilihan suara saat ini tidak aktif atau telah ditutup.`
+                    }
+                  </p>
+                </div>
+                {hasVoted && (
+                  <div className="px-3.5 py-1.5 bg-emerald-700 font-bold font-mono text-white text-[10px] uppercase rounded-full tracking-wide">
+                    SUARA MASUK ✓
+                  </div>
+                )}
+              </div>
+
+              {/* Candidate Grid */}
+              <div className="space-y-4">
+                <h4 className="text-xs font-black uppercase tracking-wider text-slate-400">Daftar Calon Ketua Koperasi</h4>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {pollCandidates.map((c, i) => {
+                    const isMyCandidate = voterVote?.candidateId === c.id;
+                    const cVotes = pollVotes.filter(v => v.candidateId === c.id).length;
+                    
+                    return (
+                      <div 
+                        key={c.id} 
+                        className={`flex flex-col bg-slate-50 rounded-xl border transition-all duration-200 relative overflow-hidden h-full justify-between shadow-xs ${
+                          isMyCandidate 
+                            ? 'border-emerald-500 ring-2 ring-emerald-500/20 bg-emerald-50/10' 
+                            : 'border-slate-200 hover:border-slate-350 hover:bg-white'
+                        }`}
+                      >
+                        {/* Candidate Accent Card Header */}
+                        <div className="p-5 space-y-4 flex-1">
+                          
+                          {/* Candidate Avatar & Label */}
+                          <div className="flex gap-4 items-center">
+                            <div className="w-12 h-12 bg-blue-900 border border-[#dca415] rounded-full overflow-hidden flex items-center justify-center text-white font-extrabold text-base uppercase shadow-inner">
+                              {c.photo ? (
+                                <img src={c.photo} className="w-full h-full object-cover" alt={c.nama} />
+                              ) : (
+                                c.nama.split(' ').filter(n => !n.includes('.') && n.length > 1).map(b => b.charAt(0)).slice(0, 2).join('')
+                              )}
+                            </div>
+                            <div>
+                              <span className="text-[10px] font-extrabold text-amber-600 uppercase font-mono tracking-wider">No. Urut 0{i+1}</span>
+                              <h5 className="text-xs sm:text-sm font-black text-slate-800 line-clamp-1">{c.nama}</h5>
+                            </div>
+                          </div>
+
+                          {/* Visi & Misi Box */}
+                          <div className="bg-white/70 p-4 rounded-lg border border-slate-100 min-h-[160px] max-h-[220px] overflow-y-auto shadow-xs text-xs">
+                            <span className="text-[9px] font-black uppercase text-slate-400 block tracking-wider mb-2">Pernyataan Visi & Misi</span>
+                            <div className="text-slate-600 leading-relaxed font-semibold whitespace-pre-wrap">
+                              {c.visiMisi}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Button Action footer */}
+                        <div className="p-4 bg-slate-100/60 border-t border-slate-100 mt-auto">
+                          {hasVoted ? (
+                            isMyCandidate ? (
+                              <div className="w-full text-center py-2 bg-emerald-700 text-white font-black text-xs rounded-lg shadow-sm flex items-center justify-center gap-1">
+                                <CheckCircle className="w-4 h-4" /> Pilihan Anda
+                              </div>
+                            ) : (
+                              <button 
+                                disabled 
+                                className="w-full text-center py-2 bg-slate-200 text-slate-400 font-extrabold text-xs rounded-lg cursor-not-allowed"
+                              >
+                                Sudah Memilih Calon Lain
+                              </button>
+                            )
+                          ) : isPollingOn ? (
+                            <button
+                              onClick={() => {
+                                if (window.confirm(`Apakah Anda yakin ingin memberikan suara Anda kepada ${c.nama} sebagai Ketua Koperasi IPPI DPW Jatim? Tindakan ini tidak dapat dibatalkan.`)) {
+                                  onCastVote(c.id);
+                                }
+                              }}
+                              className="w-full py-2 bg-blue-900 hover:bg-blue-950 text-white font-black text-xs rounded-lg transition-all text-center cursor-pointer shadow-xs hover:shadow-md"
+                            >
+                              PILIH CALON INI ✓
+                            </button>
+                          ) : (
+                            <button 
+                              disabled 
+                              className="w-full text-center py-2 bg-rose-50 text-rose-500 border border-rose-100 font-extrabold text-xs rounded-lg cursor-not-allowed"
+                            >
+                              Pemilihan Ditutup
+                            </button>
+                          )}
+                        </div>
+
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Polling Results Section */}
+              <div className="pt-6 border-t border-slate-150">
+                {pollSettings.showResultsToMembers ? (
+                  <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 md:p-6 space-y-6">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                      <div className="space-y-0.5">
+                        <h4 className="text-sm font-black text-slate-900">Perolehan Suara Sementara</h4>
+                        <p className="text-xs text-slate-500 font-medium">Berdasarkan data yang disinkronkan secara real-time dari database.</p>
+                      </div>
+                      <div className="bg-emerald-100 text-emerald-900 font-bold font-mono text-xs px-3 py-1.5 rounded-lg border border-emerald-200 shrink-0">
+                        Total Suara: <span className="font-extrabold text-sm">{totalVotesCast}</span> suara masuk
+                      </div>
+                    </div>
+
+                    <div className="space-y-5">
+                      {pollCandidates.map((c, idx) => {
+                        const votes = getCandidateVotes(c.id);
+                        const percent = getCandidatePercentage(c.id);
+                        return (
+                          <div key={c.id} className="space-y-1.5">
+                            <div className="flex justify-between items-center text-xs font-bold font-mono">
+                              <span className="text-slate-700">0{idx+1}. {c.nama}</span>
+                              <span className="text-slate-800 bg-white px-2 py-0.5 border border-slate-150 rounded-md">
+                                {votes} suara ({percent}%)
+                              </span>
+                            </div>
+                            <div className="w-full h-3.5 bg-slate-200 rounded-full overflow-hidden relative shadow-inner">
+                              <div 
+                                className="h-full bg-blue-900 transition-all duration-1000 rounded-full" 
+                                style={{ width: `${percent}%` }}
+                              ></div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center space-y-2">
+                    <HelpCircle className="w-10 h-10 text-slate-400 mx-auto" />
+                    <h5 className="text-sm font-black text-slate-800">Perolehan Suara Ditangguhkan</h5>
+                    <p className="text-xs text-slate-550 max-w-md mx-auto leading-relaxed">
+                      Atas kebijakan panitia dan ketentuan administrator demi kelancaran proses pemilu, hasil perolehan suara sementara saat ini ditutup dan hanya dapat diakses oleh admin pengawas koperasi.
+                    </p>
+                  </div>
+                )}
+              </div>
+
+            </div>
           )}
 
         </div>

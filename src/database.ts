@@ -33,7 +33,10 @@ import {
   VisitorLog,
   LMSCourse,
   LMSUserProgress,
-  Regulation
+  Regulation,
+  PollCandidate,
+  PollVote,
+  PollSettings
 } from './types';
 
 // Check if Firebase was provisioned and active
@@ -348,6 +351,57 @@ export async function saveLMSProgress(progress: LMSUserProgress[]): Promise<void
   await saveData<LMSUserProgress[]>('kop_lms_progress', 'lms_progress', progress);
 }
 
+// ----------------- Polling & Voting Services -----------------
+
+export const DEFAULT_POLL_SETTINGS: PollSettings = {
+  isPollingActive: true,
+  endDate: "2026-07-31T23:59",
+  showResultsToMembers: true,
+  pollTitle: "Pemilihan Ketua Koperasi IPPI DPW Jawa Timur Periode 2026-2030"
+};
+
+export const DEFAULT_POLL_CANDIDATES: PollCandidate[] = [
+  {
+    id: "candidate-1",
+    nama: "H. Sugeng Riyanto, M.M.",
+    visiMisi: "Visi:\nMewujudkan Koperasi IPPI DPW Jatim sebagai pilar ekonomi digital anggota yang modern, mandiri, dan transparan.\n\nMisi:\n1. Digitalisasi layanan keuangan simpan pinjam secara berkelanjutan.\n2. Pengembangan program inkubator bisnis dan pelatihan UMKM bagi anggota.\n3. Peningkatan alokasi serta pembagian SHU yang transparan dan adil."
+  },
+  {
+    id: "candidate-2",
+    nama: "Hj. Endang Setyowati, S.E.",
+    visiMisi: "Visi:\nMemperkokoh solidaritas gotong royong demi kesejahteraan bersama ekonomi purnatugas.\n\nMisi:\n1. Optimalisasi kemudahan fasilitas kredit permodalan usaha bagi anggota.\n2. Membangun kemitraan strategis dengan BUMD dan instansi regional.\n3. Melaksanakan pelatihan vokasi berkala berbasis potensi dan keunggulan lokal."
+  },
+  {
+    id: "candidate-3",
+    nama: "Ir. H. Bambang Wijanarko",
+    visiMisi: "Visi:\nKoperasi adaptif, akseleratif, dan inklusif di era teknologi digital.\n\nMisi:\n1. Implementasi platform manajemen koperasi berbasis cloud yang transparan.\n2. Mengembangkan divisi usaha perdagangan umum kreatif.\n3. Program apresiasi loyalitas anggota seperti umroh dan asuransi kesehatan."
+  }
+];
+
+export async function getPollSettings(): Promise<PollSettings> {
+  return loadData<PollSettings>('kop_poll_settings', 'poll_settings', DEFAULT_POLL_SETTINGS);
+}
+
+export async function savePollSettings(settings: PollSettings): Promise<void> {
+  await saveData<PollSettings>('kop_poll_settings', 'poll_settings', settings);
+}
+
+export async function getPollCandidates(): Promise<PollCandidate[]> {
+  return loadData<PollCandidate[]>('kop_poll_candidates', 'poll_candidates', DEFAULT_POLL_CANDIDATES);
+}
+
+export async function savePollCandidates(candidates: PollCandidate[]): Promise<void> {
+  await saveData<PollCandidate[]>('kop_poll_candidates', 'poll_candidates', candidates);
+}
+
+export async function getPollVotes(): Promise<PollVote[]> {
+  return loadData<PollVote[]>('kop_poll_votes', 'poll_votes', []);
+}
+
+export async function savePollVotes(votes: PollVote[]): Promise<void> {
+  await saveData<PollVote[]>('kop_poll_votes', 'poll_votes', votes);
+}
+
 // Multi-resource database initialization seed function
 export { DEFAULT_REGULATIONS } from './data/defaultData';
 
@@ -367,6 +421,9 @@ export async function seedInitialData(): Promise<void> {
   await saveVisitorLogs(DEFAULT_VISITOR_LOGS);
   await saveLMSCourses(DEFAULT_LMS_COURSES);
   await saveLMSProgress([]);
+  await savePollSettings(DEFAULT_POLL_SETTINGS);
+  await savePollCandidates(DEFAULT_POLL_CANDIDATES);
+  await savePollVotes([]);
 }
 
 // Global persistence tester as required by Firestore Security verification
