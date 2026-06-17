@@ -117,6 +117,52 @@ const getLocalOrFallback = <T,>(key: string, fallback: T): T => {
   }
 };
 
+const generateUniqueNoAnggota = (existingMembers: Member[]): { noAnggota: string; noRekening: string } => {
+  let maxSuffix = 10; // Start at 10 (so first sequential is 11, giving 999000011)
+  existingMembers.forEach(m => {
+    if (m.noAnggota && m.noAnggota.startsWith('999000')) {
+      const suffixPart = m.noAnggota.replace('999000', '');
+      const num = parseInt(suffixPart, 10);
+      if (!isNaN(num) && num > maxSuffix) {
+        maxSuffix = num;
+      }
+    }
+  });
+  const nextSuffixNum = maxSuffix + 1;
+  const sequentialNoString = String(nextSuffixNum).padStart(3, '0');
+  return {
+    noAnggota: `999000${sequentialNoString}`,
+    noRekening: `999000${sequentialNoString}0`
+  };
+};
+
+const healMembersList = (mList: Member[]): { healedList: Member[]; changed: boolean } => {
+  let changed = false;
+  const healedList = [...mList];
+  
+  for (let i = 0; i < healedList.length; i++) {
+    const m = healedList[i];
+    const isNoAnggotaPending = !m.noAnggota || m.noAnggota.toLowerCase() === 'pending' || m.noAnggota === '';
+    const isNoRekeningPending = !m.noRekening || m.noRekening.toLowerCase().includes('pending') || m.noRekening === '';
+    
+    if (m.status === 'approved' && (isNoAnggotaPending || isNoRekeningPending)) {
+      changed = true;
+      const { noAnggota, noRekening } = generateUniqueNoAnggota(healedList);
+      
+      healedList[i] = {
+        ...m,
+        noAnggota: isNoAnggotaPending ? noAnggota : m.noAnggota,
+        noRekening: isNoRekeningPending ? noRekening : m.noRekening,
+        saldoPokok: m.saldoPokok !== undefined && m.saldoPokok !== 0 ? m.saldoPokok : 500000,
+        saldoSukarela: m.saldoSukarela !== undefined && m.saldoSukarela !== 0 ? m.saldoSukarela : 150000,
+        saldoWajib: m.saldoWajib !== undefined && m.saldoWajib !== 0 ? m.saldoWajib : 100000
+      };
+    }
+  }
+  
+  return { healedList, changed };
+};
+
 export default function App() {
   // Database status loading flag: initialized to false so the user can browse instantly using local/fallback states
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -175,7 +221,12 @@ export default function App() {
       try {
         await Promise.all([
           getCooperativeSettings().then(val => { if (active) setSettings(val); }),
-          getMembers().then(val => { if (active) setMembers(val); }),
+          getMembers().then(val => {
+            if (active) {
+              const { healedList } = healMembersList(val);
+              setMembers(healedList);
+            }
+          }),
           getProducts().then(val => { if (active) setProducts(val); }),
           getTransactions().then(val => { if (active) setTransactions(val); }),
           getArticles().then(val => { if (active) setArticles(val); }),
@@ -214,7 +265,10 @@ export default function App() {
 
     const unsubscribes = [
       subscribeData<CooperativeSettings>('kop_settings', 'settings', setSettings),
-      subscribeData<Member[]>('kop_members', 'members', setMembers),
+      subscribeData<Member[]>('kop_members', 'members', (val) => {
+        const { healedList } = healMembersList(val);
+        setMembers(healedList);
+      }),
       subscribeData<StoreProduct[]>('kop_products', 'products', setProducts),
       subscribeData<Transaction[]>('kop_transactions', 'transactions', setTransactions),
       subscribeData<Article[]>('kop_articles', 'articles', setArticles),
@@ -430,11 +484,43 @@ export default function App() {
   };
 
   const handleUpdateMember = (id: string, updatedData: Partial<Member>) => {
-    setMembers(prev => prev.map(m => m.id === id ? { ...m, ...updatedData } : m));
+    setMembers(prev => prev.map(m => {
+      if (m.id === id) {
+        const merged = { ...m, ...updatedData };
+        const isNoAnggotaPending = !merged.noAnggota || merged.noAnggota.toLowerCase() === 'pending' || merged.noAnggota === '';
+        const isNoRekeningPending = !merged.noRekening || merged.noRekening.toLowerCase().includes('pending') || merged.noRekening === '';
+        
+        if (merged.status === 'approved' && (isNoAnggotaPending || isNoRekeningPending)) {
+          const { noAnggota, noRekening } = generateUniqueNoAnggota(prev);
+          merged.noAnggota = isNoAnggotaPending ? noAnggota : merged.noAnggota;
+          merged.noRekening = isNoRekeningPending ? noRekening : merged.noRekening;
+          merged.saldoPokok = merged.saldoPokok || 500000;
+          merged.saldoSukarela = merged.saldoSukarela || 150000;
+          merged.saldoWajib = merged.saldoWajib || 100000;
+        }
+        return merged;
+      }
+      return m;
+    }));
     
     // Update activeMember reference if the edits were of the logged in user themselves
     if (activeMember && activeMember.id === id) {
-      setActiveMember(prev => prev ? { ...prev, ...updatedData } : null);
+      setActiveMember(prev => {
+        if (!prev) return null;
+        const merged = { ...prev, ...updatedData };
+        const isNoAnggotaPending = !merged.noAnggota || merged.noAnggota.toLowerCase() === 'pending' || merged.noAnggota === '';
+        const isNoRekeningPending = !merged.noRekening || merged.noRekening.toLowerCase().includes('pending') || merged.noRekening === '';
+        
+        if (merged.status === 'approved' && (isNoAnggotaPending || isNoRekeningPending)) {
+          const { noAnggota, noRekening } = generateUniqueNoAnggota(members);
+          merged.noAnggota = isNoAnggotaPending ? noAnggota : merged.noAnggota;
+          merged.noRekening = isNoRekeningPending ? noRekening : merged.noRekening;
+          merged.saldoPokok = merged.saldoPokok || 500000;
+          merged.saldoSukarela = merged.saldoSukarela || 150000;
+          merged.saldoWajib = merged.saldoWajib || 100000;
+        }
+        return merged;
+      });
     }
 
     const newLog: VisitorLog = {
@@ -463,18 +549,17 @@ export default function App() {
   };
 
   const handleAddMember = (memberData: any) => {
-    const isFirstTime = members.length;
-    const sequentialNoString = String(10 + isFirstTime).padStart(3, '0');
+    const { noAnggota, noRekening } = generateUniqueNoAnggota(members);
     
     const newMember: Member = {
       ...memberData,
       id: `member-${Date.now()}`,
-      noAnggota: `999000${sequentialNoString}`,
-      noRekening: `999000${sequentialNoString}0`,
+      noAnggota: memberData.status === 'approved' ? noAnggota : '',
+      noRekening: memberData.status === 'approved' ? noRekening : '',
       registeredAt: new Date().toISOString(),
-      saldoPokok: 500000,
-      saldoWajib: 100000,
-      saldoSukarela: 100000,
+      saldoPokok: memberData.status === 'approved' ? 500000 : 0,
+      saldoWajib: memberData.status === 'approved' ? 100000 : 0,
+      saldoSukarela: memberData.status === 'approved' ? 100000 : 0,
       saldoPenyertaan: 0
     };
 
@@ -496,18 +581,14 @@ export default function App() {
     const approvedMember = members.find(m => m.id === id);
     if (!approvedMember) return;
 
-    const totalCurrentMembers = members.length;
-    // Sequential generation e.g. 999000021 sequentially
-    const randomSuffix = String(totalCurrentMembers + 10).padStart(3, '0');
-    const computedNoAnggota = `999000${randomSuffix}`;
-    const computedNoRekening = `999000${randomSuffix}0`;
+    const { noAnggota, noRekening } = generateUniqueNoAnggota(members);
 
     // Establish default approved savings (Pokok Rp500.000 + Sukarela Rp250.000)
     setMembers(prev => prev.map(m => m.id === id ? {
       ...m,
       status: 'approved',
-      noAnggota: computedNoAnggota,
-      noRekening: computedNoRekening,
+      noAnggota: noAnggota,
+      noRekening: noRekening,
       saldoPokok: 500000,
       saldoSukarela: 150000,
       saldoWajib: 100000
@@ -520,7 +601,7 @@ export default function App() {
       kategori: 'Uang Masuk',
       sumberTujuan: 'Iuran Anggota',
       deskripsi: `Penyetoran dana iuran awal ang. baru (${approvedMember.nama})`,
-      noRekening: computedNoRekening,
+      noRekening: noRekening,
       namaBankPemilik: `Koperasi - ${approvedMember.nama}`,
       jumlahMasuk: 750000,
       jumlahKeluar: 0,
