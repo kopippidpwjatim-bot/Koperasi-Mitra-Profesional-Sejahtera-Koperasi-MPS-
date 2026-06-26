@@ -117,7 +117,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       }
     }
 
-    setCheckoutSuccess(`Pesanan berhasil diserahkan! Total transaksi: ${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(total)}. Silakan ambil barang di unit Swalayan IPPI atau hubungi admin logistik.`);
+    setCheckoutSuccess(`Pesanan berhasil diserahkan! Total transaksi: ${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(total)}. Silakan ambil barang di unit Swalayan Koperasi MPS atau hubungi admin logistik.`);
     setGuestCart([]);
     setTimeout(() => {
       setCheckoutSuccess(null);
@@ -134,7 +134,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
   const openWAToSecretary = () => {
     const cleanPhone = settings.noTelpWA.replace(/[^0-9]/g, '').replace(/^0/, '62');
-    const msg = encodeURIComponent(`Halo Sekretaris IPPI DPW Jatim, saya ingin mengajukan verifikasi keanggotaan baru koperasi.`);
+    const msg = encodeURIComponent(`Halo Sekretaris Koperasi MPS DPW Jatim, saya ingin mengajukan verifikasi keanggotaan baru koperasi.`);
     window.open(`https://wa.me/${cleanPhone}?text=${msg}`, '_blank');
   };
 
@@ -149,14 +149,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <div className="w-11 h-11 bg-white rounded-full p-1 border border-indigo-200 overflow-hidden flex items-center justify-center shadow-xs shrink-0">
                 <img 
                   src={settings.logo} 
-                  alt="Logo Koperasi IPPI" 
+                  alt="Logo Koperasi MPS" 
                   className="w-full h-full object-contain"
                 />
               </div>
               <div>
-                <span className="text-[10px] font-black uppercase text-yellow-400 tracking-wider block leading-none">KOPERASI IPPI</span>
-                <h1 className="text-sm sm:text-base font-extrabold text-white tracking-tight leading-tight">DPW Provinsi Jawa Timur</h1>
-                <p className="text-[9px] text-indigo-200 hidden sm:block">Ikatan Profesional & Pensiunan Indonesia | Akreditasi Legalitas & Kesejahteraan Mandiri</p>
+                <span className="text-[10px] font-black uppercase text-yellow-400 tracking-wider block leading-none">KOPERASI MPS</span>
+                <p className="text-[9px] text-indigo-200 hidden sm:block">Koperasi Mitra Profesional Sejahtera (Koperasi MPS) | Akreditasi Legalitas & Kesejahteraan Mandiri</p>
               </div>
             </div>
 
@@ -258,13 +257,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <div className="lg:col-span-8 space-y-6">
                   <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#dca415]/15 border border-yellow-500/25 rounded-full text-[#dca415]">
                     <Building2 className="w-4 h-4" />
-                    <span className="text-[10.5px] font-bold tracking-widest uppercase">Koperasi IPPI DPW Jawa Timur</span>
+                    <span className="text-[10.5px] font-bold tracking-widest uppercase">Koperasi MPS</span>
                   </div>
                   <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight leading-tight uppercase font-sans">
                     Mewujudkan Purnatugas Mandiri, <span className="text-yellow-400">Sejahtera</span> & Bermartabat
                   </h1>
                   <p className="text-slate-300 text-sm sm:text-base max-w-xl font-medium leading-relaxed">
-                    Koperasi Serba Usaha Ikatan Profesional & Pensiunan Indonesia (IPPI) DPW Jawa Timur bertekad mendampingi kesejahteraan finansial, sosial, dan kesehatan purnabakti lewat layanan Koperasi terpercaya.
+                    Koperasi Mitra Profesional Sejahtera (Koperasi MPS) bertekad mendampingi kesejahteraan finansial, sosial, dan kesehatan purnabakti lewat layanan Koperasi terpercaya.
                   </p>
                   <div className="flex flex-wrap gap-3 pt-2">
                     <button 
@@ -336,7 +335,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   <div key={item.id} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center bg-white p-8 rounded-2xl border border-slate-200 shadow-xs">
                     <div className={`space-y-6 ${idx % 2 === 1 ? 'lg:order-last' : ''}`}>
                       <span className="text-xs uppercase tracking-widest text-[#dca415] font-black">{item.title}</span>
-                      <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0c4a80] leading-tight mb-2">{item.title} KSU IPPI JATIM</h2>
+                      <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0c4a80] leading-tight mb-2">{item.title} KOPERASI MPS JATIM</h2>
                       <p className="text-slate-600 text-xs sm:text-sm leading-relaxed whitespace-pre-line">
                         {item.content}
                       </p>
@@ -559,7 +558,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             {/* Page Header */}
             <div className="text-center space-y-2">
               <span className="text-xs uppercase tracking-widest text-[#dca415] font-black">TENTANG KAMI</span>
-              <h2 className="text-2xl sm:text-3xl font-black text-blue-950">PROFIL & STRUKTUR ORGANISASI IPPI JATIM</h2>
+              <h2 className="text-2xl sm:text-3xl font-black text-blue-950">PROFIL & STRUKTUR ORGANISASI KOPERASI MPS JATIM</h2>
               <div className="h-1 w-20 bg-yellow-500 mx-auto rounded-full mt-2"></div>
             </div>
 
@@ -602,7 +601,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <div className="bg-slate-900 text-white rounded-xl p-6 flex flex-col sm:flex-row justify-between items-center gap-4 shadow-md border-b-4 border-yellow-500">
               <div className="space-y-1">
                 <h4 className="text-sm font-black text-yellow-400">LEGALITAS & BADAN HUKUM RESMI</h4>
-                <p className="text-xs text-slate-300">Koperasi Jasa KSU IPPI DPW Jatim telah terdaftar resmi di Kementerian Koperasi & UKM RI.</p>
+                <p className="text-xs text-slate-300">Koperasi Mitra Profesional Sejahtera (Koperasi MPS) DPW Jawa Timur telah terdaftar resmi di Kementerian Koperasi & UKM RI.</p>
                 <p className="text-[10px] font-mono text-slate-400">NO. IZIN PENDIRIAN : {settings.noIjinPendirian}</p>
               </div>
               <button 
@@ -621,7 +620,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             {/* SERVICES BANNER */}
             <div className="text-center space-y-2 max-w-2xl mx-auto">
               <span className="text-xs uppercase tracking-widest text-[#dca415] font-black">UNIT USAHA KSU</span>
-              <h2 className="text-2xl sm:text-3xl font-black text-blue-950">CORE BUSINESS KOPERASI IPPI DPW JATIM</h2>
+              <h2 className="text-2xl sm:text-3xl font-black text-blue-950">CORE BUSINESS KOPERASI MPS</h2>
               <p className="text-slate-500 text-xs sm:text-sm">
                 Empat pilar layanan ekonomi bersama yang kokoh untuk menjamin kemudahan pembiayaan, logistik, belanja pangan, dan jasa umum keanggotaan.
               </p>
@@ -735,7 +734,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                                 Nikmati diskon kiriman s/d 15% untuk paket pos domestik. Penjemputan gratis se-Surabaya & Sidoarjo. Hubungi Sekretariat Koperasi di nomor {settings.noTelpWA} untuk registrasi kurir logistik.
                               </p>
                               <button
-                                onClick={() => alert(`Tarif Khusus Jasa Logistik IPPI Jatim:\nSurabaya -> Jakarta p/Kg : Rp 12.000\nSurabaya -> Malang p/Kg : Rp 7.500\n\nHubungi WA di ${settings.noTelpWA}`)}
+                                onClick={() => alert(`Tarif Khusus Jasa Logistik Koperasi MPS Jatim:\nSurabaya -> Jakarta p/Kg : Rp 12.000\nSurabaya -> Malang p/Kg : Rp 7.500\n\nHubungi WA di ${settings.noTelpWA}`)}
                                 className="px-4 py-1.5 bg-yellow-500 hover:bg-yellow-600 text-slate-950 text-[10px] font-black rounded cursor-pointer"
                               >
                                 Cek Tarif Ekspedisi
@@ -920,7 +919,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             {/* Page Header */}
             <div className="text-center space-y-2">
               <span className="text-xs uppercase tracking-widest text-[#dca415] font-black">GALERI & DOKUMENTASI</span>
-              <h2 className="text-2xl sm:text-3xl font-black text-blue-950">AKTIVITAS & KEGIATAN KSU IPPI JATIM</h2>
+              <h2 className="text-2xl sm:text-3xl font-black text-blue-950">AKTIVITAS & KEGIATAN KOPERASI MPS JATIM</h2>
               <div className="h-1 w-20 bg-yellow-500 mx-auto rounded-full mt-2"></div>
             </div>
 
@@ -1001,7 +1000,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 
                 {contactSuccess ? (
                   <div className="p-4 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-lg text-xs leading-relaxed font-bold">
-                    Pesan Anda berhasil dikirim! Pengurus Koperasi IPPI DPW Jatim akan segera menghubungi email/nomor telfon Anda. Terima kasih.
+                    Pesan Anda berhasil dikirim! Pengurus Koperasi MPS akan segera menghubungi email/nomor telfon Anda. Terima kasih.
                   </div>
                 ) : (
                   <form onSubmit={handleSubmitContact} className="space-y-4">
@@ -1113,10 +1112,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <div className="w-9 h-9 bg-white rounded-full p-1 flex items-center justify-center">
                 <img src={settings.logo} className="h-full w-full object-contain" alt="Logo Footer" />
               </div>
-              <span className="font-extrabold text-white text-sm">KSU IPPI JAWA TIMUR</span>
+              <span className="font-extrabold text-white text-sm">KOPERASI MPS JAWA TIMUR</span>
             </div>
             <p className="leading-relaxed text-[11px] text-slate-400">
-              Membangun kemandirian ekonomi purnabakti logistik IPPI terintegrasi se-Provinsi Jawa Timur. Dedikasi tiada henti untuk hari tua bermartabat.
+              Membangun kemandirian ekonomi purnabakti logistik Koperasi MPS terintegrasi se-Provinsi Jawa Timur. Dedikasi tiada henti untuk hari tua bermartabat.
             </p>
           </div>
 
@@ -1161,7 +1160,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-slate-800 mt-8 pt-6 flex flex-col sm:flex-row justify-between items-center text-[10px] text-slate-500">
-          <p>© 2026 Koperasi Jasa KSU IPPI DPW Jawa Timur. All Rights Reserved.</p>
+          <p>© 2026 Koperasi Mitra Profesional Sejahtera (Koperasi MPS). All Rights Reserved.</p>
           <div className="flex gap-4 mt-2 sm:mt-0">
             <span>Server: CLOUD-RUN IDR</span>
             <span>Local Time: UTC+7</span>
@@ -1306,12 +1305,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* 4. OFFICIAL FLOATING WHATSAPP BUTTON */}
       <div className="fixed bottom-6 right-6 z-40 group flex flex-col items-end">
         <div className="bg-slate-950 text-white text-[10px] py-1.5 px-3 rounded-lg shadow-md mb-2 opacity-0 group-hover:opacity-100 transition-all font-bold tracking-wide leading-tight border border-yellow-500 pointer-events-none max-w-[200px] text-center">
-          Persetujuan Login? Hubungi Sekretaris IPPI DPW Jatim
+          Persetujuan Login? Hubungi Sekretaris Koperasi MPS DPW Jatim
         </div>
         <button
           onClick={openWAToSecretary}
           className="w-14 h-14 bg-emerald-600 hover:bg-emerald-700 hover:scale-105 active:scale-95 text-white rounded-full flex items-center justify-center shadow-xl transition-all border-2 border-white cursor-pointer relative"
-          title="Hubungi Sekretaris IPPI setempat untuk mendapatkan persetujuan login"
+          title="Hubungi Sekretaris Koperasi MPS setempat untuk mendapatkan persetujuan login"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" className="w-7 h-7" viewBox="0 0 16 16">
             <path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.949h.004c4.368 0 7.927-3.558 7.93-7.93a7.9 7.9 0 0 0-2.327-5.594ZM7.995 14.52a6.57 6.57 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232"/>

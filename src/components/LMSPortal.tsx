@@ -496,7 +496,7 @@ export const LMSPortal: React.FC<LMSPortalProps> = ({
                 <img 
                   src={settings.logoBrand || bestBadgeImg} 
                   className="h-20 w-20 object-contain transform hover:scale-105 transition-transform duration-300"
-                  alt="Premium IPPI Brand Badge" 
+                  alt="Premium Koperasi MPS Brand Badge" 
                   referrerPolicy="no-referrer"
                 />
               </div>
@@ -506,7 +506,7 @@ export const LMSPortal: React.FC<LMSPortalProps> = ({
               
               <div className="relative z-10 flex flex-col items-center">
                 
-                {/* Logo Koperasi di tengah-tengah diatas tulisan KOPERASI IPPI DPW JAWA TIMUR */}
+                {/* Logo Koperasi di tengah-tengah diatas tulisan KOPERASI MPS */}
                 <div className="flex justify-center items-center mb-3">
                   {settings.logo ? (
                     <img src={settings.logo} className="h-20 w-20 object-contain drop-shadow-sm transform transition duration-300 hover:scale-105" alt="Logo Resmi Koperasi" />
@@ -518,7 +518,7 @@ export const LMSPortal: React.FC<LMSPortalProps> = ({
                 </div>
 
                 <p className="text-[#0c4a80] font-extrabold tracking-widest text-xs md:text-sm uppercase mb-1 drop-shadow-xs">
-                  KOPERASI IPPI DPW JAWA TIMUR
+                  KOPERASI MPS
                 </p>
                 <p className="text-[9px] text-[#dca415] font-bold tracking-widest uppercase mb-4 max-w-xs md:max-w-md mx-auto">
                   SK PENDIRIAN: {settings.noIjinPendirian || 'AHU-0008412.AH.01.26.TAHUN-2024'}

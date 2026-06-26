@@ -6,7 +6,7 @@ export const COURSE_1_SVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.o
   <circle cx="200" cy="110" r="50" fill="none" stroke="%23dca415" stroke-width="4" stroke-dasharray="8 4" />
   <path d="M 170,120 L 195,145 L 235,95" fill="none" stroke="%2338bdf8" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
   <text x="200" y="210" font-family="sans-serif" font-weight="bold" font-size="16" fill="%23f8fafc" text-anchor="middle">Sertifikasi Keanggotaan</text>
-  <text x="200" y="230" font-family="sans-serif" font-size="12" fill="%2394a3b8" text-anchor="middle">Koperasi IPPI DPW Jatim</text>
+  <text x="200" y="230" font-family="sans-serif" font-size="12" fill="%2394a3b8" text-anchor="middle">Koperasi MPS DPW Jatim</text>
 </svg>`;
 
 export const COURSE_2_SVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 250" width="100%" height="100%">
@@ -34,19 +34,19 @@ export const COURSE_3_SVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.o
 export const DEFAULT_LMS_COURSES: LMSCourse[] = [
   {
     id: 'course-1',
-    title: 'Sertifikasi Keanggotaan & Hak Koperasi IPPI Jatim',
+    title: 'Sertifikasi Keanggotaan & Hak Koperasi MPS Jatim',
     category: 'Pecinta Koperasi',
     instructor: 'Prof. Dr. H. Slamet Purwanto, M.E.',
-    description: 'Membekali anggota dengan pemahaman mendalam tentang prinsip koperasi modern, hak & kewajiban partisipasi, pengelolaan simpanan modal, serta pengawasan akuntabilitas organisasi IPPI DPW Jawa Timur.',
+    description: 'Membekali anggota dengan pemahaman mendalam tentang prinsip koperasi modern, hak & kewajiban partisipasi, pengelolaan simpanan modal, serta pengawasan akuntabilitas organisasi Koperasi MPS Jawa Timur.',
     duration: '1.5 Jam',
     image: COURSE_1_SVG,
     lessons: [
       {
         id: 'c1-l1',
-        title: 'Pengantar Koperasi IPPI DPW Jatim',
-        content: `<h3>Selamat Datang di Portal Pembelajaran IPPI DPW Jawa Timur</h3>
-<p>Koperasi IPPI (Ikatan Profesional & Pensiunan Indonesia) DPW Jawa Timur didirikan dengan visi luhur untuk meningkatkan kesejahteraan pensiunan, profesional, serta pelaku UMKM binaan di wilayah Jawa Timur. Melalui platform gotong royong ini, setiap anggota bukan hanya sekadar nasabah, melainkan pemilik sah dari Koperasi.</p>
-<h4>Prinsip Dasar Koperasi IPPI:</h4>
+        title: 'Pengantar Koperasi MPS DPW Jatim',
+        content: `<h3>Selamat Datang di Portal Pembelajaran Koperasi MPS Jawa Timur</h3>
+<p>Koperasi Mitra Profesional Sejahtera (Koperasi MPS) DPW Jawa Timur didirikan dengan visi luhur untuk meningkatkan kesejahteraan pensiunan, profesional, serta pelaku UMKM binaan di wilayah Jawa Timur. Melalui platform gotong royong ini, setiap anggota bukan hanya sekadar nasabah, melainkan pemilik sah dari Koperasi.</p>
+<h4>Prinsip Dasar Koperasi MPS:</h4>
 <ul>
   <li><b>Keanggotaan Sukarela dan Terbuka:</b> Terbuka untuk seluruh pensiunan, profesional, dan pengusaha UMKM tanpa diskriminasi.</li>
   <li><b>Pengendalian Demokratis oleh Anggota:</b> Keputusan tertinggi berada pada RAT (Rapat Anggota Tahunan). Satu anggota memiliki hak satu suara (one member, one vote).</li>
@@ -61,7 +61,7 @@ export const DEFAULT_LMS_COURSES: LMSCourse[] = [
         id: 'c1-l2',
         title: 'Memahami Simpanan Pokok, Wajib, Sukarela & Pinjaman',
         content: `<h3>Struktur Keuangan dan Permodalan Koperasi</h3>
-<p>Koperasi IPPI DPW Jatim menggunakan skema permodalan gotong royong yang dibagi menjadi beberapa komponen berdasar Anggaran Dasar/Anggaran Rumah Tangga (AD/ART):</p>
+<p>Koperasi MPS DPW Jatim menggunakan skema permodalan gotong royong yang dibagi menjadi beberapa komponen berdasar Anggaran Dasar/Anggaran Rumah Tangga (AD/ART):</p>
 <ol>
   <li><b>Simpanan Pokok:</b> Dibayarkan sekali saja saat pertama kali mendaftar sebagai anggota resmi. Simpanan ini tidak dapat ditarik selama masih menjadi anggota koperasi.</li>
   <li><b>Simpanan Wajib:</b> Iuran berkala bulanan yang wajib disetorkan oleh setiap anggota aktif guna memperkuat likuiditas modal koperasi.</li>
@@ -69,16 +69,16 @@ export const DEFAULT_LMS_COURSES: LMSCourse[] = [
   <li><b>Simpanan Penyertaan:</b> Investasi modal tambahan dari anggota untuk membiayai usaha-usaha strategis koperasi dengan imbalan bagi hasil (SHU) yang menarik.</li>
 </ol>
 <h3>Pengajuan Pinjaman Yang Bertanggung Jawab</h3>
-<p>Koperasi IPPI DPW Jatim menyediakan sistem penyaluran pinjaman produktif bagi anggota dengan tenor pembayaran yang bersahabat dan bunga bersaing (1% per bulan flat). Pengajuan dapat diajukan langsung melalui Dashboard Anggota dan akan divalidasi langsung oleh Pengurus (Admin, Sekretaris, Bendahara, dan Ketua).</p>`,
+<p>Koperasi MPS DPW Jatim menyediakan sistem penyaluran pinjaman produktif bagi anggota dengan tenor pembayaran yang bersahabat dan bunga bersaing (1% per bulan flat). Pengajuan dapat diajukan langsung melalui Dashboard Anggota dan akan divalidasi langsung oleh Pengurus (Admin, Sekretaris, Bendahara, dan Ketua).</p>`,
         duration: '20 Menit',
         order: 2
       },
       {
         id: 'c1-l3',
         title: 'Hak Suara, Transparansi, & Rapat Anggota Tahunan (RAT)',
-        content: `<h3>Kedaulatan Anggota di Koperasi IPPI</h3>
+        content: `<h3>Kedaulatan Anggota di Koperasi MPS</h3>
 <p>Berbeda dengan perseroan terbatas atau perbankan komersial di mana pemilik saham terbesar berkuasa penuh, di koperasi kedudukan setiap anggota adalah <b>setara</b>.</p>
-<h4>Hak-Hak Utama Anggota Koperasi IPPI:</h4>
+<h4>Hak-Hak Utama Anggota Koperasi MPS:</h4>
 <ul>
   <li><b>Hak Bersuara (Voice):</b> Mengajukan usul, saran, serta kritik membangun pada saat Rapat Anggota Tahunan (RAT).</li>
   <li><b>Hak Memilih & Dipilih:</b> Hak suara untuk memilih pengurus (Ketua, Sekretaris, Bendahara) dan pengawas, serta hak untuk dipilih menjadi pengurus jika memenuhi syarat kualifikasi.</li>
@@ -94,7 +94,7 @@ export const DEFAULT_LMS_COURSES: LMSCourse[] = [
       questions: [
         {
           id: 'q1-1',
-          questionText: 'Siapakah pemilik tertinggi dari kekuasaan dan keputusan di Koperasi IPPI DPW Jawa Timur?',
+          questionText: 'Siapakah pemilik tertinggi dari kekuasaan dan keputusan di Koperasi MPS DPW Jawa Timur?',
           options: [
             'Ketua Koperasi saja',
             'Rapat Anggota Tahunan (RAT) yang dihadiri seluruh anggota',
@@ -116,7 +116,7 @@ export const DEFAULT_LMS_COURSES: LMSCourse[] = [
         },
         {
           id: 'q1-3',
-          questionText: 'Berapakah persen suku bunga flat per bulan yang ditawarkan Koperasi IPPI DPW Jatim untuk pinjaman anggota?',
+          questionText: 'Berapakah persen suku bunga flat per bulan yang ditawarkan Koperasi MPS DPW Jatim untuk pinjaman anggota?',
           options: [
             '1.0% flat per bulan',
             '5.5% flat per bulan',
@@ -174,7 +174,7 @@ export const DEFAULT_LMS_COURSES: LMSCourse[] = [
 <p>Agar promosi produk UMKM Anda dibaca dan mendatangkan pembeli, hindari menulis iklan yang kaku. Gunakan struktur AIDA:</p>
 <ul>
   <li><b>Attention (Perhatian):</b> Buat 1 baris judul pembuka yang mengejutkan atau memicu rasa penasaran pelanggan. <br><i>Contoh: "Bosan Beras Cepat Kutu dan Bau Apek? Cobalah Ini!"</i></li>
-  <li><b>Interest (Ketertarikan):</b> Jelaskan fakta menarik atau masalah yang sedang dihadapi calon pembeli. <br><i>Contoh: "Koperasi IPPI DPW Jatim kini menyediakan Beras Premium sehat tanpa bahan pemutih kimia langsung dari petani lokal."</i></li>
+  <li><b>Interest (Ketertarikan):</b> Jelaskan fakta menarik atau masalah yang sedang dihadapi calon pembeli. <br><i>Contoh: "Koperasi MPS DPW Jatim kini menyediakan Beras Premium sehat tanpa bahan pemutih kimia langsung dari petani lokal."</i></li>
   <li><b>Desire (Keinginan):</b> Berikan penawaran spesial, diskon, atau testimoni kepuasan pelanggan agar calon pembeli tergoda. <br><i>Contoh: "Khusus anggota koperasi bulan ini, dapatkan potongan harga 10% dan gratis ongkir wilayah Surabaya!"</i></li>
   <li><b>Action (Tindakan):</b> Berikan instruksi jelas ke mana mereka harus bertransaksi. <br><i>Contoh: "Stok terbatas! Klik tombol WA di bawah atau pesan via e-commerce Koperasi sekarang."</i></li>
 </ul>`,
@@ -203,7 +203,7 @@ export const DEFAULT_LMS_COURSES: LMSCourse[] = [
             'Action, Insight, Decision, Authority',
             'Attention, Interest, Desire, Action',
             'Association, Integration, Development, Automation',
-            'Anggota, IPPI, Daerah, Asosiasi'
+            'Anggota, MPS, Daerah, Asosiasi'
           ],
           correctOptionIndex: 1
         },

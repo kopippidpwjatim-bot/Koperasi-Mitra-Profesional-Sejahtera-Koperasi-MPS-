@@ -9,7 +9,7 @@ export const DEFAULT_LOGO_SVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.
   <path id="curve-bottom" d="M 440,250 A 190,190 0 0,1 60,250" fill="none"/>
   
   <text font-family="'Inter', 'Helvetica', 'Arial', sans-serif" font-weight="900" font-size="34" fill="%230c4a80" letter-spacing="1.5">
-    <textPath href="%23curve-top" startOffset="50%" text-anchor="middle">KOPERASI IPPI</textPath>
+    <textPath href="%23curve-top" startOffset="50%" text-anchor="middle">KOPERASI MPS</textPath>
   </text>
   
   <text font-family="'Inter', 'Helvetica', 'Arial', sans-serif" font-weight="800" font-size="34" fill="%230c4a80" letter-spacing="1">
@@ -40,7 +40,7 @@ export const DEFAULT_SETTINGS: CooperativeSettings = {
   alamatSekretariat: "Jl. Gayung Kebonsari No. 35, Ketintang, Gayungan, Kota Surabaya, Jawa Timur 60235",
   noIjinPendirian: "AHU-0008412.AH.01.26.TAHUN-2024",
   noTelpWA: "081803100222",
-  email: "kopippidpwjatim@gmail.com"
+  email: "kopmpsdpwjatim@gmail.com"
 };
 
 export const DEFAULT_MEMBERS: Member[] = [
@@ -54,7 +54,7 @@ export const DEFAULT_MEMBERS: Member[] = [
     agama: "Islam",
     pekerjaanKeahlian: "Manajemen, Koperasi Sekolah, Humas",
     noHp: "08123456789",
-    email: "admin@koperasi-ippi.com",
+    email: "admin@koperasi-mps.com",
     alamatLengkap: "Rungkut Menanggal Harapan VII C/12 Surabaya, Jawa Timur 60293",
     status: "approved",
     role: "admin",
@@ -77,7 +77,7 @@ export const DEFAULT_MEMBERS: Member[] = [
     agama: "Islam",
     pekerjaanKeahlian: "Logistik, Kurir Ekspres, Pengembangan Ekosistem Bisnis",
     noHp: "081803100222",
-    email: "sekretaris@koperasi-ippi.com",
+    email: "sekretaris@koperasi-mps.com",
     alamatLengkap: "Perumahan Jade Sidokare Asri Blok C-15, Sidoarjo 61214",
     status: "approved",
     role: "sekretaris",
@@ -100,7 +100,7 @@ export const DEFAULT_MEMBERS: Member[] = [
     agama: "Islam",
     pekerjaanKeahlian: "Analisis Makroekonomi, Hukum Bisnis Koperasi",
     noHp: "081122334455",
-    email: "ketua@koperasi-ippi.com",
+    email: "ketua@koperasi-mps.com",
     alamatLengkap: "Jl. Kertajaya Indah Timur XI/180 Surabaya 60116",
     status: "approved",
     role: "ketua",
@@ -123,7 +123,7 @@ export const DEFAULT_MEMBERS: Member[] = [
     agama: "Islam",
     pekerjaanKeahlian: "Akuntansi Publik, Audit Finansial, Manajemen Resiko Simpan Pinjam",
     noHp: "082233445566",
-    email: "bendahara@koperasi-ippi.com",
+    email: "bendahara@koperasi-mps.com",
     alamatLengkap: "Perum Graha Bunder Asri G-32, Kebomas, Gresik 61121",
     status: "approved",
     role: "bendahara",
@@ -164,12 +164,12 @@ export const DEFAULT_MEMBERS: Member[] = [
 export const DEFAULT_PRODUCTS: StoreProduct[] = [
   {
     id: "prod-1",
-    nama: "Beras Premium IPPI Jatim SLY (5 Kg)",
+    nama: "Beras Premium MPS Jatim SLY (5 Kg)",
     harga: 72500,
     image: "https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&q=80&w=200",
     kategori: "Kebutuhan Pokok",
     stok: 120,
-    deskripsi: "Beras poles kualitas super, pulen, wangi pandan alami, langsung dari penggilingan padi anggota IPPI Jatim."
+    deskripsi: "Beras poles kualitas super, pulen, wangi pandan alami, langsung dari penggilingan padi anggota Koperasi MPS Jatim."
   },
   {
     id: "prod-2",
@@ -231,7 +231,7 @@ export const DEFAULT_TRANSACTIONS: Transaction[] = [
     sumberTujuan: "Nota Dana Masuk",
     deskripsi: "Pendapatan Usaha Penjualan Sembako Swalayan Periode Mei 2026",
     noRekening: "8881239901",
-    namaBankPemilik: "Bank Jatim - Giro KSU IPPI Jatim",
+    namaBankPemilik: "Bank Jatim - Giro KSU Koperasi MPS Jatim",
     jumlahMasuk: 4500000,
     jumlahKeluar: 0,
     saldoAkhir: 600000,
@@ -259,7 +259,7 @@ export const DEFAULT_TRANSACTIONS: Transaction[] = [
     sumberTujuan: "SPJ",
     deskripsi: "Bantuan Dana Sosial Penyaluran Sembako Duafa DPW Jatim",
     noRekening: "1098231221",
-    namaBankPemilik: "Bank Jatim - Pengurus Sosial IPPI",
+    namaBankPemilik: "Bank Jatim - Pengurus Sosial Koperasi MPS",
     jumlahMasuk: 0,
     jumlahKeluar: 2500000,
     saldoAkhir: 2300000,
@@ -273,15 +273,15 @@ export const DEFAULT_ARTICLES: Article[] = [
     id: "art-1",
     title: "Mengelola Dana Pensiun dengan Prinsip Gotong Royong Koperasi",
     summary: "Mari pelajari bagaimana memaksimalkan sisa hasil usaha (SHU) melalui keikutsertaan aktif dalam unit simpan pinjam koperasi korps pensiunan.",
-    content: "Masa pensiun bukanlah akhir dari produktivitas finansial. Melalui Koperasi KSU IPPI DPW Jatim, para purnatugas dapat saling bahu membahu menghidupkan ekosistem ekonomi. Pensiunan tidak hanya menyimpan dana, tetapi dana tersebut dikembangkan lewat unit pinjaman modal usaha kecil sesama pensiunan. Pada akhir tahun buku, keuntungan tersebut dikembalikan secara transparan dalam bentuk Sisa Hasil Usaha (SHU), menciptakan siklus berkah gotong royong yang sehat.",
+    content: "Masa pensiun bukanlah akhir dari produktivitas finansial. Melalui Koperasi Mitra Profesional Sejahtera (Koperasi MPS) DPW Jawa Timur, para purnatugas dapat saling bahu membahu menghidupkan ekosistem ekonomi. Pensiunan tidak hanya menyimpan dana, tetapi dana tersebut dikembangkan lewat unit pinjaman modal usaha kecil sesama pensiunan. Pada akhir tahun buku, keuntungan tersebut dikembalikan secara transparan dalam bentuk Sisa Hasil Usaha (SHU), menciptakan siklus berkah gotong royong yang sehat.",
     date: "2026-06-05",
     category: "Tips Keuangan"
   },
   {
     id: "art-2",
-    title: "Kemitraan Logistik IPPI Jawa Timur dengan Ekosistem Pos Indonesia",
-    summary: "Koperasi IPPI DPW Jatim meluncurkan unit jasa logistik untuk melayani pengiriman barang anggota menggunakan jaringan terluas.",
-    content: "Sejalan dengan sejarah panjang para anggota yang sebagian besar merupakan pensiunan PT Pos Indonesia (Persero), Unit Jasa Logistik Koperasi IPPI DPW Jatim berkolaborasi strategis guna memberikan tarif khusus kargo dan pengiriman dokumen bagi anggota sekalian. Layanan ini mencakup diskon khusus bagi UKM yang dikelola oleh anggota atau keluarga inti anggota IPPI Jawa Timur.",
+    title: "Kemitraan Logistik Koperasi MPS Jawa Timur dengan Ekosistem Pos Indonesia",
+    summary: "Koperasi MPS Jawa Timur meluncurkan unit jasa logistik untuk melayani pengiriman barang anggota menggunakan jaringan terluas.",
+    content: "Sejalan dengan sejarah panjang para anggota yang sebagian besar merupakan pensiunan PT Pos Indonesia (Persero), Unit Jasa Logistik Koperasi MPS Jawa Timur berkolaborasi strategis guna memberikan tarif khusus kargo dan pengiriman dokumen bagi anggota sekalian. Layanan ini mencakup diskon khusus bagi UKM yang dikelola oleh anggota atau keluarga inti anggota Koperasi MPS Jawa Timur.",
     date: "2026-05-24",
     category: "Unit Usaha"
   }
@@ -291,7 +291,7 @@ export const DEFAULT_ANNOUNCEMENTS: Announcement[] = [
   {
     id: "ann-1",
     title: "Rapat Anggota Tahunan Kelompok (RAT) Buku 2025 Jatim",
-    content: "Diberitahukan kepada seluruh anggota Koperasi IPPI DPW Jawa Timur bahwa RAT Buku Keuangan 2025 akan diselenggarakan secara hybrid pada tanggal 20 Juni 2026 bertempat di Gedung Sekretariat Gayungan, Surabaya. Harap melakukan konfirmasi kehadiran melalui portal anggota atau menghubungi koordinator kabupaten/kota setempat.",
+    content: "Diberitahukan kepada seluruh anggota Koperasi Mitra Profesional Sejahtera (Koperasi MPS) DPW Jawa Timur bahwa RAT Buku Keuangan 2025 akan diselenggarakan secara hybrid pada tanggal 20 Juni 2026 bertempat di Gedung Sekretariat Gayungan, Surabaya. Harap melakukan konfirmasi kehadiran melalui portal anggota atau menghubungi koordinator kabupaten/kota setempat.",
     date: "2026-06-10",
     important: true
   },
@@ -316,14 +316,14 @@ export const DEFAULT_TENTANG_ITEMS: TentangItem[] = [
   {
     id: "tentang-2",
     title: "Misi Koperasi",
-    content: "1. Menyelenggarakan Unit Simpan Pinjam dengan tata kelola profesional dan bunga rendah yang meringankan.\n2. Memajukan UMKM serta pemenuhan kebutuhan sembako pangan harian lewat Swalayan IPPI Sejahtera.\n3. Mengoptimalkan keahlian ekspedisi anggota purnatugas PT Pos melalui kolaborasi Unit Jasa Logistik.\n4. Memberikan pelayanan sosial, santunan duka cita, serta advokasi kesehatan pensiunan di daerah Jawa Timur secara merata.",
+    content: "1. Menyelenggarakan Unit Simpan Pinjam dengan tata kelola profesional dan bunga rendah yang meringankan.\n2. Memajukan UMKM serta pemenuhan kebutuhan sembako pangan harian lewat Swalayan Koperasi MPS Sejahtera.\n3. Mengoptimalkan keahlian ekspedisi anggota purnatugas PT Pos melalui kolaborasi Unit Jasa Logistik.\n4. Memberikan pelayanan sosial, santunan duka cita, serta advokasi kesehatan pensiunan di daerah Jawa Timur secara merata.",
     image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&q=80&w=400",
     showOnBeranda: true,
     order: 2
   },
   {
     id: "tentang-3",
-    title: "Sejarah Koperasi IPPI DPW Jatim",
+    title: "Sejarah Koperasi Mitra Profesional Sejahtera (Koperasi MPS)",
     content: "Koperasi didirikan bertepatan dengan menguatnya kebutuhan pensiunan korps PT Pos Jatim untuk bersatu mengelola perekonomian pasca masa dinas aktif. Diinisiasi pada tahun 2018 melalui rapat gabungan dewan purnakarya se-Karesidenan Madiun dan Kediri, kemudian diresmikan di tingkat DPW Jawa Timur dengan status Koperasi KSU berbadan hukum lengkap pada tahun 2024.",
     image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&q=80&w=630",
     showOnBeranda: true,
@@ -332,7 +332,7 @@ export const DEFAULT_TENTANG_ITEMS: TentangItem[] = [
   {
     id: "tentang-4",
     title: "Struktur Kepengurusan DPW Jatim",
-    content: "Prof. Dr. H. Slamet Purwanto, M.E. (Ketua Koperasi IPPI DPW Jatim - Pensiunan UNAIR)\nDrs. Mohammad Anshori, M.Si. (Sekretaris I Koperasi - Pensiunan PT Pos Indonesia)\nHj. Kartika Wardhani, S.E., Ak. (Bendahara & Kepala Keuangan - Purnatugas Bank Jatim / Akuntan)\nIr. H. Budi Setiawan (Dewan Pengawas Utama - Mantan Kepala Regional Pos IV)",
+    content: "Prof. Dr. H. Slamet Purwanto, M.E. (Ketua Koperasi MPS DPW Jatim - Pensiunan UNAIR)\nDrs. Mohammad Anshori, M.Si. (Sekretaris I Koperasi - Pensiunan PT Pos Indonesia)\nHj. Kartika Wardhani, S.E., Ak. (Bendahara & Kepala Keuangan - Purnatugas Bank Jatim / Akuntan)\nIr. H. Budi Setiawan (Dewan Pengawas Utama - Mantan Kepala Regional Pos IV)",
     image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=400",
     showOnBeranda: false,
     order: 4
@@ -351,7 +351,7 @@ export const DEFAULT_LAYANAN_ITEMS: LayananItem[] = [
   },
   {
     id: "layanan-2",
-    title: "Unit Usaha Swalayan & Toko IPPI",
+    title: "Unit Usaha Swalayan & Toko Koperasi MPS",
     badge: "UNIT II",
     content: "Nikmati transaksi belanja online kebutuhan sembako pokok harian dengan sistem pemotongan saldo simpanan secara aman. Terbuka pula layanan kas umum (POS) di sekretariat DPW.",
     image: "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=400",
@@ -360,7 +360,7 @@ export const DEFAULT_LAYANAN_ITEMS: LayananItem[] = [
   },
   {
     id: "layanan-3",
-    title: "Unit Jasa Pengiriman & Logistik IPPI",
+    title: "Unit Jasa Pengiriman & Logistik Koperasi MPS",
     badge: "UNIT III",
     content: "Menyediakan pengiriman paket domestik kargo yang dikelola mandiri oleh Koperasi bekerjasama penuh dengan PT Pos Indonesia (Persero). Solusi logistik andal dengan penjemputan barang ke alamat para anggota di wilayah Jawa Timur.",
     image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&q=80&w=400",

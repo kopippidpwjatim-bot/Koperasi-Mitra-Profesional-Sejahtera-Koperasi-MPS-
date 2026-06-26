@@ -89,8 +89,7 @@ export const DashboardSekretaris: React.FC<DashboardSekretarisProps> = ({
             </td>
             <td class="w-5/6 pl-4 text-center">
               <h2 class="text-xs font-black uppercase tracking-widest text-[#dca415] block leading-none">KOPERASI JASA SERBA USAHA</h2>
-              <h1 class="text-xl font-black text-blue-900 leading-tight">IKATAN PROFESIONAL & PENSIUNAN INDONESIA (IPPI)</h1>
-              <p class="text-[15px] font-bold text-slate-800">DPW PROVINSI JAWA TIMUR</p>
+              <h1 class="text-xl font-black text-blue-900 leading-tight">KOPERASI MITRA PROFESIONAL SEJAHTERA (KOPERASI MPS)</h1>
               <p class="text-[10px] text-slate-500 font-medium leading-relaxed">${settings.alamatSekretariat}</p>
               <p class="text-[8.5px] text-slate-400 font-mono mt-0.5">
                 BH: ${settings.noIjinPendirian} | Telp/WA: ${settings.noTelpWA} | Email: ${settings.email}
@@ -114,7 +113,7 @@ export const DashboardSekretaris: React.FC<DashboardSekretarisProps> = ({
     
     // Automatically trigger WA prompt as specified by guidelines
     const cleanPhone = m.noHp.replace(/[^0-9]/g, '').replace(/^0/, '62');
-    const msg = encodeURIComponent(`Selamat Anda telah bergabung dengan IPPI, silahkan login dengan user dan password yang sudah didaftarkan.`);
+    const msg = encodeURIComponent(`Selamat Anda telah bergabung dengan Koperasi MPS, silahkan login dengan user dan password yang sudah didaftarkan.`);
     const parentWaUrl = `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${msg}`;
     
     alert(`Sukses disetujui!\nNo Anggota murni terbit dan No Rekening digital dialokasikan.\nSeketika membuka WhatsApp untuk mengirim konfirmasi aktivasi ke ${m.nama}.`);
@@ -678,8 +677,7 @@ export const DashboardSekretaris: React.FC<DashboardSekretarisProps> = ({
                     </td>
                     <td className="w-5/6 text-center pl-4">
                       <p className="text-[10px] font-black text-amber-600 block uppercase tracking-wider leading-none">KOPERASI JASA SERBA USAHA</p>
-                      <h4 className="text-[18px] font-black text-blue-900 tracking-tight leading-tight uppercase font-sans">IKATAN PROFESIONAL & PENSIUNAN INDONESIA</h4>
-                      <p className="text-xs font-black uppercase text-slate-800 leading-snug">DPW PROVINSI JAWA TIMUR</p>
+                      <h4 className="text-[18px] font-black text-blue-900 tracking-tight leading-tight uppercase font-sans">KOPERASI MITRA PROFESIONAL SEJAHTERA</h4>
                       <p className="text-[10px] text-slate-550 leading-relaxed max-w-[450px] mx-auto mt-0.5">{settings.alamatSekretariat}</p>
                       <p className="font-mono text-[8.5px] text-slate-400 mt-1">
                         Ijin Pendirian: {settings.noIjinPendirian} | Hotline WA: {settings.noTelpWA} | Email: {settings.email}

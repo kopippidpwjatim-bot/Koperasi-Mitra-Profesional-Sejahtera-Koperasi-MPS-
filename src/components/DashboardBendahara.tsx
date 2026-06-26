@@ -167,13 +167,13 @@ export const DashboardBendahara: React.FC<DashboardBendaharaProps> = ({
     const printWindow = window.open('', '', 'width=900,height=600');
     if (!printWindow) return;
 
-    printWindow.document.write('<html><head><title>Jurnal Buku Besar Finansial IPPI</title>');
+    printWindow.document.write('<html><head><title>Jurnal Buku Besar Finansial Koperasi MPS</title>');
     printWindow.document.write('<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">');
     printWindow.document.write('</head><body class="p-8">');
     printWindow.document.write(`
       <div class="border-b-4 border-double border-slate-900 pb-4 mb-6 text-center">
         <h2 class="text-xs font-black uppercase text-amber-600 block leading-none">KOPERASI JASA SERBA USAHA</h2>
-        <h1 class="text-xl font-bold text-blue-900">IKATAN PROFESIONAL & PENSIUNAN INDONESIA (IPPI)</h1>
+        <h1 class="text-xl font-bold text-blue-900">KOPERASI MITRA PROFESIONAL SEJAHTERA (KOPERASI MPS)</h1>
         <p class="text-xs text-slate-500">${settings.alamatSekretariat}</p>
       </div>
 

@@ -15,7 +15,7 @@ export const KTA: React.FC<KTAProps> = ({ member, settings }) => {
     const printWindow = window.open('', '', 'height=600,width=800');
     if (!printWindow) return;
     
-    printWindow.document.write('<html><head><title>Cetak Kartu Anggota Koperasi IPPI Jatim</title>');
+    printWindow.document.write('<html><head><title>Cetak Kartu Anggota Koperasi MPS Jatim</title>');
     printWindow.document.write('<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">');
     printWindow.document.write('<style>body { -webkit-print-color-adjust: exact; padding: 20px; }</style>');
     printWindow.document.write('</head><body>');
@@ -45,7 +45,7 @@ export const KTA: React.FC<KTAProps> = ({ member, settings }) => {
             <div className="w-12 h-12 bg-white rounded-full p-0.5 flex-shrink-0 flex items-center justify-center overflow-hidden">
               <img 
                 src={settings.logo} 
-                alt="Logo Koperasi IPPI" 
+                alt="Logo Koperasi MPS" 
                 className="w-full h-full object-contain"
                 onError={(e) => {
                   (e.target as HTMLImageElement).onerror = null;
@@ -53,8 +53,7 @@ export const KTA: React.FC<KTAProps> = ({ member, settings }) => {
               />
             </div>
             <div>
-              <h2 className="text-[12px] font-black uppercase tracking-wider leading-none text-yellow-400">KOPERASI JASA KSU IPPI</h2>
-              <p className="text-[10px] font-semibold text-slate-200">DPW JAWA TIMUR</p>
+              <h2 className="text-[12px] font-black uppercase tracking-wider leading-none text-yellow-400">KOPERASI JASA KSU MPS</h2>
               <p className="text-[7px] text-slate-300">Badan Hukum: {settings.noIjinPendirian}</p>
             </div>
           </div>
@@ -95,7 +94,7 @@ export const KTA: React.FC<KTAProps> = ({ member, settings }) => {
           {/* Footer Card */}
           <div className="flex justify-between items-end border-t border-slate-700/50 pt-1.5 mt-1 text-[8px] text-slate-300 font-mono">
             <span>KARTU ANGGOTA ELEKTRONIK (KTA)</span>
-            <span className="text-[8px] font-sans font-semibold text-yellow-400 uppercase">IPPI JATIM</span>
+            <span className="text-[8px] font-sans font-semibold text-yellow-400 uppercase">KOPERASI MPS JATIM</span>
           </div>
         </div>
 
@@ -112,12 +111,12 @@ export const KTA: React.FC<KTAProps> = ({ member, settings }) => {
                 </div>
                 <span className="text-[11px] font-bold tracking-wider uppercase text-yellow-400">KETENTUAN KARTU ANGGOTA</span>
               </div>
-              <span className="text-[8px] font-semibold text-slate-400">IPPI DPW Jatim</span>
+              <span className="text-[8px] font-semibold text-slate-400">Koperasi MPS DPW Jatim</span>
             </div>
 
             {/* Terms List and Information */}
             <div className="text-[7.5px] text-slate-300 space-y-1 my-2">
-              <p>1. Kartu ini merupakan bukti keanggotaan sah Koperasi Jasa KSU IPPI DPW Jawa Timur.</p>
+              <p>1. Kartu ini merupakan bukti keanggotaan sah Koperasi Mitra Profesional Sejahtera (Koperasi MPS) DPW Jawa Timur.</p>
               <p>2. Hak-hak pemegang kartu berpaku pada Anggaran Dasar/Anggaran Rumah Tangga (AD/ART) Koperasi.</p>
               <p>3. Apabila kartu ini ditemukan di jalan, mohon hubungi sekretariat tertera di bawah ini.</p>
             </div>

@@ -14,6 +14,7 @@ export interface Member {
   noHp: string;
   email: string;
   alamatLengkap: string;
+  jenisUmkm?: string; // Jenis UMKM yang digeluti
   photo?: string; // base64 DataURL or fallback SVG URL
   noAnggota?: string; // 10 digit, e.g. 999000011
   noRekening?: string; // 10 digit

@@ -15,7 +15,7 @@ interface DashboardAnggotaProps {
   transactions: Transaction[];
   loans: LoanApplication[];
   withdrawals: WithdrawalRequest[];
-  onUpdateProfile: (updatedData: { noHp: string, email: string, alamatLengkap: string, photo: string }) => void;
+  onUpdateProfile: (updatedData: Partial<Member>) => void;
   onApplyLoan: (loanData: { jumlah: number, tenor: number, tujuan: string }) => void;
   onApplyWithdrawal: (withdrawalData: { jumlah: number, jenisSimpanan: 'Sukarela' | 'Penyertaan' }) => void;
   onBuyPPOB: (amount: number, ppobType: string, refDetail: string) => boolean;
@@ -88,10 +88,19 @@ export const DashboardAnggota: React.FC<DashboardAnggotaProps> = ({
   const [isEditingProfile, setIsEditingProfile] = useState<boolean>(false);
   
   // Profile edits
+  const [namaEdit, setNamaEdit] = useState(member.nama);
+  const [tempatLahirEdit, setTempatLahirEdit] = useState(member.tempatLahir);
+  const [tanggalLahirEdit, setTanggalLahirEdit] = useState(member.tanggalLahir);
+  const [institusiPensiunEdit, setInstitusiPensiunEdit] = useState(member.institusiPensiun);
+  const [jenisKelaminEdit, setJenisKelaminEdit] = useState(member.jenisKelamin);
+  const [agamaEdit, setAgamaEdit] = useState(member.agama);
+  const [pekerjaanKeahlianEdit, setPekerjaanKeahlianEdit] = useState(member.pekerjaanKeahlian);
+  const [jenisUmkmEdit, setJenisUmkmEdit] = useState(member.jenisUmkm || '');
   const [phoneEdit, setPhoneEdit] = useState(member.noHp);
   const [emailEdit, setEmailEdit] = useState(member.email);
   const [addressEdit, setAddressEdit] = useState(member.alamatLengkap);
   const [photoEdit, setPhotoEdit] = useState(member.photo || '');
+  const [passwordEdit, setPasswordEdit] = useState(member.password || '');
 
   // Loan application
   const [loanForm, setLoanForm] = useState({ jumlah: 2000000, tenor: 12, tujuan: '' });
@@ -116,10 +125,19 @@ export const DashboardAnggota: React.FC<DashboardAnggotaProps> = ({
   const handleUpdate = (e: React.FormEvent) => {
     e.preventDefault();
     onUpdateProfile({
+      nama: namaEdit,
+      tempatLahir: tempatLahirEdit,
+      tanggalLahir: tanggalLahirEdit,
+      institusiPensiun: institusiPensiunEdit,
+      jenisKelamin: jenisKelaminEdit,
+      agama: agamaEdit,
+      pekerjaanKeahlian: pekerjaanKeahlianEdit,
+      jenisUmkm: jenisUmkmEdit,
       noHp: phoneEdit,
       email: emailEdit,
       alamatLengkap: addressEdit,
-      photo: photoEdit
+      photo: photoEdit,
+      password: passwordEdit
     });
     setIsEditingProfile(false);
     alert("Profil berhasil diperbarui!");
@@ -645,10 +663,19 @@ export const DashboardAnggota: React.FC<DashboardAnggotaProps> = ({
                 {!isEditingProfile && (
                   <button
                     onClick={() => {
+                      setNamaEdit(member.nama);
+                      setTempatLahirEdit(member.tempatLahir);
+                      setTanggalLahirEdit(member.tanggalLahir);
+                      setInstitusiPensiunEdit(member.institusiPensiun);
+                      setJenisKelaminEdit(member.jenisKelamin);
+                      setAgamaEdit(member.agama);
+                      setPekerjaanKeahlianEdit(member.pekerjaanKeahlian);
+                      setJenisUmkmEdit(member.jenisUmkm || '');
                       setPhoneEdit(member.noHp);
                       setEmailEdit(member.email);
                       setAddressEdit(member.alamatLengkap);
                       setPhotoEdit(member.photo || '');
+                      setPasswordEdit(member.password || '');
                       setIsEditingProfile(true);
                     }}
                     className="px-3 py-1.5 bg-slate-900 text-white font-bold text-xs rounded-lg inline-flex items-center gap-1 cursor-pointer"
@@ -661,6 +688,100 @@ export const DashboardAnggota: React.FC<DashboardAnggotaProps> = ({
               {isEditingProfile ? (
                 <form onSubmit={handleUpdate} className="space-y-4 text-xs">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[10px] font-black text-slate-500 mb-1 uppercase">Nama Lengkap & Gelar</label>
+                      <input
+                        type="text"
+                        required
+                        className="w-full bg-slate-50 border border-slate-300 p-2.5 rounded-lg outline-none focus:border-blue-900"
+                        value={namaEdit}
+                        onChange={(e) => setNamaEdit(e.target.value)}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-black text-slate-500 mb-1 uppercase">Tempat Lahir</label>
+                      <input
+                        type="text"
+                        required
+                        className="w-full bg-slate-50 border border-slate-300 p-2.5 rounded-lg outline-none focus:border-blue-900"
+                        value={tempatLahirEdit}
+                        onChange={(e) => setTempatLahirEdit(e.target.value)}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-black text-slate-500 mb-1 uppercase">Tanggal Lahir</label>
+                      <input
+                        type="date"
+                        required
+                        className="w-full bg-slate-50 border border-slate-300 p-2.5 rounded-lg outline-none focus:border-blue-900"
+                        value={tanggalLahirEdit}
+                        onChange={(e) => setTanggalLahirEdit(e.target.value)}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-black text-slate-500 mb-1 uppercase">Institusi Pensiunan</label>
+                      <input
+                        type="text"
+                        required
+                        className="w-full bg-slate-50 border border-slate-300 p-2.5 rounded-lg outline-none focus:border-blue-900"
+                        value={institusiPensiunEdit}
+                        onChange={(e) => setInstitusiPensiunEdit(e.target.value)}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-black text-slate-500 mb-1 uppercase">Jenis Kelamin</label>
+                      <select
+                        className="w-full bg-slate-50 border border-slate-300 p-2 rounded-lg text-xs bg-white"
+                        value={jenisKelaminEdit}
+                        onChange={(e) => setJenisKelaminEdit(e.target.value as 'Laki-Laki' | 'Perempuan')}
+                      >
+                        <option value="Laki-Laki">Laki-Laki</option>
+                        <option value="Perempuan">Perempuan</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-black text-slate-500 mb-1 uppercase">Agama</label>
+                      <select
+                        className="w-full bg-slate-50 border border-slate-300 p-2 rounded-lg text-xs bg-white"
+                        value={agamaEdit}
+                        onChange={(e) => setAgamaEdit(e.target.value as any)}
+                      >
+                        <option value="Islam">Islam</option>
+                        <option value="Kristen">Kristen</option>
+                        <option value="Budha">Budha</option>
+                        <option value="Hindu">Hindu</option>
+                        <option value="Konghucu">Konghucu</option>
+                        <option value="Kepercayaan">Kepercayaan</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-black text-slate-500 mb-1 uppercase">Pekerjaan / Keahlian</label>
+                      <input
+                        type="text"
+                        required
+                        className="w-full bg-slate-50 border border-slate-300 p-2.5 rounded-lg outline-none focus:border-blue-900"
+                        value={pekerjaanKeahlianEdit}
+                        onChange={(e) => setPekerjaanKeahlianEdit(e.target.value)}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-black text-slate-500 mb-1 uppercase">Jenis UMKM yang Digeluti</label>
+                      <input
+                        type="text"
+                        required
+                        className="w-full bg-slate-50 border border-slate-300 p-2.5 rounded-lg outline-none focus:border-blue-900"
+                        value={jenisUmkmEdit}
+                        onChange={(e) => setJenisUmkmEdit(e.target.value)}
+                      />
+                    </div>
+
                     <div>
                       <label className="block text-[10px] font-black text-slate-500 mb-1 uppercase">Nomor Telpon / HP / WA</label>
                       <input
@@ -677,9 +798,21 @@ export const DashboardAnggota: React.FC<DashboardAnggotaProps> = ({
                       <input
                         type="email"
                         required
-                        className="w-full bg-slate-50 border border-slate-300 p-2.5 rounded-lg outline-none focus:border-blue-900"
+                        className="w-full bg-slate-50 border border-slate-300 p-2.5 rounded-lg outline-none focus:border-blue-950"
                         value={emailEdit}
                         onChange={(e) => setEmailEdit(e.target.value)}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-black text-slate-500 mb-1 uppercase">Password Login</label>
+                      <input
+                        type="text"
+                        required
+                        className="w-full bg-slate-50 border border-slate-300 p-2.5 rounded-lg font-mono outline-none focus:border-blue-900"
+                        placeholder="Ubah password jika diinginkan"
+                        value={passwordEdit}
+                        onChange={(e) => setPasswordEdit(e.target.value)}
                       />
                     </div>
 
@@ -728,8 +861,18 @@ export const DashboardAnggota: React.FC<DashboardAnggotaProps> = ({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-xs text-slate-800 leading-normal">
                   <div className="space-y-4">
                     <div>
+                      <span className="text-[9px] uppercase tracking-wider text-slate-400 font-bold block">Nama Anggota (Gelar)</span>
+                      <p className="font-semibold text-slate-900 mt-1 text-sm">{member.nama}</p>
+                    </div>
+
+                    <div>
                       <span className="text-[9px] uppercase tracking-wider text-slate-400 font-bold block">Tempat/Tanggal Lahir</span>
                       <p className="font-semibold text-slate-900 mt-1">{member.tempatLahir}, {member.tanggalLahir}</p>
+                    </div>
+
+                    <div>
+                      <span className="text-[9px] uppercase tracking-wider text-slate-400 font-bold block">Jenis Kelamin / Agama</span>
+                      <p className="font-semibold text-slate-900 mt-1">{member.jenisKelamin} / {member.agama}</p>
                     </div>
 
                     <div>
@@ -740,6 +883,11 @@ export const DashboardAnggota: React.FC<DashboardAnggotaProps> = ({
                     <div>
                       <span className="text-[9px] uppercase tracking-wider text-slate-400 font-bold block">Spesialisasi / Keahlian</span>
                       <p className="font-semibold text-slate-800 mt-1">{member.pekerjaanKeahlian}</p>
+                    </div>
+
+                    <div>
+                      <span className="text-[9px] uppercase tracking-wider text-[#0c4a80] font-black block">Jenis UMKM yang Digeluti</span>
+                      <p className="font-bold text-blue-900 mt-1 bg-blue-55/70 px-2 py-1 rounded w-fit border border-blue-200/50">{member.jenisUmkm || 'Belum diisi'}</p>
                     </div>
                   </div>
 
@@ -752,6 +900,11 @@ export const DashboardAnggota: React.FC<DashboardAnggotaProps> = ({
                     <div>
                       <span className="text-[9px] uppercase tracking-wider text-slate-400 font-bold block">Email Terdaftar</span>
                       <p className="font-semibold text-slate-900 mt-1">{member.email}</p>
+                    </div>
+
+                    <div>
+                      <span className="text-[9px] uppercase tracking-wider text-slate-400 font-bold block">Password Terkunci</span>
+                      <p className="font-mono text-slate-900 mt-1">••••••••</p>
                     </div>
 
                     <div>
@@ -830,7 +983,7 @@ export const DashboardAnggota: React.FC<DashboardAnggotaProps> = ({
                   </h4>
                   <p className="text-xs opacity-90 leading-relaxed font-medium">
                     {hasVoted 
-                      ? `Anda telah menyalurkan hak suara Anda. Terima kasih atas partisipasi aktif Anda demi kemajuan Koperasi IPPI DPW Jatim!` 
+                      ? `Anda telah menyalurkan hak suara Anda. Terima kasih atas partisipasi aktif Anda demi kemajuan Koperasi MPS DPW Jatim!` 
                       : isPollingOn 
                         ? `Hak suara Anda tersedia! Silakan telaah Visi & Misi masing-masing calon di bawah ini sebelum menjatuhkan pilihan terbaik Anda.` 
                         : `Pemilihan suara saat ini tidak aktif atau telah ditutup.`
@@ -907,7 +1060,7 @@ export const DashboardAnggota: React.FC<DashboardAnggotaProps> = ({
                           ) : isPollingOn ? (
                             <button
                               onClick={() => {
-                                if (window.confirm(`Apakah Anda yakin ingin memberikan suara Anda kepada ${c.nama} sebagai Ketua Koperasi IPPI DPW Jatim? Tindakan ini tidak dapat dibatalkan.`)) {
+                                if (window.confirm(`Apakah Anda yakin ingin memberikan suara Anda kepada ${c.nama} sebagai Ketua Koperasi MPS DPW Jatim? Tindakan ini tidak dapat dibatalkan.`)) {
                                   onCastVote(c.id);
                                 }
                               }}

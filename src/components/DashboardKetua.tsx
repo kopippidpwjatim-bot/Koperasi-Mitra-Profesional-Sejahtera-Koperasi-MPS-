@@ -52,8 +52,7 @@ export const DashboardKetua: React.FC<DashboardKetuaProps> = ({
             </td>
             <td class="w-5/6 pl-4 text-center">
               <h2 class="text-xs font-black uppercase tracking-widest text-[#dca415] block leading-none">KOPERASI JASA SERBA USAHA</h2>
-              <h1 class="text-xl font-black text-blue-900 leading-tight">IKATAN PROFESIONAL & PENSIUNAN INDONESIA (IPPI)</h1>
-              <p class="text-[15px] font-bold text-slate-800">DPW PROVINSI JAWA TIMUR</p>
+              <h1 class="text-xl font-black text-blue-900 leading-tight">KOPERASI MITRA PROFESIONAL SEJAHTERA (KOPERASI MPS)</h1>
               <p class="text-[10px] text-slate-500 font-medium leading-relaxed">${settings.alamatSekretariat}</p>
               <p class="text-[8.5px] text-slate-400 font-mono mt-0.5">
                 BH: ${settings.noIjinPendirian} | Telp/WA: ${settings.noTelpWA} | Email: ${settings.email}
@@ -101,7 +100,7 @@ export const DashboardKetua: React.FC<DashboardKetuaProps> = ({
               <span className="text-[10px] text-slate-500">Otorisator Keuangan Utama</span>
             </div>
             <h2 className="text-base sm:text-lg font-black text-slate-950">{ketuaMember.nama}</h2>
-            <p className="text-xs text-slate-550">Legalitas IPPI DPW Jatim: <span className="font-bold underline text-blue-900">{settings.noIjinPendirian}</span></p>
+            <p className="text-xs text-slate-550">Legalitas Koperasi MPS DPW Jatim: <span className="font-bold underline text-blue-900">{settings.noIjinPendirian}</span></p>
           </div>
         </div>
 
@@ -269,7 +268,7 @@ export const DashboardKetua: React.FC<DashboardKetuaProps> = ({
             <div className="bg-slate-900 text-white p-4 border rounded-xl shadow-xs border-l-4 border-[#dca415]">
               <span className="text-[9.5px] uppercase tracking-wide text-yellow-500 font-black block">AKUMULASI TOTAL AKTIVA NERACA</span>
               <p className="text-lg font-black tracking-tight text-white font-mono mt-1">{formatRupiah(totalAssetKoperasi)}</p>
-              <span className="text-[8.5px] text-slate-400 mt-1 block font-bold">KSU IPPI DPW JATIM</span>
+              <span className="text-[8.5px] text-slate-400 mt-1 block font-bold">KOPERASI MPS DPW JATIM</span>
             </div>
           </div>
 
@@ -328,7 +327,7 @@ export const DashboardKetua: React.FC<DashboardKetuaProps> = ({
                     <span className="font-bold">{formatRupiah(totalAssetKoperasi * 0.2)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Modal Cadangan Koperasi IPPI:</span>
+                    <span>Modal Cadangan Koperasi MPS:</span>
                     <span className="font-bold">{formatRupiah(totalAssetKoperasi * 0.1)}</span>
                   </div>
                   <div className="flex justify-between border-t pt-1 font-bold text-slate-900 border-slate-350 bg-slate-50 px-2.5 rounded">
@@ -348,7 +347,7 @@ export const DashboardKetua: React.FC<DashboardKetuaProps> = ({
       {activeTabKet === 'kop_preview' && (
         <div className="bg-white border rounded-xl p-6 shadow-xs space-y-6">
           <div className="text-center">
-            <h3 className="text-sm font-black text-[#0c4a80] uppercase tracking-wider">Kop Surat Kelembagaan DPW IPPI</h3>
+            <h3 className="text-sm font-black text-[#0c4a80] uppercase tracking-wider">Kop Surat Kelembagaan DPW Koperasi MPS</h3>
             <p className="text-slate-500 max-w-md mx-auto mt-0.5 leading-normal">
               Melakukan generate instan kop surat resmi untuk pelaporan tahunan ke Kementerian Koperasi RI Provinsi Jawa Timur.
             </p>
@@ -365,8 +364,7 @@ export const DashboardKetua: React.FC<DashboardKetuaProps> = ({
                     </td>
                     <td className="w-5/6 text-center pl-4">
                       <p className="text-[10px] font-black text-amber-600 block uppercase tracking-wider leading-none">KOPERASI JASA SERBA USAHA</p>
-                      <h4 className="text-[18px] font-black text-blue-900 tracking-tight leading-tight uppercase font-sans">IKATAN PROFESIONAL & PENSIUNAN INDONESIA</h4>
-                      <p className="text-xs font-black uppercase text-slate-800 leading-snug">DPW PROVINSI JAWA TIMUR</p>
+                      <h4 className="text-[18px] font-black text-blue-900 tracking-tight leading-tight uppercase font-sans">KOPERASI MITRA PROFESIONAL SEJAHTERA</h4>
                       <p className="text-[10px] text-slate-550 leading-relaxed max-w-[450px] mx-auto mt-0.5">{settings.alamatSekretariat}</p>
                       <p className="font-mono text-[8.5px] text-slate-400 mt-1">
                         Ijin Pendirian: {settings.noIjinPendirian} | Hotline WA: {settings.noTelpWA} | Email: {settings.email}
@@ -378,7 +376,7 @@ export const DashboardKetua: React.FC<DashboardKetuaProps> = ({
             </div>
 
             <div className="h-44 flex items-center justify-center text-slate-400 italic font-mono text-[10.5px]">
-              Surat Keterangan Kepatuhan Keuangan (SKKK) IPPI DPW Jatim
+              Surat Keterangan Kepatuhan Keuangan (SKKK) Koperasi MPS DPW Jatim
             </div>
           </div>
 

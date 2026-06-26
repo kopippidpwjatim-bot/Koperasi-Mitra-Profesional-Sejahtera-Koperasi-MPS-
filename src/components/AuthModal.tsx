@@ -88,6 +88,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     noHp: '',
     email: '',
     alamatLengkap: '',
+    jenisUmkm: '',
     password: '',
     photo: '' // Base64
   });
@@ -131,7 +132,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     }
 
     if (found.status === 'pending') {
-      alert(`Pemberitahuan: Akun Anda sedang diajukan untuk disetujui.\nSilakan hubungi Sekretaris IPPI Jatim di ${settings.noTelpWA} untuk persetujuan login.`);
+      alert(`Pemberitahuan: Akun Anda sedang diajukan untuk disetujui.\nSilakan hubungi Sekretaris Koperasi MPS Jatim di ${settings.noTelpWA} untuk persetujuan login.`);
       return;
     }
 
@@ -145,14 +146,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     // Validate all fields strictly as requested: "Semua kolom diatas harus di isi, dengan tanda merah Bintang"
     const {
       nama, tempatLahir, tanggalLahir, institusiPensiun,
-      pekerjaanKeahlian, noHp, email, alamatLengkap, password, photo
+      pekerjaanKeahlian, noHp, email, alamatLengkap, password, photo, jenisUmkm
     } = registerForm;
 
     if (
       !nama || !tempatLahir || !tanggalLahir || !institusiPensiun ||
-      !pekerjaanKeahlian || !noHp || !email || !alamatLengkap || !password || !photo
+      !pekerjaanKeahlian || !noHp || !email || !alamatLengkap || !password || !photo || !jenisUmkm
     ) {
-      alert("⚠️ Peringatan: Semua kolom bertanda bintang merah (*) dan Pas Foto wajib diisi untuk mendaftarkan keanggotaan.");
+      alert("⚠️ Peringatan: Semua kolom bertanda bintang merah (*), Jenis UMKM, dan Pas Foto wajib diisi untuk mendaftarkan keanggotaan.");
       return;
     }
 
@@ -168,7 +169,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const openWAToSekretarisDirect = () => {
     const cleanPhone = settings.noTelpWA.replace(/[^0-9]/g, '').replace(/^0/, '62');
     const textMsg = encodeURIComponent(
-      `Selamat siang Koperasi IPPI DPW Jatim, saya ${registerForm.nama} baru saja melakukan registrasi online di Portal Koperasi. Mohon dibantu untuk persetujuan (approval) masuk ke Member Area. Terima kasih.`
+      `Selamat siang Koperasi MPS DPW Jatim, saya ${registerForm.nama} baru saja melakukan registrasi online di Portal Koperasi. Mohon dibantu untuk persetujuan (approval) masuk ke Member Area. Terima kasih.`
     );
     window.open(`https://wa.me/${cleanPhone}?text=${textMsg}`, '_blank');
   };
@@ -183,7 +184,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           
           <div className="space-y-4 relative z-10">
             <span className="text-[10px] bg-yellow-500/20 text-yellow-400 font-extrabold uppercase px-2.5 py-1 rounded-full border border-yellow-500/20 tracking-wider">
-              PORTAL KSU IPPI JATIM
+              PORTAL KOPERASI MPS JATIM
             </span>
             <h3 className="text-xl font-bold uppercase leading-tight font-sans text-white">
               Satu Akses Layanan Pensiunan Sukses
@@ -199,34 +200,34 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             <div className="grid grid-cols-2 gap-2 text-[9px] font-mono text-slate-200">
               <div 
                 className="bg-slate-950/50 p-1.5 rounded cursor-pointer hover:bg-[#dca415]/20 hover:text-[#ffffff] transition border border-slate-800"
-                onClick={() => setLoginForm({ identifier: 'admin@koperasi-ippi.com', password: 'admin' })}
+                onClick={() => setLoginForm({ identifier: 'admin@koperasi-mps.com', password: 'admin' })}
               >
                 <p className="font-bold text-yellow-400">1. ADMIN</p>
-                <p>U: admin@koperasi-ippi.com</p>
+                <p>U: admin@koperasi-mps.com</p>
                 <p>P: admin</p>
               </div>
               <div 
                 className="bg-slate-950/50 p-1.5 rounded cursor-pointer hover:bg-[#dca415]/20 hover:text-[#ffffff] transition border border-slate-800"
-                onClick={() => setLoginForm({ identifier: 'sekretaris@koperasi-ippi.com', password: 'sekretaris' })}
+                onClick={() => setLoginForm({ identifier: 'sekretaris@koperasi-mps.com', password: 'sekretaris' })}
               >
                 <p className="font-bold text-yellow-400">2. SEKRETARIS</p>
-                <p>U: sekretaris@koperasi-ippi.com</p>
+                <p>U: sekretaris@koperasi-mps.com</p>
                 <p>P: sekretaris</p>
               </div>
               <div 
                 className="bg-slate-950/50 p-1.5 rounded cursor-pointer hover:bg-[#dca415]/20 hover:text-[#ffffff] transition border border-slate-800"
-                onClick={() => setLoginForm({ identifier: 'ketua@koperasi-ippi.com', password: 'ketua' })}
+                onClick={() => setLoginForm({ identifier: 'ketua@koperasi-mps.com', password: 'ketua' })}
               >
                 <p className="font-bold text-yellow-400">3. KETUA</p>
-                <p>U: ketua@koperasi-ippi.com</p>
+                <p>U: ketua@koperasi-mps.com</p>
                 <p>P: ketua</p>
               </div>
               <div 
                 className="bg-slate-950/50 p-1.5 rounded cursor-pointer hover:bg-[#dca415]/20 hover:text-[#ffffff] transition border border-slate-800"
-                onClick={() => setLoginForm({ identifier: 'bendahara@koperasi-ippi.com', password: 'bendahara' })}
+                onClick={() => setLoginForm({ identifier: 'bendahara@koperasi-mps.com', password: 'bendahara' })}
               >
                 <p className="font-bold text-yellow-400">4. BENDAHARA</p>
-                <p>U: bendahara@koperasi-ippi.com</p>
+                <p>U: bendahara@koperasi-mps.com</p>
                 <p>P: bendahara</p>
               </div>
               <div 
@@ -284,7 +285,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 <div className="p-4 bg-yellow-50 border border-yellow-300/60 rounded-xl space-y-1">
                   <p className="text-xs font-black text-yellow-950 uppercase">PEMBERITAHUAN VERIFIKASI SEKERETARIS</p>
                   <p className="text-[11px] text-slate-700 italic leading-relaxed">
-                    &ldquo;Silahkan hubungi, Sekretaris IPPI setempat untuk mendapatkan persetujuan login&rdquo;
+                    &ldquo;Silahkan hubungi, Sekretaris Koperasi MPS setempat untuk mendapatkan persetujuan login&rdquo;
                   </p>
                 </div>
               </div>
@@ -529,6 +530,21 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                         placeholder="Contoh: kurir dan logistik, ekpedisi"
                         value={registerForm.pekerjaanKeahlian}
                         onChange={(e) => setRegisterForm({ ...registerForm, pekerjaanKeahlian: e.target.value })}
+                      />
+                    </div>
+
+                    {/* Jenis UMKM yang Digeluti */}
+                    <div>
+                      <label className="block text-[10px] font-black text-slate-500 mb-0.5 uppercase">
+                        Jenis UMKM yang Digeluti <span className="text-red-500 font-sans font-black">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        className="w-full min-h-[36px] bg-slate-50 border border-slate-350 p-2.5 rounded-lg text-xs outline-none focus:border-blue-900"
+                        placeholder="Contoh: Kuliner, Kerajinan, Jasa, Pertanian, ritel, dsb"
+                        value={registerForm.jenisUmkm || ''}
+                        onChange={(e) => setRegisterForm({ ...registerForm, jenisUmkm: e.target.value })}
                       />
                     </div>
 

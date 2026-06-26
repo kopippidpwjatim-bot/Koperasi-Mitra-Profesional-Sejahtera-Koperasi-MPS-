@@ -75,7 +75,7 @@ export const Receipt: React.FC<ReceiptProps> = ({ transaction, member, settings,
     const targetPhone = member?.noHp || settings.noTelpWA;
     const cleanPhone = targetPhone.replace(/[^0-9]/g, '').replace(/^0/, '62');
     
-    const textMsg = `*STRUK BUKTI TRANSAKSI KOPERASI IPPI DPW JATIM*\n\n` +
+    const textMsg = `*STRUK BUKTI TRANSAKSI KOPERASI MPS DPW JATIM*\n\n` +
       `No Transaksi: ${transaction.id}\n` +
       `Tanggal: ${transaction.tanggal}\n` +
       `Jenis: ${transaction.kategori} (${transaction.sumberTujuan})\n` +
@@ -85,7 +85,7 @@ export const Receipt: React.FC<ReceiptProps> = ({ transaction, member, settings,
       `Terbilang: _${spelledOut}_\n\n` +
       `Status: SUCCESS / LUNAS\n` +
       `Petugas: ${transaction.createdBy}\n\n` +
-      `Terima kasih atas partisipasi aktif Anda di Koperasi KSU IPPI Jawa Timur.`;
+      `Terima kasih atas partisipasi aktif Anda di Koperasi Mitra Profesional Sejahtera (Koperasi MPS) Jawa Timur.`;
       
     const waUrl = `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(textMsg)}`;
     window.open(waUrl, '_blank');
@@ -117,7 +117,7 @@ export const Receipt: React.FC<ReceiptProps> = ({ transaction, member, settings,
               <div className="w-16 h-16 bg-white rounded-full p-1 mx-auto flex items-center justify-center border border-slate-200 shadow-xs mb-1">
                 <img src={settings.logo} className="max-w-full max-h-full object-contain" alt="Coop Logo" />
               </div>
-              <h1 className="font-extrabold text-sm uppercase text-blue-900 leading-tight">KSU IPPI DPW JATIM</h1>
+              <h1 className="font-extrabold text-sm uppercase text-blue-900 leading-tight">KOPERASI MPS DPW JATIM</h1>
               <p className="text-[10px] text-slate-600 mt-1 max-w-[280px] mx-auto leading-tight">
                 {settings.alamatSecretariat || settings.alamatSekretariat}
               </p>
@@ -211,15 +211,15 @@ export const Receipt: React.FC<ReceiptProps> = ({ transaction, member, settings,
                 <p className="mt-1 truncate max-w-[120px] mx-auto font-medium">{member?.nama || "Penerima Dana"}</p>
               </div>
               <div>
-                <p className="font-bold">Bendahara IPPI Jatim</p>
+                <p className="font-bold">Bendahara Koperasi MPS Jatim</p>
                 <div className="h-12 border-b border-dashed border-slate-300 mx-auto w-3/4"></div>
-                <p className="mt-1 font-medium">{settings.namaSekretariat ? "Kartika Wardhani, S.E." : "Koperasi Jasa IPPI"}</p>
+                <p className="mt-1 font-medium">{settings.namaSekretariat ? "Kartika Wardhani, S.E." : "Koperasi MPS"}</p>
               </div>
             </div>
 
             <div className="text-center pt-4 border-t border-dashed border-slate-300 text-[8.5px] text-slate-400">
               <p>Simpan tanda bukti ini sebagai dokumen sah Koperasi.</p>
-              <p className="font-sans mt-0.5">KSU IPPI DPW JATIM &copy; 2026</p>
+              <p className="font-sans mt-0.5">KOPERASI MPS DPW JATIM &copy; 2026</p>
             </div>
 
           </div>

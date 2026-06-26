@@ -440,6 +440,7 @@ export const DashboardAdmin: React.FC<DashboardAdminProps> = ({
     jenisKelamin: 'Laki-Laki' as 'Laki-Laki' | 'Perempuan',
     agama: 'Islam' as 'Islam' | 'Kristen' | 'Budha' | 'Hindu' | 'Konghucu' | 'Kepercayaan',
     pekerjaanKeahlian: '',
+    jenisUmkm: '',
     noHp: '',
     email: '',
     alamatLengkap: '',
@@ -578,8 +579,7 @@ export const DashboardAdmin: React.FC<DashboardAdminProps> = ({
             </td>
             <td class="w-5/6 pl-4 text-center">
               <h2 class="text-xs font-black uppercase tracking-widest text-amber-600 block leading-none">KOPERASI JASA SERBA USAHA</h2>
-              <h1 class="text-2xl font-black text-blue-900 leading-tight">IKATAN PROFESIONAL & PENSIUNAN INDONESIA (IPPI)</h1>
-              <p class="text-lg font-bold text-slate-800">DPW PROVINSI JAWA TIMUR</p>
+              <h1 class="text-2xl font-black text-blue-900 leading-tight">KOPERASI MITRA PROFESIONAL SEJAHTERA (KOPERASI MPS)</h1>
               <p class="text-xs text-slate-500 font-medium leading-relaxed">${settings.alamatSekretariat}</p>
               <p class="text-[10px] text-slate-400 font-mono mt-1">
                 Kemenkop RI BH: ${settings.noIjinPendirian} | Telp/WA: ${settings.noTelpWA} | Email: ${settings.email}
@@ -623,7 +623,7 @@ export const DashboardAdmin: React.FC<DashboardAdminProps> = ({
     // Reset Form
     setUserForm({
       nama: '', tempatLahir: '', tanggalLahir: '', institusiPensiun: '',
-      jenisKelamin: 'Laki-Laki', agama: 'Islam', pekerjaanKeahlian: '',
+      jenisKelamin: 'Laki-Laki', agama: 'Islam', pekerjaanKeahlian: '', jenisUmkm: '',
       noHp: '', email: '', alamatLengkap: '', password: 'password', photo: '',
       role: 'anggota', status: 'approved'
     });
@@ -639,6 +639,7 @@ export const DashboardAdmin: React.FC<DashboardAdminProps> = ({
       jenisKelamin: u.jenisKelamin,
       agama: u.agama,
       pekerjaanKeahlian: u.pekerjaanKeahlian,
+      jenisUmkm: u.jenisUmkm || '',
       noHp: u.noHp,
       email: u.email,
       alamatLengkap: u.alamatLengkap,
@@ -683,7 +684,7 @@ export const DashboardAdmin: React.FC<DashboardAdminProps> = ({
       <div className="bg-slate-900 border-b-4 border-yellow-500 text-white p-6 sm:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <span className="text-[10px] bg-yellow-500 text-slate-950 font-black px-2 py-0.5 rounded-full select-none uppercase tracking-widest">Akses Admin Utama</span>
-          <h2 className="text-xl sm:text-2xl font-black text-white mt-1 uppercase">SISTEM ADMINISTRATIF KOPERASI JASA IPPI</h2>
+          <h2 className="text-xl sm:text-2xl font-black text-white mt-1 uppercase">SISTEM ADMINISTRATIF KOPERASI MPS</h2>
           <p className="text-slate-400 text-xs mt-0.5">Mempunyai akses penuh mengontrol log data, user, legalitas kop, dan balance sheet.</p>
         </div>
 
@@ -1194,7 +1195,7 @@ export const DashboardAdmin: React.FC<DashboardAdminProps> = ({
             <div className="flex border-b border-slate-100 pb-2 flex-wrap gap-1">
               {[
                 { id: 'tentang', lbl: '1. Tentang Kami (Profil/Visi/Sejarah)' },
-                { id: 'layanan', lbl: '2. Unit Layanan KSU IPPI' },
+                { id: 'layanan', lbl: '2. Unit Layanan Koperasi MPS' },
                 { id: 'berita', lbl: '3. Berita, Tips & Kegiatan' },
                 { id: 'galeri', lbl: '4. Galeri Foto & Dokumentasi' },
                 { id: 'produk', lbl: '5. Katalog Barang Swalayan' },
@@ -1494,7 +1495,7 @@ export const DashboardAdmin: React.FC<DashboardAdminProps> = ({
                      <input
                        type="text"
                        className="w-full bg-slate-50 border border-slate-350 p-2 rounded text-xs font-mono outline-none"
-                       placeholder="Contoh: https://facebook.com/ippi-jatim atau link luar lainnya"
+                       placeholder="Contoh: https://facebook.com/koperasi-mps atau link luar lainnya"
                        value={cmsForm.externalUrl}
                        onChange={(e) => setCmsForm({ ...cmsForm, externalUrl: e.target.value })}
                      />
@@ -1999,7 +2000,7 @@ export const DashboardAdmin: React.FC<DashboardAdminProps> = ({
                     type="email"
                     required
                     className="w-full bg-slate-50 border p-2 rounded text-xs outline-none focus:border-blue-900"
-                    placeholder="Contoh: malik@ippi.com"
+                    placeholder="Contoh: malik@koperasi-mps.com"
                     value={userForm.email}
                     onChange={(e) => setUserForm({ ...userForm, email: e.target.value })}
                   />
@@ -2014,6 +2015,30 @@ export const DashboardAdmin: React.FC<DashboardAdminProps> = ({
                     placeholder="PT Pos Indonesia"
                     value={userForm.institusiPensiun}
                     onChange={(e) => setUserForm({ ...userForm, institusiPensiun: e.target.value })}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-500 mb-0.5 uppercase">Pekerjaan/Keahlian</label>
+                  <input
+                    type="text"
+                    required
+                    className="w-full bg-slate-50 border p-2 rounded text-xs"
+                    placeholder="Contoh: kurir dan logistik"
+                    value={userForm.pekerjaanKeahlian || ''}
+                    onChange={(e) => setUserForm({ ...userForm, pekerjaanKeahlian: e.target.value })}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-500 mb-0.5 uppercase">Jenis UMKM yang Digeluti</label>
+                  <input
+                    type="text"
+                    required
+                    className="w-full bg-slate-50 border p-2 rounded text-xs"
+                    placeholder="Contoh: Kuliner, Kerajinan, Jasa, dsb"
+                    value={userForm.jenisUmkm || ''}
+                    onChange={(e) => setUserForm({ ...userForm, jenisUmkm: e.target.value })}
                   />
                 </div>
 

@@ -894,7 +894,7 @@ export default function App() {
       email: activeMember.email,
       role: 'anggota',
       timestamp: new Date().toLocaleTimeString('id-ID') + ' WIB',
-      activity: `Pembayaran online belanja Swalayan IPPI via Saldo Sukarela: ${total}`
+      activity: `Pembayaran online belanja Swalayan Koperasi MPS via Saldo Sukarela: ${total}`
     };
     setVisitorLogs(prev => [newLog, ...prev]);
 
@@ -1097,8 +1097,8 @@ export default function App() {
     return (
       <div className="min-h-screen bg-[#070d19] flex flex-col justify-center items-center text-[#ffffff] font-sans antialiased">
         <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
-        <h2 className="mt-8 text-xl font-bold tracking-tight">Koperasi IPPI DPW Jawa Timur</h2>
-        <p className="mt-2 text-xs text-indigo-300 font-mono tracking-widest uppercase">Ikatan Profesional & Pensiunan Indonesia</p>
+        <h2 className="mt-8 text-xl font-bold tracking-tight">Koperasi Mitra Profesional Sejahtera (Koperasi MPS)</h2>
+        <p className="mt-2 text-xs text-indigo-300 font-mono tracking-widest uppercase">Koperasi Mitra Profesional Sejahtera (Koperasi MPS)</p>
         <p className="mt-4 text-xs text-slate-500">Menghubungkan ke database aman...</p>
       </div>
     );
@@ -1155,8 +1155,8 @@ export default function App() {
                     <img src={settings.logo} className="w-8 h-8 object-contain" alt="Coop logo mini" />
                   </div>
                   <div>
-                    <h1 className="font-bold text-sm sm:text-base leading-tight">Koperasi IPPI DPW Jawa Timur</h1>
-                    <p className="text-[10px] uppercase tracking-wider opacity-75 font-semibold">Sistem Portal {resolvedRole.toUpperCase()} - Ikatan Profesional & Pensiunan Indonesia</p>
+                    <h1 className="font-bold text-sm sm:text-base leading-tight">Koperasi Mitra Profesional Sejahtera (Koperasi MPS)</h1>
+                    <p className="text-[10px] uppercase tracking-wider opacity-75 font-semibold">Sistem Portal {resolvedRole.toUpperCase()} - Koperasi Mitra Profesional Sejahtera (Koperasi MPS)</p>
                   </div>
                 </div>
 
@@ -1380,8 +1380,8 @@ export default function App() {
 
       {/* Footer copyright */}
       <footer className="bg-slate-900 border-t border-slate-800 text-slate-500 py-6 text-center text-[10px] tracking-wide select-none">
-        <p>© 2026 Koperasi Serba Usaha IPPI DPW Jawa Timur. All Rights Reserved. Hak Cipta dilindungi Undang-Undang RI.</p>
-        <p className="mt-1 text-slate-650">Binaan Ikatan Profesional & Pensiunan Indonesia Wilayah Provinsi Jawa Timur | AHU Legal Terdaftar</p>
+        <p>© 2026 Koperasi Mitra Profesional Sejahtera (Koperasi MPS). All Rights Reserved. Hak Cipta dilindungi Undang-Undang RI.</p>
+        <p className="mt-1 text-slate-650">Binaan Koperasi Mitra Profesional Sejahtera (Koperasi MPS) Wilayah Provinsi Jawa Timur | AHU Legal Terdaftar</p>
       </footer>
 
     </div>
