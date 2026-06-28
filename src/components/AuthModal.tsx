@@ -169,7 +169,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const openWAToSekretarisDirect = () => {
     const cleanPhone = settings.noTelpWA.replace(/[^0-9]/g, '').replace(/^0/, '62');
     const textMsg = encodeURIComponent(
-      `Selamat siang Koperasi MPS DPW Jatim, saya ${registerForm.nama} baru saja melakukan registrasi online di Portal Koperasi. Mohon dibantu untuk persetujuan (approval) masuk ke Member Area. Terima kasih.`
+      `Selamat siang Koperasi MPS, saya ${registerForm.nama} baru saja melakukan registrasi online di Portal Koperasi. Mohon dibantu untuk persetujuan (approval) masuk ke Member Area. Terima kasih.`
     );
     window.open(`https://wa.me/${cleanPhone}?text=${textMsg}`, '_blank');
   };

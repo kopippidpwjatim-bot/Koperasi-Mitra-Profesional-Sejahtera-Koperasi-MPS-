@@ -428,14 +428,14 @@ export const DEFAULT_POLL_SETTINGS: PollSettings = {
   isPollingActive: true,
   endDate: "2026-07-31T23:59",
   showResultsToMembers: true,
-  pollTitle: "Pemilihan Ketua Koperasi MPS DPW Jawa Timur Periode 2026-2030"
+  pollTitle: "Pemilihan Ketua Koperasi MPS Periode 2026-2030"
 };
 
 export const DEFAULT_POLL_CANDIDATES: PollCandidate[] = [
   {
     id: "candidate-1",
     nama: "H. Sugeng Riyanto, M.M.",
-    visiMisi: "Visi:\nMewujudkan Koperasi MPS DPW Jatim sebagai pilar ekonomi digital anggota yang modern, mandiri, dan transparan.\n\nMisi:\n1. Digitalisasi layanan keuangan simpan pinjam secara berkelanjutan.\n2. Pengembangan program inkubator bisnis dan pelatihan UMKM bagi anggota.\n3. Peningkatan alokasi serta pembagian SHU yang transparan dan adil."
+    visiMisi: "Visi:\nMewujudkan Koperasi MPS sebagai pilar ekonomi digital anggota yang modern, mandiri, dan transparan.\n\nMisi:\n1. Digitalisasi layanan keuangan simpan pinjam secara berkelanjutan.\n2. Pengembangan program inkubator bisnis dan pelatihan UMKM bagi anggota.\n3. Peningkatan alokasi serta pembagian SHU yang transparan dan adil."
   },
   {
     id: "candidate-2",

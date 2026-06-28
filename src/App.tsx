@@ -117,6 +117,45 @@ const getLocalOrFallback = <T,>(key: string, fallback: T): T => {
   }
 };
 
+const getDeviceDetails = (): string => {
+  const ua = navigator.userAgent;
+  let os = "Unknown OS";
+  let browser = "Unknown Browser";
+
+  if (ua.indexOf("Win") !== -1) os = "Windows";
+  else if (ua.indexOf("Mac") !== -1) os = "macOS";
+  else if (ua.indexOf("X11") !== -1) os = "UNIX";
+  else if (ua.indexOf("Linux") !== -1) os = "Linux";
+  else if (ua.indexOf("Android") !== -1) os = "Android";
+  else if (ua.indexOf("like Mac") !== -1) os = "iOS";
+
+  if (ua.indexOf("Firefox") !== -1) browser = "Firefox";
+  else if (ua.indexOf("SamsungBrowser") !== -1) browser = "Samsung Browser";
+  else if (ua.indexOf("Opera") !== -1 || ua.indexOf("OPR") !== -1) browser = "Opera";
+  else if (ua.indexOf("Edge") !== -1 || ua.indexOf("Edg") !== -1) browser = "Edge";
+  else if (ua.indexOf("Chrome") !== -1) browser = "Chrome";
+  else if (ua.indexOf("Safari") !== -1) browser = "Safari";
+
+  const isMobile = /Mobi|Android|iPhone|iPad/i.test(ua);
+  return `${os} (${browser})${isMobile ? " - Mobile" : " - Desktop"}`;
+};
+
+const fetchUserIp = async (): Promise<string> => {
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 sec timeout
+    const res = await fetch('https://api.ipify.org?format=json', { signal: controller.signal });
+    clearTimeout(timeoutId);
+    if (res.ok) {
+      const data = await res.json();
+      return data.ip || '127.0.0.1';
+    }
+  } catch (error) {
+    console.warn('Failed to fetch IP, falling back to local:', error);
+  }
+  return '127.0.0.1 (Local)';
+};
+
 const generateUniqueNoAnggota = (existingMembers: Member[]): { noAnggota: string; noRekening: string } => {
   let maxSuffix = 10; // Start at 10 (so first sequential is 11, giving 999000011)
   existingMembers.forEach(m => {
@@ -407,37 +446,160 @@ export default function App() {
     setShowAuthModal(true);
   };
 
-  const handleLogin = (member: Member) => {
+   const handleLogin = async (member: Member) => {
     setActiveMember(member);
     setImpersonatedRole(null); // Reset simulation
     
+    const ip = await fetchUserIp();
+    const device = getDeviceDetails();
+    const timestampStr = new Date().toLocaleTimeString('id-ID') + ' WIB';
+
     // Log login action
     const newLog: VisitorLog = {
       id: `log-${Date.now()}`,
       nama: member.nama,
       email: member.email,
       role: member.role,
-      timestamp: new Date().toLocaleTimeString('id-ID') + ' WIB',
-      activity: `LogIn sukses ke dalam portal (${member.role.toUpperCase()})`
+      timestamp: timestampStr,
+      activity: `LogIn sukses ke dalam portal (${member.role.toUpperCase()})`,
+      ip: ip,
+      device: device,
+      loginTime: timestampStr,
+      logoutTime: '-'
     };
     setVisitorLogs(prev => [newLog, ...prev]);
   };
 
   const handleLogout = () => {
     if (activeMember) {
-      const newLog: VisitorLog = {
-        id: `log-${Date.now()}`,
-        nama: activeMember.nama,
-        email: activeMember.email,
-        role: activeMember.role,
-        timestamp: new Date().toLocaleTimeString('id-ID') + ' WIB',
-        activity: 'Logout dari aplikasi portal'
-      };
-      setVisitorLogs(prev => [newLog, ...prev]);
+      const logoutTimeStr = new Date().toLocaleTimeString('id-ID') + ' WIB';
+      
+      setVisitorLogs(prev => {
+        // Find the most recent active login log for this user to set its logoutTime
+        const loginIndex = prev.findIndex(log => log.email === activeMember.email && log.logoutTime === '-');
+        if (loginIndex !== -1) {
+          const updated = [...prev];
+          updated[loginIndex] = {
+            ...updated[loginIndex],
+            logoutTime: logoutTimeStr,
+            activity: `${updated[loginIndex].activity} (Sesi selesai)`
+          };
+          
+          // Add a new activity entry representing the logout event
+          const newLog: VisitorLog = {
+            id: `log-${Date.now()}`,
+            nama: activeMember.nama,
+            email: activeMember.email,
+            role: activeMember.role,
+            timestamp: logoutTimeStr,
+            activity: 'Logout dari aplikasi portal',
+            ip: updated[loginIndex].ip || '127.0.0.1 (Local)',
+            device: updated[loginIndex].device || getDeviceDetails(),
+            loginTime: updated[loginIndex].loginTime || '-',
+            logoutTime: logoutTimeStr
+          };
+          return [newLog, ...updated];
+        } else {
+          const newLog: VisitorLog = {
+            id: `log-${Date.now()}`,
+            nama: activeMember.nama,
+            email: activeMember.email,
+            role: activeMember.role,
+            timestamp: logoutTimeStr,
+            activity: 'Logout dari aplikasi portal',
+            ip: '127.0.0.1 (Local)',
+            device: getDeviceDetails(),
+            loginTime: '-',
+            logoutTime: logoutTimeStr
+          };
+          return [newLog, ...prev];
+        }
+      });
     }
     setActiveMember(null);
     setImpersonatedRole(null);
   };
+
+  // Auto-logout after 15 minutes of inactivity (900,000 milliseconds)
+  React.useEffect(() => {
+    if (!activeMember) return;
+
+    const INACTIVITY_LIMIT = 15 * 60 * 1000; // 15 minutes in ms
+    let timeoutId: NodeJS.Timeout;
+
+    const handleAutoLogout = () => {
+      console.log('Inactivity timeout reached. Logging out...');
+      const logoutTimeStr = new Date().toLocaleTimeString('id-ID') + ' WIB';
+      
+      setVisitorLogs(prev => {
+        const loginIndex = prev.findIndex(log => log.email === activeMember.email && log.logoutTime === '-');
+        if (loginIndex !== -1) {
+          const updated = [...prev];
+          updated[loginIndex] = {
+            ...updated[loginIndex],
+            logoutTime: logoutTimeStr,
+            activity: `${updated[loginIndex].activity} (Sesi kadaluarsa / Inaktivitas)`
+          };
+          
+          const newLog: VisitorLog = {
+            id: `log-${Date.now()}`,
+            nama: activeMember.nama,
+            email: activeMember.email,
+            role: activeMember.role,
+            timestamp: logoutTimeStr,
+            activity: 'Auto-logout otomatis karena tidak ada aktivitas selama 15 menit',
+            ip: updated[loginIndex].ip || '127.0.0.1 (Local)',
+            device: updated[loginIndex].device || getDeviceDetails(),
+            loginTime: updated[loginIndex].loginTime || '-',
+            logoutTime: logoutTimeStr
+          };
+          return [newLog, ...updated];
+        } else {
+          const newLog: VisitorLog = {
+            id: `log-${Date.now()}`,
+            nama: activeMember.nama,
+            email: activeMember.email,
+            role: activeMember.role,
+            timestamp: logoutTimeStr,
+            activity: 'Auto-logout otomatis karena tidak ada aktivitas selama 15 menit',
+            ip: '127.0.0.1 (Local)',
+            device: getDeviceDetails(),
+            loginTime: '-',
+            logoutTime: logoutTimeStr
+          };
+          return [newLog, ...prev];
+        }
+      });
+
+      setActiveMember(null);
+      setImpersonatedRole(null);
+      alert('Sesi Anda telah berakhir secara otomatis karena tidak ada aktivitas selama 15 menit. Silakan melakukan login kembali.');
+    };
+
+    const resetInactivityTimer = () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      timeoutId = setTimeout(handleAutoLogout, INACTIVITY_LIMIT);
+    };
+
+    // Events that signal user activity
+    const activityEvents = ['mousemove', 'keydown', 'mousedown', 'scroll', 'touchstart', 'click'];
+    
+    // Attach event listeners
+    activityEvents.forEach(evt => {
+      window.addEventListener(evt, resetInactivityTimer);
+    });
+
+    // Start initial timer
+    resetInactivityTimer();
+
+    // Clean up event listeners and timer on dependency change or unmount
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      activityEvents.forEach(evt => {
+        window.removeEventListener(evt, resetInactivityTimer);
+      });
+    };
+  }, [activeMember]);
 
   const handleRegister = (memberData: Omit<Member, 'id' | 'saldoPokok' | 'saldoWajib' | 'saldoSukarela' | 'saldoPenyertaan' | 'registeredAt'>) => {
     const newMember: Member = {

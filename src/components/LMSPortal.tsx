@@ -886,7 +886,7 @@ export const LMSPortal: React.FC<LMSPortalProps> = ({
                         </p>
                         <p className="text-xs text-slate-400 font-medium mt-2 leading-relaxed">
                           {quizResult.passed 
-                            ? "Sertifikat Kelulusan Anda kini telah dibuka dan diterbitkan oleh Dewan Pengurus Koperasi DPW Jatim secara sah."
+                            ? "Sertifikat Kelulusan Anda kini telah dibuka dan diterbitkan oleh Dewan Pengurus Koperasi secara sah."
                             : "Skor Anda minimal harus mencapai 70% untuk dinyatakan berhak mendapatkan sertifikasi modul ini. Jangan patah semangat, silakan tonton ulasan bab materi kembali."}
                         </p>
                       </div>

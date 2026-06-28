@@ -196,7 +196,7 @@ export const DashboardSekretaris: React.FC<DashboardSekretarisProps> = ({
               <span className="text-[10px] text-slate-400">Verifikator Keanggotaan</span>
             </div>
             <h2 className="text-base sm:text-lg font-black text-slate-950">{secretaryMember.nama}</h2>
-            <p className="text-xs text-slate-500">Kancah Sekretariat DPW Jatim: <span className="font-bold">{settings.namaSekretariat}</span></p>
+            <p className="text-xs text-slate-500">Kancah Sekretariat: <span className="font-bold">{settings.namaSekretariat}</span></p>
           </div>
         </div>
 

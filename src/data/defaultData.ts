@@ -13,7 +13,7 @@ export const DEFAULT_LOGO_SVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.
   </text>
   
   <text font-family="'Inter', 'Helvetica', 'Arial', sans-serif" font-weight="800" font-size="34" fill="%230c4a80" letter-spacing="1">
-    <textPath href="%23curve-bottom" startOffset="50%" text-anchor="middle">DPW JATIM</textPath>
+    <textPath href="%23curve-bottom" startOffset="50%" text-anchor="middle">SEJAHTERA</textPath>
   </text>
   
   <g id="people" fill="%231a5f97" stroke="%23ffffff" stroke-width="4">
@@ -36,11 +36,11 @@ export const DEFAULT_LOGO_SVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.
 
 export const DEFAULT_SETTINGS: CooperativeSettings = {
   logo: DEFAULT_LOGO_SVG,
-  namaSekretariat: "DPW Jawa Timur",
+  namaSekretariat: "Koperasi MPS",
   alamatSekretariat: "Jl. Gayung Kebonsari No. 35, Ketintang, Gayungan, Kota Surabaya, Jawa Timur 60235",
   noIjinPendirian: "AHU-0008412.AH.01.26.TAHUN-2024",
   noTelpWA: "081803100222",
-  email: "kopmpsdpwjatim@gmail.com"
+  email: "kopmps@gmail.com"
 };
 
 export const DEFAULT_MEMBERS: Member[] = [
@@ -243,7 +243,7 @@ export const DEFAULT_TRANSACTIONS: Transaction[] = [
     tanggal: "2026-06-05",
     kategori: "Uang Keluar",
     sumberTujuan: "Operasional",
-    deskripsi: "Sewa Tempat Rapat Tahunan & Pengadaan ATK DPW Jawa Timur",
+    deskripsi: "Sewa Tempat Rapat Tahunan & Pengadaan ATK",
     noRekening: "7128391212",
     namaBankPemilik: "BCA - CV Pratama Jaya",
     jumlahMasuk: 0,
@@ -257,7 +257,7 @@ export const DEFAULT_TRANSACTIONS: Transaction[] = [
     tanggal: "2026-06-08",
     kategori: "Uang Keluar",
     sumberTujuan: "SPJ",
-    deskripsi: "Bantuan Dana Sosial Penyaluran Sembako Duafa DPW Jatim",
+    deskripsi: "Bantuan Dana Sosial Penyaluran Sembako Duafa",
     noRekening: "1098231221",
     namaBankPemilik: "Bank Jatim - Pengurus Sosial Koperasi MPS",
     jumlahMasuk: 0,
@@ -273,15 +273,15 @@ export const DEFAULT_ARTICLES: Article[] = [
     id: "art-1",
     title: "Mengelola Dana Pensiun dengan Prinsip Gotong Royong Koperasi",
     summary: "Mari pelajari bagaimana memaksimalkan sisa hasil usaha (SHU) melalui keikutsertaan aktif dalam unit simpan pinjam koperasi korps pensiunan.",
-    content: "Masa pensiun bukanlah akhir dari produktivitas finansial. Melalui Koperasi Mitra Profesional Sejahtera (Koperasi MPS) DPW Jawa Timur, para purnatugas dapat saling bahu membahu menghidupkan ekosistem ekonomi. Pensiunan tidak hanya menyimpan dana, tetapi dana tersebut dikembangkan lewat unit pinjaman modal usaha kecil sesama pensiunan. Pada akhir tahun buku, keuntungan tersebut dikembalikan secara transparan dalam bentuk Sisa Hasil Usaha (SHU), menciptakan siklus berkah gotong royong yang sehat.",
+    content: "Masa pensiun bukanlah akhir dari produktivitas finansial. Melalui Koperasi Mitra Profesional Sejahtera (Koperasi MPS), para purnatugas dapat saling bahu membahu menghidupkan ekosistem ekonomi. Pensiunan tidak hanya menyimpan dana, tetapi dana tersebut dikembangkan lewat unit pinjaman modal usaha kecil sesama pensiunan. Pada akhir tahun buku, keuntungan tersebut dikembalikan secara transparan dalam bentuk Sisa Hasil Usaha (SHU), menciptakan siklus berkah gotong royong yang sehat.",
     date: "2026-06-05",
     category: "Tips Keuangan"
   },
   {
     id: "art-2",
-    title: "Kemitraan Logistik Koperasi MPS Jawa Timur dengan Ekosistem Pos Indonesia",
-    summary: "Koperasi MPS Jawa Timur meluncurkan unit jasa logistik untuk melayani pengiriman barang anggota menggunakan jaringan terluas.",
-    content: "Sejalan dengan sejarah panjang para anggota yang sebagian besar merupakan pensiunan PT Pos Indonesia (Persero), Unit Jasa Logistik Koperasi MPS Jawa Timur berkolaborasi strategis guna memberikan tarif khusus kargo dan pengiriman dokumen bagi anggota sekalian. Layanan ini mencakup diskon khusus bagi UKM yang dikelola oleh anggota atau keluarga inti anggota Koperasi MPS Jawa Timur.",
+    title: "Kemitraan Logistik Koperasi MPS dengan Ekosistem Pos Indonesia",
+    summary: "Koperasi MPS meluncurkan unit jasa logistik untuk melayani pengiriman barang anggota menggunakan jaringan terluas.",
+    content: "Sejalan dengan sejarah panjang para anggota yang sebagian besar merupakan pensiunan PT Pos Indonesia (Persero), Unit Jasa Logistik Koperasi MPS berkolaborasi strategis guna memberikan tarif khusus kargo and pengiriman dokumen bagi anggota sekalian. Layanan ini mencakup diskon khusus bagi UKM yang dikelola oleh anggota atau keluarga inti anggota Koperasi MPS.",
     date: "2026-05-24",
     category: "Unit Usaha"
   }
@@ -290,8 +290,8 @@ export const DEFAULT_ARTICLES: Article[] = [
 export const DEFAULT_ANNOUNCEMENTS: Announcement[] = [
   {
     id: "ann-1",
-    title: "Rapat Anggota Tahunan Kelompok (RAT) Buku 2025 Jatim",
-    content: "Diberitahukan kepada seluruh anggota Koperasi Mitra Profesional Sejahtera (Koperasi MPS) DPW Jawa Timur bahwa RAT Buku Keuangan 2025 akan diselenggarakan secara hybrid pada tanggal 20 Juni 2026 bertempat di Gedung Sekretariat Gayungan, Surabaya. Harap melakukan konfirmasi kehadiran melalui portal anggota atau menghubungi koordinator kabupaten/kota setempat.",
+    title: "Rapat Anggota Tahunan Kelompok (RAT) Buku 2025",
+    content: "Diberitahukan kepada seluruh anggota Koperasi Mitra Profesional Sejahtera (Koperasi MPS) bahwa RAT Buku Keuangan 2025 akan diselenggarakan secara hybrid pada tanggal 20 Juni 2026 bertempat di Gedung Sekretariat Gayungan, Surabaya. Harap melakukan konfirmasi kehadiran melalui portal anggota atau menghubungi koordinator kabupaten/kota setempat.",
     date: "2026-06-10",
     important: true
   },
@@ -324,15 +324,15 @@ export const DEFAULT_TENTANG_ITEMS: TentangItem[] = [
   {
     id: "tentang-3",
     title: "Sejarah Koperasi Mitra Profesional Sejahtera (Koperasi MPS)",
-    content: "Koperasi didirikan bertepatan dengan menguatnya kebutuhan pensiunan korps PT Pos Jatim untuk bersatu mengelola perekonomian pasca masa dinas aktif. Diinisiasi pada tahun 2018 melalui rapat gabungan dewan purnakarya se-Karesidenan Madiun dan Kediri, kemudian diresmikan di tingkat DPW Jawa Timur dengan status Koperasi KSU berbadan hukum lengkap pada tahun 2024.",
+    content: "Koperasi didirikan bertepatan dengan menguatnya kebutuhan pensiunan korps PT Pos Jatim untuk bersatu mengelola perekonomian pasca masa dinas aktif. Diinisiasi pada tahun 2018 melalui rapat gabungan dewan purnakarya se-Karesidenan Madiun dan Kediri, kemudian diresmikan dengan status Koperasi KSU berbadan hukum lengkap pada tahun 2024.",
     image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&q=80&w=630",
     showOnBeranda: true,
     order: 3
   },
   {
     id: "tentang-4",
-    title: "Struktur Kepengurusan DPW Jatim",
-    content: "Prof. Dr. H. Slamet Purwanto, M.E. (Ketua Koperasi MPS DPW Jatim - Pensiunan UNAIR)\nDrs. Mohammad Anshori, M.Si. (Sekretaris I Koperasi - Pensiunan PT Pos Indonesia)\nHj. Kartika Wardhani, S.E., Ak. (Bendahara & Kepala Keuangan - Purnatugas Bank Jatim / Akuntan)\nIr. H. Budi Setiawan (Dewan Pengawas Utama - Mantan Kepala Regional Pos IV)",
+    title: "Struktur Kepengurusan Koperasi MPS",
+    content: "Prof. Dr. H. Slamet Purwanto, M.E. (Ketua Koperasi MPS - Pensiunan UNAIR)\nDrs. Mohammad Anshori, M.Si. (Sekretaris I Koperasi - Pensiunan PT Pos Indonesia)\nHj. Kartika Wardhani, S.E., Ak. (Bendahara & Kepala Keuangan - Purnatugas Bank Jatim / Akuntan)\nIr. H. Budi Setiawan (Dewan Pengawas Utama - Mantan Kepala Regional Pos IV)",
     image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=400",
     showOnBeranda: false,
     order: 4
@@ -353,7 +353,7 @@ export const DEFAULT_LAYANAN_ITEMS: LayananItem[] = [
     id: "layanan-2",
     title: "Unit Usaha Swalayan & Toko Koperasi MPS",
     badge: "UNIT II",
-    content: "Nikmati transaksi belanja online kebutuhan sembako pokok harian dengan sistem pemotongan saldo simpanan secara aman. Terbuka pula layanan kas umum (POS) di sekretariat DPW.",
+    content: "Nikmati transaksi belanja online kebutuhan sembako pokok harian dengan sistem pemotongan saldo simpanan secara aman. Terbuka pula layanan kas umum (POS) di sekretariat.",
     image: "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=400",
     showOnBeranda: true,
     order: 2
@@ -439,7 +439,7 @@ export const DEFAULT_REGULATIONS: Regulation[] = [
   {
     id: "reg-2",
     title: "Syarat & Ketentuan",
-    content: "1. Anggota wajib mengisi formulir pendaftaran secara detail & mengupload pas-foto resmi.\n2. Login memerlukan persetujuan Sekretaris DPW Jatim.\n3. Saldo simpanan wajib ditarik sepenuhnya saat keluar keanggotaan.",
+    content: "1. Anggota wajib mengisi formulir pendaftaran secara detail & mengupload pas-foto resmi.\n2. Login memerlukan persetujuan Sekretaris Koperasi.\n3. Saldo simpanan wajib ditarik sepenuhnya saat keluar keanggotaan.",
     order: 2
   },
   {

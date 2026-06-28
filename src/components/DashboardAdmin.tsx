@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { 
   Settings, Users, ShieldAlert, History, RefreshCw, Printer, 
-  Trash2, Edit, Plus, FileText, CheckCircle2, UserCheck, Search, Eye, Upload, Wallet, BookOpen, CheckSquare
+  Trash2, Edit, Plus, FileText, CheckCircle2, UserCheck, Search, Eye, Upload, Wallet, BookOpen, CheckSquare,
+  Globe, Laptop, Clock
 } from 'lucide-react';
 import { Member, Transaction, CooperativeSettings, VisitorLog, StoreProduct, Article, Announcement, TentangItem, LayananItem, GalleryItem, LMSCourse, LMSUserProgress, Regulation, PollSettings, PollCandidate, PollVote } from '../types';
 import { DEFAULT_LOGO_SVG } from '../data/defaultData';
@@ -1115,10 +1116,11 @@ export const DashboardAdmin: React.FC<DashboardAdminProps> = ({
                   <p className="text-center py-10 text-slate-400 text-xs italic">Belum ada kunjungan telemetri audit log terpantau dalam sesi ini.</p>
                 ) : (
                   visitorLogs.map((log) => (
-                    <div key={log.id} className="py-3 flex hover:bg-slate-50 p-2 rounded transition justify-between items-center text-xs font-sans">
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2">
+                    <div key={log.id} className="py-3 flex flex-col md:flex-row hover:bg-slate-50 p-3 rounded-lg border border-slate-100 mb-2 transition justify-between items-start md:items-center gap-2 text-xs font-sans bg-white shadow-3xs">
+                      <div className="space-y-1 flex-1">
+                        <div className="flex items-center flex-wrap gap-2">
                           <span className="font-extrabold text-slate-900 uppercase font-mono">{log.nama}</span>
+                          <span className="text-slate-400 text-[10px] font-medium font-mono">({log.email})</span>
                           <span className={`px-1.5 py-0.5 rounded text-[8px] uppercase tracking-wide font-black ${
                             log.role === 'admin' ? 'bg-red-100 text-red-700' :
                             log.role === 'bendahara' ? 'bg-purple-100 text-purple-700' :
@@ -1127,10 +1129,38 @@ export const DashboardAdmin: React.FC<DashboardAdminProps> = ({
                             {log.role}
                           </span>
                         </div>
-                        <p className="text-slate-600 italic font-medium leading-tight">Aktivitas: &ldquo;{log.activity}&rdquo;</p>
+                        
+                        <p className="text-slate-700 italic font-medium leading-tight">
+                          Aktivitas: &ldquo;<span className="text-blue-900 font-semibold">{log.activity}</span>&rdquo;
+                        </p>
+
+                        {(log.ip || log.device || log.loginTime) && (
+                          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 pt-1.5 text-[10px] text-slate-500 font-mono">
+                            {log.ip && (
+                              <span className="flex items-center gap-1 bg-slate-100 px-1.5 py-0.5 rounded text-slate-600">
+                                <Globe className="w-3 h-3 text-slate-400" />
+                                IP: {log.ip}
+                              </span>
+                            )}
+                            {log.device && (
+                              <span className="flex items-center gap-1 bg-slate-100 px-1.5 py-0.5 rounded text-slate-600">
+                                <Laptop className="w-3 h-3 text-slate-400" />
+                                {log.device}
+                              </span>
+                            )}
+                            {(log.loginTime || log.logoutTime) && (
+                              <span className="flex items-center gap-1 bg-slate-100 px-1.5 py-0.5 rounded text-slate-600">
+                                <Clock className="w-3 h-3 text-slate-400" />
+                                Sesi: {log.loginTime || '-'} s/d {log.logoutTime || '-'}
+                              </span>
+                            )}
+                          </div>
+                        )}
                       </div>
 
-                      <span className="text-[10px] text-slate-400 font-mono font-semibold">{log.timestamp}</span>
+                      <div className="text-right flex flex-col items-end gap-1 select-none self-end md:self-center">
+                        <span className="text-[10px] text-slate-400 font-mono font-semibold bg-slate-50 border px-2 py-0.5 rounded">{log.timestamp}</span>
+                      </div>
                     </div>
                   ))
                 )}
@@ -1617,7 +1647,7 @@ export const DashboardAdmin: React.FC<DashboardAdminProps> = ({
                     type="text"
                     required
                     className="w-full bg-white border border-slate-250 p-2.5 rounded-lg text-xs outline-none focus:border-blue-900 font-bold"
-                    placeholder="Contoh: Pemilihan Ketua DPW Jawa Timur Periode 2026-2030"
+                    placeholder="Contoh: Pemilihan Ketua Koperasi MPS Periode 2026-2030"
                     value={pollTitle}
                     onChange={(e) => setPollTitle(e.target.value)}
                   />

@@ -983,7 +983,7 @@ export const DashboardAnggota: React.FC<DashboardAnggotaProps> = ({
                   </h4>
                   <p className="text-xs opacity-90 leading-relaxed font-medium">
                     {hasVoted 
-                      ? `Anda telah menyalurkan hak suara Anda. Terima kasih atas partisipasi aktif Anda demi kemajuan Koperasi MPS DPW Jatim!` 
+                      ? `Anda telah menyalurkan hak suara Anda. Terima kasih atas partisipasi aktif Anda demi kemajuan Koperasi MPS!` 
                       : isPollingOn 
                         ? `Hak suara Anda tersedia! Silakan telaah Visi & Misi masing-masing calon di bawah ini sebelum menjatuhkan pilihan terbaik Anda.` 
                         : `Pemilihan suara saat ini tidak aktif atau telah ditutup.`
@@ -1060,7 +1060,7 @@ export const DashboardAnggota: React.FC<DashboardAnggotaProps> = ({
                           ) : isPollingOn ? (
                             <button
                               onClick={() => {
-                                if (window.confirm(`Apakah Anda yakin ingin memberikan suara Anda kepada ${c.nama} sebagai Ketua Koperasi MPS DPW Jatim? Tindakan ini tidak dapat dibatalkan.`)) {
+                                if (window.confirm(`Apakah Anda yakin ingin memberikan suara Anda kepada ${c.nama} sebagai Ketua Koperasi MPS? Tindakan ini tidak dapat dibatalkan.`)) {
                                   onCastVote(c.id);
                                 }
                               }}

@@ -75,7 +75,7 @@ export const Receipt: React.FC<ReceiptProps> = ({ transaction, member, settings,
     const targetPhone = member?.noHp || settings.noTelpWA;
     const cleanPhone = targetPhone.replace(/[^0-9]/g, '').replace(/^0/, '62');
     
-    const textMsg = `*STRUK BUKTI TRANSAKSI KOPERASI MPS DPW JATIM*\n\n` +
+    const textMsg = `*STRUK BUKTI TRANSAKSI KOPERASI MPS*\n\n` +
       `No Transaksi: ${transaction.id}\n` +
       `Tanggal: ${transaction.tanggal}\n` +
       `Jenis: ${transaction.kategori} (${transaction.sumberTujuan})\n` +
@@ -117,7 +117,7 @@ export const Receipt: React.FC<ReceiptProps> = ({ transaction, member, settings,
               <div className="w-16 h-16 bg-white rounded-full p-1 mx-auto flex items-center justify-center border border-slate-200 shadow-xs mb-1">
                 <img src={settings.logo} className="max-w-full max-h-full object-contain" alt="Coop Logo" />
               </div>
-              <h1 className="font-extrabold text-sm uppercase text-blue-900 leading-tight">KOPERASI MPS DPW JATIM</h1>
+              <h1 className="font-extrabold text-sm uppercase text-blue-900 leading-tight">KOPERASI MPS</h1>
               <p className="text-[10px] text-slate-600 mt-1 max-w-[280px] mx-auto leading-tight">
                 {settings.alamatSecretariat || settings.alamatSekretariat}
               </p>
@@ -219,7 +219,7 @@ export const Receipt: React.FC<ReceiptProps> = ({ transaction, member, settings,
 
             <div className="text-center pt-4 border-t border-dashed border-slate-300 text-[8.5px] text-slate-400">
               <p>Simpan tanda bukti ini sebagai dokumen sah Koperasi.</p>
-              <p className="font-sans mt-0.5">KOPERASI MPS DPW JATIM &copy; 2026</p>
+              <p className="font-sans mt-0.5">KOPERASI MPS &copy; 2026</p>
             </div>
 
           </div>

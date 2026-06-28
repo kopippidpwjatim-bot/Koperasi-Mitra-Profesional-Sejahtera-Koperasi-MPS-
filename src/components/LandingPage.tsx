@@ -134,7 +134,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
   const openWAToSecretary = () => {
     const cleanPhone = settings.noTelpWA.replace(/[^0-9]/g, '').replace(/^0/, '62');
-    const msg = encodeURIComponent(`Halo Sekretaris Koperasi MPS DPW Jatim, saya ingin mengajukan verifikasi keanggotaan baru koperasi.`);
+    const msg = encodeURIComponent(`Halo Sekretaris Koperasi MPS, saya ingin mengajukan verifikasi keanggotaan baru koperasi.`);
     window.open(`https://wa.me/${cleanPhone}?text=${msg}`, '_blank');
   };
 
@@ -601,11 +601,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <div className="bg-slate-900 text-white rounded-xl p-6 flex flex-col sm:flex-row justify-between items-center gap-4 shadow-md border-b-4 border-yellow-500">
               <div className="space-y-1">
                 <h4 className="text-sm font-black text-yellow-400">LEGALITAS & BADAN HUKUM RESMI</h4>
-                <p className="text-xs text-slate-300">Koperasi Mitra Profesional Sejahtera (Koperasi MPS) DPW Jawa Timur telah terdaftar resmi di Kementerian Koperasi & UKM RI.</p>
+                <p className="text-xs text-slate-300">Koperasi Mitra Profesional Sejahtera (Koperasi MPS) telah terdaftar resmi di Kementerian Koperasi & UKM RI.</p>
                 <p className="text-[10px] font-mono text-slate-400">NO. IZIN PENDIRIAN : {settings.noIjinPendirian}</p>
               </div>
               <button 
-                onClick={() => alert(`Sertifikat Legalitas Koperasi: ${settings.noIjinPendirian}\nDPW Jatim terverifikasi legal sejak Maret 2024.`)}
+                onClick={() => alert(`Sertifikat Legalitas Koperasi: ${settings.noIjinPendirian}\nKoperasi terverifikasi legal sejak Maret 2024.`)}
                 className="px-4 py-2 bg-[#dca415] hover:bg-yellow-600 text-slate-950 font-bold rounded-lg text-xs cursor-pointer"
               >
                 Lihat Berkas Ahli
@@ -1305,7 +1305,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* 4. OFFICIAL FLOATING WHATSAPP BUTTON */}
       <div className="fixed bottom-6 right-6 z-40 group flex flex-col items-end">
         <div className="bg-slate-950 text-white text-[10px] py-1.5 px-3 rounded-lg shadow-md mb-2 opacity-0 group-hover:opacity-100 transition-all font-bold tracking-wide leading-tight border border-yellow-500 pointer-events-none max-w-[200px] text-center">
-          Persetujuan Login? Hubungi Sekretaris Koperasi MPS DPW Jatim
+          Persetujuan Login? Hubungi Sekretaris Koperasi MPS
         </div>
         <button
           onClick={openWAToSecretary}

@@ -168,6 +168,10 @@ export interface VisitorLog {
   role: UserRole;
   timestamp: string;
   activity: string;
+  ip?: string;
+  device?: string;
+  loginTime?: string;
+  logoutTime?: string;
 }
 
 // Learning Management System (LMS) Interfaces
