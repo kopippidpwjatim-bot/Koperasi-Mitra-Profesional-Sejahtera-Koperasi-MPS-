@@ -1,6 +1,6 @@
 {
-  "name": "Koperasi IPPI DPW Jawa Timur",
-  "description": "Portal Resmi & Sistem Informasi Koperasi Jasa Usaha IPPI DPW Jawa Timur. Menghadirkan layanan Unit Simpan Pinjam, Swalayan, Logistik, dan Portal Anggota Terintegrasi.",
+  "name": "Koperasi Mitra Profesional Sejahtera (Koperasi MPS)",
+  "description": "Portal Resmi & Sistem Informasi Koperasi Mitra Profesional Sejahtera (MPS). Menghadirkan layanan Unit Simpan Pinjam, Swalayan, Logistik, dan Portal Anggota Terintegrasi.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
