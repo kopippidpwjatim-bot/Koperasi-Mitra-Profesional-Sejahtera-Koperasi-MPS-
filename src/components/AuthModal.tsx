@@ -110,6 +110,26 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     }
   };
 
+  // Robust phone comparison helper for Indonesian numbers
+  const arePhonesMatching = (p1: string, p2: string): boolean => {
+    if (!p1 || !p2) return false;
+    const clean1 = p1.replace(/[^0-9]/g, '');
+    const clean2 = p2.replace(/[^0-9]/g, '');
+    if (!clean1 || !clean2) return false;
+    
+    // Compare last 9 digits (highly unique subscriber number)
+    const last9_1 = clean1.slice(-9);
+    const last9_2 = clean2.slice(-9);
+    if (last9_1 && last9_2 && last9_1 === last9_2) {
+      return true;
+    }
+    
+    // Fallback: standardizing starting prefix
+    const norm1 = clean1.startsWith('62') ? '0' + clean1.slice(2) : (clean1.startsWith('8') ? '0' + clean1 : clean1);
+    const norm2 = clean2.startsWith('62') ? '0' + clean2.slice(2) : (clean2.startsWith('8') ? '0' + clean2 : clean2);
+    return norm1 === norm2;
+  };
+
   const executeLogin = (e: React.FormEvent) => {
     e.preventDefault();
     if (!loginForm.identifier || !loginForm.password) {
@@ -117,14 +137,19 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       return;
     }
 
-    // Check by email or noAnggota or noRekening or nama (lowercase match)
-    const found = members.find(m => 
-      (m.email.toLowerCase() === loginForm.identifier.toLowerCase() || 
-       m.noAnggota === loginForm.identifier || 
-       m.noRekening === loginForm.identifier ||
-       m.nama.toLowerCase().includes(loginForm.identifier.toLowerCase())) &&
-      m.password === loginForm.password
-    );
+    const inputId = loginForm.identifier.trim();
+    const inputIdLower = inputId.toLowerCase();
+
+    // Secure exact match checking to prevent account spoofing via partial name matches
+    const found = members.find(m => {
+      const emailMatch = m.email && (m.email.toLowerCase().trim() === inputIdLower);
+      const noAnggotaMatch = m.noAnggota && (m.noAnggota.trim() === inputId);
+      const noRekeningMatch = m.noRekening && (m.noRekening.trim() === inputId);
+      const phoneMatch = m.noHp && arePhonesMatching(m.noHp, inputId);
+      const nameMatch = m.nama && (m.nama.toLowerCase().trim() === inputIdLower);
+
+      return (emailMatch || noAnggotaMatch || noRekeningMatch || phoneMatch || nameMatch) && m.password === loginForm.password;
+    });
 
     if (!found) {
       setLoginError("Username/No Anggota atau Password salah.");
@@ -157,25 +182,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       return;
     }
 
-    // Check if email or phone number is already registered
-    const normalizeIndoPhone = (phoneStr: string): string => {
-      if (!phoneStr) return '';
-      let cleaned = phoneStr.replace(/[^0-9]/g, '');
-      if (cleaned.startsWith('62')) {
-        cleaned = '0' + cleaned.slice(2);
-      }
-      return cleaned;
-    };
-
     const targetEmail = (email || '').toLowerCase().trim();
-    const targetPhone = normalizeIndoPhone(noHp || '');
 
+    // Extremely robust email or phone duplicate check
     const isDuplicate = members.some(m => {
       const existingEmail = (m.email || '').toLowerCase().trim();
-      const existingPhone = normalizeIndoPhone(m.noHp || '');
       
       const emailMatch = targetEmail && existingEmail && (existingEmail === targetEmail);
-      const phoneMatch = targetPhone && existingPhone && (existingPhone === targetPhone);
+      const phoneMatch = m.noHp && noHp && arePhonesMatching(m.noHp, noHp);
       
       return emailMatch || phoneMatch;
     });

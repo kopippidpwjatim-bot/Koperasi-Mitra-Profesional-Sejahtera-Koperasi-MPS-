@@ -202,6 +202,26 @@ const healMembersList = (mList: Member[]): { healedList: Member[]; changed: bool
   return { healedList, changed };
 };
 
+// Robust phone comparison helper for Indonesian numbers
+export const arePhonesMatching = (p1: string, p2: string): boolean => {
+  if (!p1 || !p2) return false;
+  const clean1 = p1.replace(/[^0-9]/g, '');
+  const clean2 = p2.replace(/[^0-9]/g, '');
+  if (!clean1 || !clean2) return false;
+  
+  // Compare last 9 digits (highly unique subscriber number)
+  const last9_1 = clean1.slice(-9);
+  const last9_2 = clean2.slice(-9);
+  if (last9_1 && last9_2 && last9_1 === last9_2) {
+    return true;
+  }
+  
+  // Fallback: standardizing starting prefix
+  const norm1 = clean1.startsWith('62') ? '0' + clean1.slice(2) : (clean1.startsWith('8') ? '0' + clean1 : clean1);
+  const norm2 = clean2.startsWith('62') ? '0' + clean2.slice(2) : (clean2.startsWith('8') ? '0' + clean2 : clean2);
+  return norm1 === norm2;
+};
+
 export default function App() {
   // Database status loading flag: initialized to false so the user can browse instantly using local/fallback states
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -602,6 +622,19 @@ export default function App() {
   }, [activeMember]);
 
   const handleRegister = (memberData: Omit<Member, 'id' | 'saldoPokok' | 'saldoWajib' | 'saldoSukarela' | 'saldoPenyertaan' | 'registeredAt'>) => {
+    const targetEmail = (memberData.email || '').toLowerCase().trim();
+    const isDuplicate = members.some(m => {
+      const existingEmail = (m.email || '').toLowerCase().trim();
+      const emailMatch = targetEmail && existingEmail && (existingEmail === targetEmail);
+      const phoneMatch = m.noHp && memberData.noHp && arePhonesMatching(m.noHp, memberData.noHp);
+      return emailMatch || phoneMatch;
+    });
+
+    if (isDuplicate) {
+      alert("⚠️ Gagal: Email atau No. HP sudah terdaftar di sistem. Silakan login atau hubungi pengurus.");
+      return;
+    }
+
     const newMember: Member = {
       ...memberData,
       id: `member-${Date.now()}`,
@@ -711,6 +744,19 @@ export default function App() {
   };
 
   const handleAddMember = (memberData: any) => {
+    const targetEmail = (memberData.email || '').toLowerCase().trim();
+    const isDuplicate = members.some(m => {
+      const existingEmail = (m.email || '').toLowerCase().trim();
+      const emailMatch = targetEmail && existingEmail && (existingEmail === targetEmail);
+      const phoneMatch = m.noHp && memberData.noHp && arePhonesMatching(m.noHp, memberData.noHp);
+      return emailMatch || phoneMatch;
+    });
+
+    if (isDuplicate) {
+      alert("⚠️ Gagal: Email atau No. HP anggota tersebut sudah terdaftar di sistem.");
+      return;
+    }
+
     const { noAnggota, noRekening } = generateUniqueNoAnggota(members);
     
     const newMember: Member = {
