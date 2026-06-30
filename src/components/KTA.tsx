@@ -53,7 +53,7 @@ export const KTA: React.FC<KTAProps> = ({ member, settings }) => {
               />
             </div>
             <div>
-              <h2 className="text-[12px] font-black uppercase tracking-wider leading-none text-yellow-400">KOPERASI JASA KSU MPS</h2>
+              <h2 className="text-[12px] font-black uppercase tracking-wider leading-none text-yellow-400">KOPERASI MPS</h2>
               <p className="text-[7px] text-slate-300">Badan Hukum: {settings.noIjinPendirian}</p>
             </div>
           </div>

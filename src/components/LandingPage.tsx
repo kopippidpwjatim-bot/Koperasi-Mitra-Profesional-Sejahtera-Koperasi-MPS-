@@ -295,7 +295,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 {[
                   { icon: <Users className="text-blue-900 w-6 h-6" />, val: "1.250+", lbl: "Anggota Aktif", desc: "Pensiunan Se-Jatim" },
                   { icon: <Building2 className="text-[#dca415] w-6 h-6" />, val: "38 Kota", lbl: "Kabupaten/Kota", desc: "Koordinasi Wilayah" },
-                  { icon: <FileText className="text-blue-900 w-6 h-6" />, val: "4 Unit", lbl: "Unit Usaha KSU", desc: "Simpan Pinjam, Swalayan, Kargo" },
+                  { icon: <FileText className="text-blue-900 w-6 h-6" />, val: "4 Unit", lbl: "Unit Usaha ", desc: "Simpan Pinjam, Swalayan, Kargo" },
                   { icon: <ShieldCheck className="text-green-600 w-6 h-6" />, val: "Legal", lbl: "Kemenkop RI", desc: "AHU Legal Terdaftar" }
                 ].map((m, idx) => (
                   <div key={idx} className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs flex flex-col items-center text-center space-y-2">

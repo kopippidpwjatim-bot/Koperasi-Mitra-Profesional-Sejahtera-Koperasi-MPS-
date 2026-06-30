@@ -115,7 +115,7 @@ export const DashboardKetua: React.FC<DashboardKetuaProps> = ({
       <div className="flex border-b border-slate-200 bg-white p-2.5 rounded-xl border flex-wrap gap-1.5 mb-6 shadow-xs">
         {[
           { id: 'otoritas', lbl: 'Persetujuan Biaya Pengeluaran (Beban Kas)', icon: <ShieldCheck className="w-4 h-4" /> },
-          { id: 'laporan', lbl: 'Neraca Keuangan & Unit Usaha KSU', icon: <FileSpreadsheet className="w-4 h-4" /> },
+          { id: 'laporan', lbl: 'Neraca Keuangan & Unit Usaha ', icon: <FileSpreadsheet className="w-4 h-4" /> },
           { id: 'kop_preview', lbl: 'Kop Surat & Cetak PDF', icon: <Printer className="w-4 h-4" /> }
         ].map((tab) => (
           <button

@@ -231,7 +231,7 @@ export const DEFAULT_TRANSACTIONS: Transaction[] = [
     sumberTujuan: "Nota Dana Masuk",
     deskripsi: "Pendapatan Usaha Penjualan Sembako Swalayan Periode Mei 2026",
     noRekening: "8881239901",
-    namaBankPemilik: "Bank Jatim - Giro KSU Koperasi MPS Jatim",
+    namaBankPemilik: "Bank Jatim - Giro Koperasi MPS Jatim",
     jumlahMasuk: 4500000,
     jumlahKeluar: 0,
     saldoAkhir: 600000,

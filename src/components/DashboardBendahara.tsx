@@ -257,7 +257,7 @@ export const DashboardBendahara: React.FC<DashboardBendaharaProps> = ({
         {[
           { id: 'jurnal', lbl: 'Entry Jurnal Masuk & Keluar', icon: <Banknote className="w-4 h-4" /> },
           { id: 'iuran', lbl: 'Input Kartu Iuran Anggota', icon: <ChevronRight className="w-4 h-4" /> },
-          { id: 'laporan', lbl: 'Detail Ringkasan Buku Kas KSU', icon: <FileText className="w-4 h-4" /> }
+          { id: 'laporan', lbl: 'Detail Ringkasan Buku Kas ', icon: <FileText className="w-4 h-4" /> }
         ].map((tab) => (
           <button
             key={tab.id}
