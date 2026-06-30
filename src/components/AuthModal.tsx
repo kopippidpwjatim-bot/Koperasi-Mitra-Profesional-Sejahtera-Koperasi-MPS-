@@ -157,6 +157,34 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       return;
     }
 
+    // Check if email or phone number is already registered
+    const normalizeIndoPhone = (phoneStr: string): string => {
+      if (!phoneStr) return '';
+      let cleaned = phoneStr.replace(/[^0-9]/g, '');
+      if (cleaned.startsWith('62')) {
+        cleaned = '0' + cleaned.slice(2);
+      }
+      return cleaned;
+    };
+
+    const targetEmail = (email || '').toLowerCase().trim();
+    const targetPhone = normalizeIndoPhone(noHp || '');
+
+    const isDuplicate = members.some(m => {
+      const existingEmail = (m.email || '').toLowerCase().trim();
+      const existingPhone = normalizeIndoPhone(m.noHp || '');
+      
+      const emailMatch = targetEmail && existingEmail && (existingEmail === targetEmail);
+      const phoneMatch = targetPhone && existingPhone && (existingPhone === targetPhone);
+      
+      return emailMatch || phoneMatch;
+    });
+
+    if (isDuplicate) {
+      alert("coba periksa kembali, email atau no hp sudah pernah digunakan untuk mendaftar, hubungi admin bila lupa password");
+      return;
+    }
+
     onRegister({
       ...registerForm,
       role: 'anggota',
