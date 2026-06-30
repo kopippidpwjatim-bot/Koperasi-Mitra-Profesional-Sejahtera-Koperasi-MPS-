@@ -1,5 +1,6 @@
 import React from 'react';
 import { Member, CooperativeSettings } from '../types';
+import { DEFAULT_LOGO_SVG } from '../data/defaultData';
 
 interface KTAProps {
   member: Member;
@@ -44,11 +45,11 @@ export const KTA: React.FC<KTAProps> = ({ member, settings }) => {
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 bg-white rounded-full p-0.5 flex-shrink-0 flex items-center justify-center overflow-hidden">
               <img 
-                src={settings.logo} 
+                src={settings?.logo || DEFAULT_LOGO_SVG} 
                 alt="Logo Koperasi MPS" 
                 className="w-full h-full object-contain"
                 onError={(e) => {
-                  (e.target as HTMLImageElement).onerror = null;
+                  (e.target as HTMLImageElement).src = DEFAULT_LOGO_SVG;
                 }}
               />
             </div>
@@ -107,7 +108,14 @@ export const KTA: React.FC<KTAProps> = ({ member, settings }) => {
             <div className="flex items-center justify-between border-b border-slate-800 pb-2">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 bg-white rounded-full p-0.5 flex items-center justify-center">
-                  <img src={settings.logo} className="w-full h-full object-contain" alt="Logo mini" />
+                  <img 
+                    src={settings?.logo || DEFAULT_LOGO_SVG} 
+                    className="w-full h-full object-contain" 
+                    alt="Logo mini"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = DEFAULT_LOGO_SVG;
+                    }}
+                  />
                 </div>
                 <span className="text-[11px] font-bold tracking-wider uppercase text-yellow-400">KETENTUAN KARTU ANGGOTA</span>
               </div>
